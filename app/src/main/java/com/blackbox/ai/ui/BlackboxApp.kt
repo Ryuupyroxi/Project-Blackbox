@@ -234,7 +234,7 @@ fun LlamaApp(
                                         "videogen_img2vid" -> Screen.VideoGen.route
                                         else -> targetId
                                     }
-                                    com.example.llamadroid.data.SharedFileHolder.setPendingFile(data.uri, data.mimeType, targetId)
+                                    com.blackbox.ai.data.SharedFileHolder.setPendingFile(data.uri, data.mimeType, targetId)
                                     navController.navigate(route)
                                 }
                                 pendingShareData = null
@@ -494,7 +494,7 @@ fun LlamaApp(
                 )
             ) { backStackEntry ->
                 val projectId = backStackEntry.arguments?.getLong("projectId") ?: 0L
-                com.example.llamadroid.ui.dataset.DatasetProjectScreen(navController, projectId)
+                com.blackbox.ai.ui.dataset.DatasetProjectScreen(navController, projectId)
             }
             // Termux SSH
             composable(Screen.Termux.route) { TermuxScreen(navController) }
@@ -520,12 +520,12 @@ fun LlamaApp(
             
             // FastSD Gallery
             composable(Screen.FastsdGallery.route) {
-                com.example.llamadroid.ui.ai.FastsdGalleryScreen(navController)
+                com.blackbox.ai.ui.ai.FastsdGalleryScreen(navController)
             }
             
             // AI Agent
             composable(Screen.Agent.route) {
-                com.example.llamadroid.ui.agent.AgentScreen(navController)
+                com.blackbox.ai.ui.agent.AgentScreen(navController)
             }
             
             // Tama Farming
@@ -544,7 +544,7 @@ fun LlamaApp(
                 }
                 
                 val currentPet = pet!!  // Safe: already checked pet != null above
-                com.example.llamadroid.tama.ui.FarmScreen(
+                com.blackbox.ai.tama.ui.FarmScreen(
                     pet = currentPet,
                     gameEngine = tamaGameEngine,
                     farmRepository = farmRepository,
@@ -555,7 +555,7 @@ fun LlamaApp(
             composable(Screen.Barn.route) {
                 val pet by tamaGameEngine.pet.collectAsState()
                 pet?.let { currentPet ->
-                    com.example.llamadroid.tama.ui.BarnScreen(
+                    com.blackbox.ai.tama.ui.BarnScreen(
                         pet = currentPet,
                         gameEngine = tamaGameEngine,
                         farmRepository = farmRepository,
@@ -567,7 +567,7 @@ fun LlamaApp(
             composable(Screen.Coop.route) {
                 val pet by tamaGameEngine.pet.collectAsState()
                 pet?.let { currentPet ->
-                    com.example.llamadroid.tama.ui.ChickenCoopScreen(
+                    com.blackbox.ai.tama.ui.ChickenCoopScreen(
                         pet = currentPet,
                         gameEngine = tamaGameEngine,
                         farmRepository = farmRepository,
@@ -578,15 +578,15 @@ fun LlamaApp(
             
             // Ollama Manager
             composable(Screen.OllamaManager.route) {
-                com.example.llamadroid.ui.ai.ollama.OllamaManagerScreen(navController)
+                com.blackbox.ai.ui.ai.ollama.OllamaManagerScreen(navController)
             }
             
             // Native Llama Client
             composable(Screen.LlamaServerList.route) {
-                com.example.llamadroid.ui.ai.llama.LlamaServerListScreen(navController)
+                com.blackbox.ai.ui.ai.llama.LlamaServerListScreen(navController)
             }
             composable(Screen.LlamaChatList.route) {
-                com.example.llamadroid.ui.ai.llama.LlamaChatListScreen(navController)
+                com.blackbox.ai.ui.ai.llama.LlamaChatListScreen(navController)
             }
             composable(
                 route = Screen.LlamaChatList.folderRoute,
@@ -595,13 +595,13 @@ fun LlamaApp(
                 )
             ) { backStackEntry ->
                 val folderId = backStackEntry.arguments?.getLong("folderId")
-                com.example.llamadroid.ui.ai.llama.LlamaChatListScreen(
+                com.blackbox.ai.ui.ai.llama.LlamaChatListScreen(
                     navController = navController,
                     initialFolderId = folderId
                 )
             }
             composable(Screen.LlamaScheduler.route) {
-                com.example.llamadroid.ui.ai.llama.LlamaSchedulerScreen(navController)
+                com.blackbox.ai.ui.ai.llama.LlamaSchedulerScreen(navController)
             }
             composable(
                 route = Screen.LlamaChat.route,
@@ -612,7 +612,7 @@ fun LlamaApp(
             ) { backStackEntry ->
                 val chatId = backStackEntry.arguments?.getLong("chatId") ?: -1L
                 val serverId = backStackEntry.arguments?.getLong("serverId") ?: -1L
-                com.example.llamadroid.ui.ai.llama.LlamaChatScreen(navController, chatId, serverId)
+                com.blackbox.ai.ui.ai.llama.LlamaChatScreen(navController, chatId, serverId)
             }
             
             composable(Screen.Store.route) {
@@ -620,7 +620,7 @@ fun LlamaApp(
                 petState?.let { activePet ->
                     val farmUpgrades by farmRepository.observeUpgrades(activePet.id).collectAsState(initial = emptyList())
                     val livestock by farmRepository.observeLivestock(activePet.id).collectAsState(initial = emptyList())
-                    com.example.llamadroid.tama.ui.StoreScreen(
+                    com.blackbox.ai.tama.ui.StoreScreen(
                         pet = activePet,
                         farmRepository = farmRepository,
                         upgrades = farmUpgrades,
@@ -771,12 +771,12 @@ fun LlamaApp(
             
             // Agent Workspace File Manager
             composable(Screen.AgentWorkspace.route) {
-                com.example.llamadroid.ui.agent.AgentWorkspaceScreen(navController)
+                com.blackbox.ai.ui.agent.AgentWorkspaceScreen(navController)
             }
             
             // Tama virtual pet
             composable(Screen.Tama.route) {
-                com.example.llamadroid.tama.ui.TamaScreen(
+                com.blackbox.ai.tama.ui.TamaScreen(
                     navController = navController,
                     gameEngine = tamaGameEngine,
                     settingsRepo = settingsRepo,
@@ -796,7 +796,7 @@ fun LlamaApp(
                     }
                     return@composable
                 }
-                com.example.llamadroid.tama.ui.TamaGalleryScreen(
+                com.blackbox.ai.tama.ui.TamaGalleryScreen(
                     navController = navController,
                     gameEngine = tamaGameEngine,
                     pet = pet!!
@@ -814,7 +814,7 @@ fun LlamaApp(
                     }
                     return@composable
                 }
-                com.example.llamadroid.tama.ui.ArcadeScreen(
+                com.blackbox.ai.tama.ui.ArcadeScreen(
                     navController = navController,
                     gameEngine = tamaGameEngine,
                     pet = pet!!
@@ -832,7 +832,7 @@ fun LlamaApp(
             
             // Tama Dungeon/Adventure
             composable(Screen.Dungeon.route) {
-                com.example.llamadroid.tama.ui.DungeonScreen(
+                com.blackbox.ai.tama.ui.DungeonScreen(
                     navController = navController,
                     database = tamaDatabase,
                     settingsRepository = settingsRepo
@@ -846,7 +846,7 @@ fun LlamaApp(
                 )
             ) { backStackEntry ->
                 val dungeonTypeName = backStackEntry.arguments?.getString("dungeonType") ?: "CHAOS_REALM"
-                com.example.llamadroid.tama.ui.AdventureScreen(
+                com.blackbox.ai.tama.ui.AdventureScreen(
                     navController = navController,
                     dungeonTypeName = dungeonTypeName,
                     database = tamaDatabase,
@@ -855,17 +855,17 @@ fun LlamaApp(
             }
 
             composable(Screen.AdventureGate.route) {
-                com.example.llamadroid.tama.ui.AdventureGateScreen(
+                com.blackbox.ai.tama.ui.AdventureGateScreen(
                     navController = navController,
                     database = tamaDatabase
                 )
             }
 
             composable(Screen.NightArena.route) {
-                com.example.llamadroid.tama.ui.AdventureGateScreen(
+                com.blackbox.ai.tama.ui.AdventureGateScreen(
                     navController = navController,
                     database = tamaDatabase,
-                    mode = com.example.llamadroid.tama.ui.AdventureGateScreenMode.NIGHT_ARENA
+                    mode = com.blackbox.ai.tama.ui.AdventureGateScreenMode.NIGHT_ARENA
                 )
             }
         }

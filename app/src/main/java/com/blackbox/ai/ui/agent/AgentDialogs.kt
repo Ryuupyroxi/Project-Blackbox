@@ -165,7 +165,7 @@ fun SetupInfoDialog(onDismiss: () -> Unit) {
     }
 
     // Get available tools for Orchestrator
-    val tools = remember { com.example.llamadroid.service.AgentService.getAgentTools(com.example.llamadroid.service.AgentService.Companion.AgentRole.ORCHESTRATOR) }
+    val tools = remember { com.blackbox.ai.service.AgentService.getAgentTools(com.blackbox.ai.service.AgentService.Companion.AgentRole.ORCHESTRATOR) }
     
     Dialog(onDismissRequest = onDismiss) {
         Card(

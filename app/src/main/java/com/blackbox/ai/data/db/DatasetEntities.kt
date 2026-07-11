@@ -1,8 +1,8 @@
 package com.blackbox.ai.data.db
 
 import androidx.room.*
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.service.OllamaService
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.service.OllamaService
 
 /**
  * Dataset generation database entities

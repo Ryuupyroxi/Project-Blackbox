@@ -37,7 +37,7 @@ class ProjectExportService(
         outputUri: Uri
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
-            val db = com.example.llamadroid.data.db.AppDatabase.getDatabase(context)
+            val db = com.blackbox.ai.data.db.AppDatabase.getDatabase(context)
             
             // Get conversation data
             val conversation = db.agentChatDao().getConversation(conversationId)
@@ -127,7 +127,7 @@ class ProjectExportService(
         inputUri: Uri
     ): Result<Long> = withContext(Dispatchers.IO) {
         try {
-            val db = com.example.llamadroid.data.db.AppDatabase.getDatabase(context)
+            val db = com.blackbox.ai.data.db.AppDatabase.getDatabase(context)
             val bundle = readProjectBundle(inputUri)
             val metadata = bundle.metadata
             val importedMessages = bundle.messages
@@ -190,7 +190,7 @@ class ProjectExportService(
     }
 
     private suspend fun resolveMessagesForExport(
-        db: com.example.llamadroid.data.db.AppDatabase,
+        db: com.blackbox.ai.data.db.AppDatabase,
         conversationId: Long
     ): List<AgentService.Companion.ChatMessage> {
         if (AgentService.activeConversationId.value == conversationId) {

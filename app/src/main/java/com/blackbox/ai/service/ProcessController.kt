@@ -1,8 +1,8 @@
 package com.blackbox.ai.service
 
 import android.util.Log
-import com.example.llamadroid.LlamaApplication
-import com.example.llamadroid.R
+import com.blackbox.ai.LlamaApplication
+import com.blackbox.ai.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,8 +11,8 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.DeviceAcceleration
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.DeviceAcceleration
 import kotlin.math.min
 
 data class ProcessRunResult(
@@ -584,7 +584,7 @@ class ProcessController {
     
     fun stop() {
         stoppedIntentionally = true
-        com.example.llamadroid.util.ProcessUtils.stopProcessSync(process)
+        com.blackbox.ai.util.ProcessUtils.stopProcessSync(process)
         process = null
     }
     

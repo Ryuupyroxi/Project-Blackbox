@@ -9,9 +9,9 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import com.example.llamadroid.R
-import com.example.llamadroid.data.proot.ProotManager
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.R
+import com.blackbox.ai.data.proot.ProotManager
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.*
 
 /**
@@ -23,10 +23,10 @@ class SDEnvironmentService : Service() {
         private const val NOTIFICATION_ID = 2001
         private const val CHANNEL_ID = "sd_environment_channel"
         
-        private const val ACTION_INSTALL = "com.example.llamadroid.action.INSTALL_A1111"
-        private const val ACTION_UNINSTALL = "com.example.llamadroid.action.UNINSTALL_A1111"
-        private const val ACTION_START_SERVER = "com.example.llamadroid.action.START_SD_SERVER"
-        private const val ACTION_STOP_SERVER = "com.example.llamadroid.action.STOP_SD_SERVER"
+        private const val ACTION_INSTALL = "com.blackbox.ai.action.INSTALL_A1111"
+        private const val ACTION_UNINSTALL = "com.blackbox.ai.action.UNINSTALL_A1111"
+        private const val ACTION_START_SERVER = "com.blackbox.ai.action.START_SD_SERVER"
+        private const val ACTION_STOP_SERVER = "com.blackbox.ai.action.STOP_SD_SERVER"
         
         fun startInstall(context: Context) {
             val intent = Intent(context, SDEnvironmentService::class.java).apply {

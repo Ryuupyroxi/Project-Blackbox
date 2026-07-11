@@ -1,7 +1,7 @@
 package com.blackbox.ai.service
 
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.LogEntry
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.LogEntry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 

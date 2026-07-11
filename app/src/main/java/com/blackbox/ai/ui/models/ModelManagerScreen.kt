@@ -471,8 +471,8 @@ fun InstalledTab(viewModel: ModelManagerViewModel) {
         
         // Edit Dialog
         if (showRenameDialog && modelToRename != null) {
-            val db = remember { com.example.llamadroid.data.db.AppDatabase.getDatabase(context) }
-            val settingsRepository = remember { com.example.llamadroid.data.SettingsRepository(context) }
+            val db = remember { com.blackbox.ai.data.db.AppDatabase.getDatabase(context) }
+            val settingsRepository = remember { com.blackbox.ai.data.SettingsRepository(context) }
             val selectedEmbeddingModelPath by settingsRepository.selectedEmbeddingModelPath.collectAsState()
             AlertDialog(
                 onDismissRequest = { showRenameDialog = false },
@@ -575,14 +575,14 @@ fun InstalledTab(viewModel: ModelManagerViewModel) {
                                             (useForKnowledgeEmbedding || selectedEmbeddingModelPath == model.path)
                                         ) {
                                             settingsRepository.setSelectedEmbeddingModelPath(finalPath)
-                                            com.example.llamadroid.data.repository.KnowledgeBaseRepository(context, db)
+                                            com.blackbox.ai.data.repository.KnowledgeBaseRepository(context, db)
                                                 .markIndexedSourcesStaleForCurrentConfig()
                                         } else if (
                                             editedModelType != ModelType.EMBEDDING &&
                                             selectedEmbeddingModelPath in listOf(model.path, finalPath)
                                         ) {
                                             settingsRepository.setSelectedEmbeddingModelPath(null)
-                                            com.example.llamadroid.data.repository.KnowledgeBaseRepository(context, db)
+                                            com.blackbox.ai.data.repository.KnowledgeBaseRepository(context, db)
                                                 .markIndexedSourcesStaleForCurrentConfig()
                                             withContext(Dispatchers.Main) {
                                                 android.widget.Toast.makeText(
@@ -898,7 +898,7 @@ private suspend fun importModel(
     sdCaps: String?
 ) {
     try {
-        val settingsRepo = com.example.llamadroid.data.SettingsRepository(context)
+        val settingsRepo = com.blackbox.ai.data.SettingsRepository(context)
         val modelStorageUri = settingsRepo.modelStorageUri.value
         val targetFilename = filename.ifBlank { "imported_model.gguf" }
         
@@ -947,7 +947,7 @@ private suspend fun importModel(
             }
         }
         finalPath = targetFile.absolutePath
-        com.example.llamadroid.util.DebugLog.log("[MODEL-IMPORT] Saved to: $finalPath")
+        com.blackbox.ai.util.DebugLog.log("[MODEL-IMPORT] Saved to: $finalPath")
         
         viewModel.importLocalModel(
             path = finalPath,
@@ -958,7 +958,7 @@ private suspend fun importModel(
             sdCapabilities = sdCaps
         )
     } catch (e: Exception) {
-        com.example.llamadroid.util.DebugLog.log("[MODEL-IMPORT] Error: ${e.message}")
+        com.blackbox.ai.util.DebugLog.log("[MODEL-IMPORT] Error: ${e.message}")
         e.printStackTrace()
     }
 }
@@ -976,7 +976,7 @@ private suspend fun importModelWithProgress(
     onComplete: () -> Unit
 ) {
     try {
-        val settingsRepo = com.example.llamadroid.data.SettingsRepository(context)
+        val settingsRepo = com.blackbox.ai.data.SettingsRepository(context)
         val modelStorageUri = settingsRepo.modelStorageUri.value
         val targetFilename = filename.ifBlank { "imported_model.gguf" }
         
@@ -1005,14 +1005,14 @@ private suspend fun importModelWithProgress(
         var didCopy = false
         
         // Check if we have "All files access" permission for direct path access
-        val hasAllFilesAccess = com.example.llamadroid.util.StoragePermissionHelper.hasAllFilesAccess()
+        val hasAllFilesAccess = com.blackbox.ai.util.StoragePermissionHelper.hasAllFilesAccess()
         
         // FIRST: Try to resolve SAF URI to a real file path (for SD card/external storage)
-        val directPath = com.example.llamadroid.util.FilePathResolver.getPathFromUri(context, uri)
+        val directPath = com.blackbox.ai.util.FilePathResolver.getPathFromUri(context, uri)
         
-        if (directPath != null && hasAllFilesAccess && com.example.llamadroid.util.FilePathResolver.isPathAccessible(directPath)) {
+        if (directPath != null && hasAllFilesAccess && com.blackbox.ai.util.FilePathResolver.isPathAccessible(directPath)) {
             // We can access the file directly! No copy needed.
-            com.example.llamadroid.util.DebugLog.log("[MODEL-IMPORT] Using direct path (no copy): $directPath")
+            com.blackbox.ai.util.DebugLog.log("[MODEL-IMPORT] Using direct path (no copy): $directPath")
             finalPath = directPath
             didCopy = false
             
@@ -1022,7 +1022,7 @@ private suspend fun importModelWithProgress(
         } else {
             // Check if direct path found but no permission
             if (directPath != null && !hasAllFilesAccess) {
-                com.example.llamadroid.util.DebugLog.log("[MODEL-IMPORT] Direct path available but missing 'All files access' permission, copying...")
+                com.blackbox.ai.util.DebugLog.log("[MODEL-IMPORT] Direct path available but missing 'All files access' permission, copying...")
                 kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                     android.widget.Toast.makeText(
                         context, 
@@ -1033,7 +1033,7 @@ private suspend fun importModelWithProgress(
             }
             
             // Fallback: Copy the file to app storage
-            com.example.llamadroid.util.DebugLog.log("[MODEL-IMPORT] Direct path not available, copying file...")
+            com.blackbox.ai.util.DebugLog.log("[MODEL-IMPORT] Direct path not available, copying file...")
             
             // Use app's external files directory if enabled, otherwise internal
             val useExternalStorage = modelStorageUri != null
@@ -1056,7 +1056,7 @@ private suspend fun importModelWithProgress(
                 it.length 
             } ?: 0L
             
-            com.example.llamadroid.util.DebugLog.log("[MODEL-IMPORT] Starting copy: $filename (${fileSize / (1024*1024)} MB)")
+            com.blackbox.ai.util.DebugLog.log("[MODEL-IMPORT] Starting copy: $filename (${fileSize / (1024*1024)} MB)")
             
             // Copy with progress tracking
             context.contentResolver.openInputStream(uri)?.use { input ->
@@ -1088,7 +1088,7 @@ private suspend fun importModelWithProgress(
             
             finalPath = targetFile.absolutePath
             didCopy = true
-            com.example.llamadroid.util.DebugLog.log("[MODEL-IMPORT] Saved to: $finalPath")
+            com.blackbox.ai.util.DebugLog.log("[MODEL-IMPORT] Saved to: $finalPath")
             
             // Final progress update
             kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
@@ -1100,13 +1100,13 @@ private suspend fun importModelWithProgress(
         var layerCount = 0
         if (type == ModelType.LLM && finalPath.endsWith(".gguf")) {
             try {
-                val modelInfo = com.example.llamadroid.util.GGUFParser.parse(finalPath)
+                val modelInfo = com.blackbox.ai.util.GGUFParser.parse(finalPath)
                 if (modelInfo != null) {
                     layerCount = modelInfo.layerCount
-                    com.example.llamadroid.util.DebugLog.log("[MODEL-IMPORT] Detected $layerCount layers from GGUF")
+                    com.blackbox.ai.util.DebugLog.log("[MODEL-IMPORT] Detected $layerCount layers from GGUF")
                 }
             } catch (e: Exception) {
-                com.example.llamadroid.util.DebugLog.log("[MODEL-IMPORT] Failed to parse GGUF for layers: ${e.message}")
+                com.blackbox.ai.util.DebugLog.log("[MODEL-IMPORT] Failed to parse GGUF for layers: ${e.message}")
             }
         }
         
@@ -1130,7 +1130,7 @@ private suspend fun importModelWithProgress(
             }
         }
     } catch (e: Exception) {
-        com.example.llamadroid.util.DebugLog.log("[MODEL-IMPORT] Error: ${e.message}")
+        com.blackbox.ai.util.DebugLog.log("[MODEL-IMPORT] Error: ${e.message}")
         e.printStackTrace()
     } finally {
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
@@ -1208,11 +1208,11 @@ fun DownloadingTab(viewModel: ModelManagerViewModel) {
                             // Cancel button
                             IconButton(
                                 onClick = { 
-                                    val filename = com.example.llamadroid.data.model.DownloadProgressHolder.getFilename(repoId)
+                                    val filename = com.blackbox.ai.data.model.DownloadProgressHolder.getFilename(repoId)
                                     if (filename != null) {
                                         Downloader.cancelDownload(filename)
                                     }
-                                    com.example.llamadroid.data.model.DownloadProgressHolder.removeProgress(repoId)
+                                    com.blackbox.ai.data.model.DownloadProgressHolder.removeProgress(repoId)
                                 }
                             ) {
                                 Icon(

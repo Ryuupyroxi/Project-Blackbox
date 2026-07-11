@@ -1,8 +1,8 @@
 package com.blackbox.ai.service
 
 import android.content.Context
-import com.example.llamadroid.data.db.AiRuntimeJobEntity
-import com.example.llamadroid.data.db.AppDatabase
+import com.blackbox.ai.data.db.AiRuntimeJobEntity
+import com.blackbox.ai.data.db.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

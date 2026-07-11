@@ -84,40 +84,40 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.llamadroid.R
-import com.example.llamadroid.tama.db.TamaDatabase
-import com.example.llamadroid.tama.data.FarmTradeItemCatalog
-import com.example.llamadroid.tama.data.InventoryItem
-import com.example.llamadroid.tama.data.TamaDialogTextCatalog
-import com.example.llamadroid.tama.game.PetMapper
-import com.example.llamadroid.tama.rpg.AdventureGateBattleEvent
-import com.example.llamadroid.tama.rpg.AdventureGateBattleEventType
-import com.example.llamadroid.tama.rpg.AdventureGateBattleLogEntry
-import com.example.llamadroid.tama.rpg.AdventureGateBattleSnapshot
-import com.example.llamadroid.tama.rpg.AdventureGateCatalog
-import com.example.llamadroid.tama.rpg.AdventureGateCombatantState
-import com.example.llamadroid.tama.rpg.AdventureGateCombatEngine
-import com.example.llamadroid.tama.rpg.AdventureGateElement
-import com.example.llamadroid.tama.rpg.AdventureGateEquipmentDefinition
-import com.example.llamadroid.tama.rpg.AdventureGateEquipmentSlot
-import com.example.llamadroid.tama.rpg.AdventureGateLogMessage
-import com.example.llamadroid.tama.rpg.AdventureGateNightArenaRun
-import com.example.llamadroid.tama.rpg.AdventureGatePhaseDefinition
-import com.example.llamadroid.tama.rpg.AdventureGateProfile
-import com.example.llamadroid.tama.rpg.AdventureGatePotionUseError
-import com.example.llamadroid.tama.rpg.AdventureGateRepository
-import com.example.llamadroid.tama.rpg.AdventureGateRecipeDefinition
-import com.example.llamadroid.tama.rpg.AdventureGateStatusEffect
-import com.example.llamadroid.tama.rpg.AdventureGateSupplyDefinition
-import com.example.llamadroid.tama.rpg.AdventureGateSupplyKind
-import com.example.llamadroid.tama.rpg.AdventureGateSkillTreePath
-import com.example.llamadroid.tama.rpg.AdventureGateSkillKind
-import com.example.llamadroid.tama.rpg.AdventureGateSkillDefinition
-import com.example.llamadroid.tama.rpg.AdventureGateSkillPurchaseError
-import com.example.llamadroid.tama.rpg.AdventureGateWorldDefinition
-import com.example.llamadroid.tama.rpg.AdventureGateWorldProgress
-import com.example.llamadroid.tama.rpg.NightArenaGenerator
-import com.example.llamadroid.tama.rpg.NightArenaLevel
+import com.blackbox.ai.R
+import com.blackbox.ai.tama.db.TamaDatabase
+import com.blackbox.ai.tama.data.FarmTradeItemCatalog
+import com.blackbox.ai.tama.data.InventoryItem
+import com.blackbox.ai.tama.data.TamaDialogTextCatalog
+import com.blackbox.ai.tama.game.PetMapper
+import com.blackbox.ai.tama.rpg.AdventureGateBattleEvent
+import com.blackbox.ai.tama.rpg.AdventureGateBattleEventType
+import com.blackbox.ai.tama.rpg.AdventureGateBattleLogEntry
+import com.blackbox.ai.tama.rpg.AdventureGateBattleSnapshot
+import com.blackbox.ai.tama.rpg.AdventureGateCatalog
+import com.blackbox.ai.tama.rpg.AdventureGateCombatantState
+import com.blackbox.ai.tama.rpg.AdventureGateCombatEngine
+import com.blackbox.ai.tama.rpg.AdventureGateElement
+import com.blackbox.ai.tama.rpg.AdventureGateEquipmentDefinition
+import com.blackbox.ai.tama.rpg.AdventureGateEquipmentSlot
+import com.blackbox.ai.tama.rpg.AdventureGateLogMessage
+import com.blackbox.ai.tama.rpg.AdventureGateNightArenaRun
+import com.blackbox.ai.tama.rpg.AdventureGatePhaseDefinition
+import com.blackbox.ai.tama.rpg.AdventureGateProfile
+import com.blackbox.ai.tama.rpg.AdventureGatePotionUseError
+import com.blackbox.ai.tama.rpg.AdventureGateRepository
+import com.blackbox.ai.tama.rpg.AdventureGateRecipeDefinition
+import com.blackbox.ai.tama.rpg.AdventureGateStatusEffect
+import com.blackbox.ai.tama.rpg.AdventureGateSupplyDefinition
+import com.blackbox.ai.tama.rpg.AdventureGateSupplyKind
+import com.blackbox.ai.tama.rpg.AdventureGateSkillTreePath
+import com.blackbox.ai.tama.rpg.AdventureGateSkillKind
+import com.blackbox.ai.tama.rpg.AdventureGateSkillDefinition
+import com.blackbox.ai.tama.rpg.AdventureGateSkillPurchaseError
+import com.blackbox.ai.tama.rpg.AdventureGateWorldDefinition
+import com.blackbox.ai.tama.rpg.AdventureGateWorldProgress
+import com.blackbox.ai.tama.rpg.NightArenaGenerator
+import com.blackbox.ai.tama.rpg.NightArenaLevel
 import java.text.DateFormat
 import java.util.Date
 import kotlinx.coroutines.delay
@@ -518,7 +518,7 @@ fun AdventureGateScreen(
 @Composable
 private fun AdventureGateHub(
     profile: AdventureGateProfile,
-    pet: com.example.llamadroid.tama.data.TamaPet,
+    pet: com.blackbox.ai.tama.data.TamaPet,
     progressRows: List<AdventureGateWorldProgress>,
     selectedWorldId: String,
     onSelectWorld: (AdventureGateWorldDefinition) -> Unit,
@@ -600,7 +600,7 @@ private fun NightArenaLockedInfo() {
 @Composable
 private fun NightArenaHub(
     profile: AdventureGateProfile,
-    pet: com.example.llamadroid.tama.data.TamaPet,
+    pet: com.blackbox.ai.tama.data.TamaPet,
     run: AdventureGateNightArenaRun?,
     nowMillis: Long,
     onOpenLoadout: () -> Unit,
@@ -1153,7 +1153,7 @@ private fun AdventureGateLoadoutDialog(
 @Composable
 private fun AdventureGateShopDialog(
     profile: AdventureGateProfile,
-    pet: com.example.llamadroid.tama.data.TamaPet,
+    pet: com.blackbox.ai.tama.data.TamaPet,
     inventory: List<InventoryItem>,
     money: Long,
     progressRows: List<AdventureGateWorldProgress>,
@@ -1793,7 +1793,7 @@ private fun GearClosetLauncher(
 @Composable
 private fun GearClosetDialog(
     profile: AdventureGateProfile,
-    pet: com.example.llamadroid.tama.data.TamaPet,
+    pet: com.blackbox.ai.tama.data.TamaPet,
     inventory: List<InventoryItem>,
     onDismiss: () -> Unit,
     onEquipEquipment: (String, AdventureGateEquipmentSlot) -> Unit,
@@ -1994,7 +1994,7 @@ private fun GearClosetDialog(
 
 @Composable
 private fun GearClosetPetPanel(
-    pet: com.example.llamadroid.tama.data.TamaPet,
+    pet: com.blackbox.ai.tama.data.TamaPet,
     profile: AdventureGateProfile,
     selectedSlot: AdventureGateEquipmentSlot,
     onSelectSlot: (AdventureGateEquipmentSlot) -> Unit
@@ -2138,8 +2138,8 @@ private fun GearClosetSlotSocket(
 
 @Composable
 private fun GearClosetStatsPanel(
-    current: com.example.llamadroid.tama.rpg.AdventureGateStats,
-    preview: com.example.llamadroid.tama.rpg.AdventureGateStats,
+    current: com.blackbox.ai.tama.rpg.AdventureGateStats,
+    preview: com.blackbox.ai.tama.rpg.AdventureGateStats,
     currentHp: Int,
     currentMana: Int,
     shield: AdventureGateEquipmentDefinition?
@@ -2605,7 +2605,7 @@ private fun PhaseNode(
 private fun AdventureGateBattleView(
     battle: AdventureGateBattleSnapshot,
     profile: AdventureGateProfile,
-    pet: com.example.llamadroid.tama.data.TamaPet,
+    pet: com.blackbox.ai.tama.data.TamaPet,
     repository: AdventureGateRepository,
     onCloseBattle: () -> Unit
 ) {
@@ -2935,7 +2935,7 @@ private fun AdventureGateBattleView(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 onToggleExpanded = { actionsExpanded = !actionsExpanded },
                 onOpenItems = {
-                    if (!locked && battle.turn == com.example.llamadroid.tama.rpg.AdventureGateTurn.PET) {
+                    if (!locked && battle.turn == com.blackbox.ai.tama.rpg.AdventureGateTurn.PET) {
                         actionsExpanded = false
                         showItemsDialog = true
                     }
@@ -2951,15 +2951,15 @@ private fun AdventureGateBattleView(
                     scope.launch {
                         val livingMinion = battle.minion?.takeIf { it.isAlive }
                         val targetForSkill = when (skill.targetMode) {
-                            com.example.llamadroid.tama.rpg.AdventureGateTargetMode.SINGLE_ENEMY ->
+                            com.blackbox.ai.tama.rpg.AdventureGateTargetMode.SINGLE_ENEMY ->
                                 selectedTargetId
                                     ?.takeIf { id -> battle.enemies.any { it.instanceId == id && it.isAlive } }
                                     ?: battle.enemies.firstOrNull { it.isAlive }?.instanceId
-                            com.example.llamadroid.tama.rpg.AdventureGateTargetMode.SINGLE_ALLY ->
+                            com.blackbox.ai.tama.rpg.AdventureGateTargetMode.SINGLE_ALLY ->
                                 selectedTargetId
                                     ?.takeIf { id -> livingMinion?.instanceId == id }
                                     ?: battle.pet.instanceId
-                            com.example.llamadroid.tama.rpg.AdventureGateTargetMode.SELF -> battle.pet.instanceId
+                            com.blackbox.ai.tama.rpg.AdventureGateTargetMode.SELF -> battle.pet.instanceId
                         }
                         val petResult = repository.performSkill(battle.petId, skill.id, targetForSkill)
                         if (petResult != null) {
@@ -3107,7 +3107,7 @@ private fun BattleWaveChip(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ArenaPetCard(
-    pet: com.example.llamadroid.tama.data.TamaPet,
+    pet: com.blackbox.ai.tama.data.TamaPet,
     combatant: AdventureGateCombatantState,
     active: Boolean,
     damagePopup: DamagePopup?,
@@ -3458,9 +3458,9 @@ private fun StatusPanel(battle: AdventureGateBattleSnapshot) {
                     stringResource(R.string.adventure_gate_turn),
                     stringResource(
                         when (battle.turn) {
-                            com.example.llamadroid.tama.rpg.AdventureGateTurn.PET -> R.string.adventure_gate_turn_pet
-                            com.example.llamadroid.tama.rpg.AdventureGateTurn.ENEMY -> R.string.adventure_gate_turn_enemy
-                            com.example.llamadroid.tama.rpg.AdventureGateTurn.COMPLETE -> R.string.adventure_gate_turn_complete
+                            com.blackbox.ai.tama.rpg.AdventureGateTurn.PET -> R.string.adventure_gate_turn_pet
+                            com.blackbox.ai.tama.rpg.AdventureGateTurn.ENEMY -> R.string.adventure_gate_turn_enemy
+                            com.blackbox.ai.tama.rpg.AdventureGateTurn.COMPLETE -> R.string.adventure_gate_turn_complete
                         }
                     ),
                     GateBlue
@@ -3604,7 +3604,7 @@ private fun SkillActionDock(
                     )
                     OutlinedButton(
                         onClick = onOpenItems,
-                        enabled = !locked && battle.turn == com.example.llamadroid.tama.rpg.AdventureGateTurn.PET && supplyCount > 0,
+                        enabled = !locked && battle.turn == com.blackbox.ai.tama.rpg.AdventureGateTurn.PET && supplyCount > 0,
                         modifier = Modifier.fillMaxWidth().height(48.dp),
                         border = BorderStroke(1.dp, GateBlue.copy(alpha = 0.7f)),
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp)
@@ -3719,12 +3719,12 @@ private fun skillDisabled(
 ): Boolean =
     battle.isCompleted ||
         locked ||
-        battle.turn != com.example.llamadroid.tama.rpg.AdventureGateTurn.PET ||
+        battle.turn != com.blackbox.ai.tama.rpg.AdventureGateTurn.PET ||
         battle.pet.mana < skill.manaCost ||
         (skill.kind == AdventureGateSkillKind.SUMMON && battle.minion?.isAlive == true) ||
         (AdventureGateCatalog.consumesGuardUse(skill.id) && battle.guardUses >= AdventureGateCatalog.BATTLE_GUARD_LIMIT) ||
         (battle.skillCooldowns[skill.id] ?: 0) > 0 ||
-        (skill.targetMode == com.example.llamadroid.tama.rpg.AdventureGateTargetMode.SINGLE_ENEMY && selectedTargetId == null)
+        (skill.targetMode == com.blackbox.ai.tama.rpg.AdventureGateTargetMode.SINGLE_ENEMY && selectedTargetId == null)
 
 @Composable
 private fun BattleItemDialog(
@@ -4321,7 +4321,7 @@ private fun HelperInspectDialog(
 
 @Composable
 private fun PetInspectDialog(
-    pet: com.example.llamadroid.tama.data.TamaPet,
+    pet: com.blackbox.ai.tama.data.TamaPet,
     profile: AdventureGateProfile,
     combatant: AdventureGateCombatantState,
     onDismiss: () -> Unit
@@ -4880,10 +4880,10 @@ private fun skillKindNameRes(kind: AdventureGateSkillKind): Int = when (kind) {
     AdventureGateSkillKind.SUMMON -> R.string.adventure_gate_skill_kind_summon
 }
 
-private fun targetModeNameRes(targetMode: com.example.llamadroid.tama.rpg.AdventureGateTargetMode): Int = when (targetMode) {
-    com.example.llamadroid.tama.rpg.AdventureGateTargetMode.SINGLE_ENEMY -> R.string.adventure_gate_skill_target_enemy
-    com.example.llamadroid.tama.rpg.AdventureGateTargetMode.SINGLE_ALLY -> R.string.adventure_gate_skill_target_ally
-    com.example.llamadroid.tama.rpg.AdventureGateTargetMode.SELF -> R.string.adventure_gate_skill_target_self
+private fun targetModeNameRes(targetMode: com.blackbox.ai.tama.rpg.AdventureGateTargetMode): Int = when (targetMode) {
+    com.blackbox.ai.tama.rpg.AdventureGateTargetMode.SINGLE_ENEMY -> R.string.adventure_gate_skill_target_enemy
+    com.blackbox.ai.tama.rpg.AdventureGateTargetMode.SINGLE_ALLY -> R.string.adventure_gate_skill_target_ally
+    com.blackbox.ai.tama.rpg.AdventureGateTargetMode.SELF -> R.string.adventure_gate_skill_target_self
 }
 
 private fun statusDamageColor(statusId: String?): Color = when (statusId) {

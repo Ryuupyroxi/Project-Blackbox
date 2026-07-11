@@ -2,10 +2,10 @@ package com.blackbox.ai.service
 
 import android.content.Context
 import android.content.Intent
-import com.example.llamadroid.data.db.AiRuntimeJobEntity
-import com.example.llamadroid.tama.notifications.TamaNotificationScheduler
-import com.example.llamadroid.ui.navigation.Screen
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.data.db.AiRuntimeJobEntity
+import com.blackbox.ai.tama.notifications.TamaNotificationScheduler
+import com.blackbox.ai.ui.navigation.Screen
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

@@ -31,17 +31,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
-import com.example.llamadroid.R
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.ModelType
-import com.example.llamadroid.onnx.OnnxCatalogProvider
-import com.example.llamadroid.onnx.isOnnxTxt2ImgBundle
-import com.example.llamadroid.onnx.isTamaDefaultPicGenModel
-import com.example.llamadroid.onnx.resolveOnnxCatalogEntry
-import com.example.llamadroid.service.RemoteSummaryBackendConfig
-import com.example.llamadroid.service.RemoteSummaryClientFactory
-import com.example.llamadroid.service.RemoteSummaryMetadata
+import com.blackbox.ai.R
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.ModelType
+import com.blackbox.ai.onnx.OnnxCatalogProvider
+import com.blackbox.ai.onnx.isOnnxTxt2ImgBundle
+import com.blackbox.ai.onnx.isTamaDefaultPicGenModel
+import com.blackbox.ai.onnx.resolveOnnxCatalogEntry
+import com.blackbox.ai.service.RemoteSummaryBackendConfig
+import com.blackbox.ai.service.RemoteSummaryClientFactory
+import com.blackbox.ai.service.RemoteSummaryMetadata
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -52,28 +52,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.TextUnit
 import coil.compose.AsyncImage
-import com.example.llamadroid.tama.data.*
-import com.example.llamadroid.tama.db.TamaArtworkEntity
-import com.example.llamadroid.tama.db.TamaDatabase
-import com.example.llamadroid.tama.db.TamaQuestChecklistItemEntity
-import com.example.llamadroid.tama.db.TamaStudyLabelEntity
-import com.example.llamadroid.tama.db.TamaStudySessionEntity
-import com.example.llamadroid.tama.game.TamaAgentService
-import com.example.llamadroid.tama.game.TamaArtworkManager
-import com.example.llamadroid.tama.game.TamaDailyDreamManager
-import com.example.llamadroid.tama.game.TamaGameEngine
-import com.example.llamadroid.tama.game.TamaStudySessionSupport
-import com.example.llamadroid.tama.rpg.AdventureGateCatalog
-import com.example.llamadroid.tama.rpg.AdventureGateProfile
-import com.example.llamadroid.tama.rpg.AdventureGateRepository
-import com.example.llamadroid.tama.rpg.AdventureGateSupplyDefinition
-import com.example.llamadroid.tama.rpg.AdventureGateSupplyKind
-import com.example.llamadroid.tama.rpg.NightArenaGenerator
-import com.example.llamadroid.ui.components.DraftIntTextField
-import com.example.llamadroid.ui.components.pressAndHoldRepeat
-import com.example.llamadroid.ui.components.RemoteSummaryBackendEditor
-import com.example.llamadroid.ui.components.rememberPressAndHoldRepeatState
-import com.example.llamadroid.ui.navigation.Screen
+import com.blackbox.ai.tama.data.*
+import com.blackbox.ai.tama.db.TamaArtworkEntity
+import com.blackbox.ai.tama.db.TamaDatabase
+import com.blackbox.ai.tama.db.TamaQuestChecklistItemEntity
+import com.blackbox.ai.tama.db.TamaStudyLabelEntity
+import com.blackbox.ai.tama.db.TamaStudySessionEntity
+import com.blackbox.ai.tama.game.TamaAgentService
+import com.blackbox.ai.tama.game.TamaArtworkManager
+import com.blackbox.ai.tama.game.TamaDailyDreamManager
+import com.blackbox.ai.tama.game.TamaGameEngine
+import com.blackbox.ai.tama.game.TamaStudySessionSupport
+import com.blackbox.ai.tama.rpg.AdventureGateCatalog
+import com.blackbox.ai.tama.rpg.AdventureGateProfile
+import com.blackbox.ai.tama.rpg.AdventureGateRepository
+import com.blackbox.ai.tama.rpg.AdventureGateSupplyDefinition
+import com.blackbox.ai.tama.rpg.AdventureGateSupplyKind
+import com.blackbox.ai.tama.rpg.NightArenaGenerator
+import com.blackbox.ai.ui.components.DraftIntTextField
+import com.blackbox.ai.ui.components.pressAndHoldRepeat
+import com.blackbox.ai.ui.components.RemoteSummaryBackendEditor
+import com.blackbox.ai.ui.components.rememberPressAndHoldRepeatState
+import com.blackbox.ai.ui.navigation.Screen
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.flowOf
@@ -358,30 +358,30 @@ fun TamaScreen(
     val cityName = stringResource(R.string.tama_city_hometown)
     val cityLocations = remember(localeTag) {
         val coreLocations = listOf(
-            Triple(0, 0, com.example.llamadroid.tama.data.LocationType.HOME),
-            Triple(1, 0, com.example.llamadroid.tama.data.LocationType.SHOP),
-            Triple(2, 0, com.example.llamadroid.tama.data.LocationType.PARK),
-            Triple(3, 0, com.example.llamadroid.tama.data.LocationType.HOSPITAL),
-            Triple(4, 0, com.example.llamadroid.tama.data.LocationType.ARCADE),
-            Triple(0, 1, com.example.llamadroid.tama.data.LocationType.ALCHEMIST),
-            Triple(1, 1, com.example.llamadroid.tama.data.LocationType.SCHOOL),
-            Triple(2, 1, com.example.llamadroid.tama.data.LocationType.WORKPLACE),
-            Triple(3, 1, com.example.llamadroid.tama.data.LocationType.FARM),
-            Triple(4, 1, com.example.llamadroid.tama.data.LocationType.BOXING_RING),
-            Triple(0, 2, com.example.llamadroid.tama.data.LocationType.DUNGEON),
-            Triple(2, 2, com.example.llamadroid.tama.data.LocationType.ADVENTURE_GATE),
-            Triple(4, 2, com.example.llamadroid.tama.data.LocationType.DUNGEON),
+            Triple(0, 0, com.blackbox.ai.tama.data.LocationType.HOME),
+            Triple(1, 0, com.blackbox.ai.tama.data.LocationType.SHOP),
+            Triple(2, 0, com.blackbox.ai.tama.data.LocationType.PARK),
+            Triple(3, 0, com.blackbox.ai.tama.data.LocationType.HOSPITAL),
+            Triple(4, 0, com.blackbox.ai.tama.data.LocationType.ARCADE),
+            Triple(0, 1, com.blackbox.ai.tama.data.LocationType.ALCHEMIST),
+            Triple(1, 1, com.blackbox.ai.tama.data.LocationType.SCHOOL),
+            Triple(2, 1, com.blackbox.ai.tama.data.LocationType.WORKPLACE),
+            Triple(3, 1, com.blackbox.ai.tama.data.LocationType.FARM),
+            Triple(4, 1, com.blackbox.ai.tama.data.LocationType.BOXING_RING),
+            Triple(0, 2, com.blackbox.ai.tama.data.LocationType.DUNGEON),
+            Triple(2, 2, com.blackbox.ai.tama.data.LocationType.ADVENTURE_GATE),
+            Triple(4, 2, com.blackbox.ai.tama.data.LocationType.DUNGEON),
         )
 
         coreLocations.map { (x, y, type) ->
-            com.example.llamadroid.tama.data.TamaLocation(
+            com.blackbox.ai.tama.data.TamaLocation(
                 id = "fixed_${x}_${y}",
                 name = type.localizedName(context),
                 type = type,
                 description = type.localizedDescription(context),
                 cityId = "hometown",
                 x = x, y = y,
-                isDiscovered = type == com.example.llamadroid.tama.data.LocationType.HOME
+                isDiscovered = type == com.blackbox.ai.tama.data.LocationType.HOME
             )
         }
     }
@@ -1372,7 +1372,7 @@ fun TamaScreen(
         }
     }
 
-    pet?.currentParkEncounter?.takeIf { currentLocation?.type == com.example.llamadroid.tama.data.LocationType.PARK }?.let { encounter ->
+    pet?.currentParkEncounter?.takeIf { currentLocation?.type == com.blackbox.ai.tama.data.LocationType.PARK }?.let { encounter ->
         TamaParkEncounterDialog(
             pet = pet!!,
             encounter = encounter,
@@ -3516,7 +3516,7 @@ private fun FoodItem.toInventoryItem(): InventoryItem {
     )
 }
 
-private fun recipeIngredientText(context: Context, recipe: com.example.llamadroid.tama.rpg.AdventureGateRecipeDefinition): String {
+private fun recipeIngredientText(context: Context, recipe: com.blackbox.ai.tama.rpg.AdventureGateRecipeDefinition): String {
     val locale = context.resources.configuration.locales[0]
     return recipe.ingredientCounts.entries
         .sortedBy { FarmTradeItemCatalog.displayName(it.key, locale) }
@@ -5106,7 +5106,7 @@ fun TamaPetDisplay(
         }
 
         // Activity timer overlay at top-right
-        if (pet.currentActivity != com.example.llamadroid.tama.data.ActivityType.NONE && pet.activityStartTime != null) {
+        if (pet.currentActivity != com.blackbox.ai.tama.data.ActivityType.NONE && pet.activityStartTime != null) {
             Column(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -5117,10 +5117,10 @@ fun TamaPetDisplay(
                 horizontalAlignment = Alignment.End
             ) {
                 val activityLabel = when (pet.currentActivity) {
-                    com.example.llamadroid.tama.data.ActivityType.WORKING -> stringResource(R.string.tama_action_work)
-                    com.example.llamadroid.tama.data.ActivityType.STUDYING -> stringResource(R.string.tama_action_study)
-                    com.example.llamadroid.tama.data.ActivityType.TRAINING -> stringResource(R.string.tama_action_train)
-                    com.example.llamadroid.tama.data.ActivityType.RELAXING -> stringResource(R.string.tama_action_relax)
+                    com.blackbox.ai.tama.data.ActivityType.WORKING -> stringResource(R.string.tama_action_work)
+                    com.blackbox.ai.tama.data.ActivityType.STUDYING -> stringResource(R.string.tama_action_study)
+                    com.blackbox.ai.tama.data.ActivityType.TRAINING -> stringResource(R.string.tama_action_train)
+                    com.blackbox.ai.tama.data.ActivityType.RELAXING -> stringResource(R.string.tama_action_relax)
                     else -> stringResource(R.string.tama_action_busy)
                 }
                 val durationMs = currentTime - pet.activityStartTime
@@ -5163,18 +5163,18 @@ fun TamaPetDisplay(
                         formatStudyDurationForUi(context, TamaStudySessionSupport.currentPhaseRemainingMs(activePomodoro, currentTime))
                     )
                 } else when (pet.currentActivity) {
-                    com.example.llamadroid.tama.data.ActivityType.WORKING -> {
+                    com.blackbox.ai.tama.data.ActivityType.WORKING -> {
                         val hourlyPay = TamaWorkCatalog.jobById(pet.currentWorkJobId)?.hourlyPay ?: 4
                         context.getString(
                             R.string.tama_activity_gain_money,
                             (hoursPassed * hourlyPay).toInt()
                         )
                     }
-                    com.example.llamadroid.tama.data.ActivityType.STUDYING -> context.getString(
+                    com.blackbox.ai.tama.data.ActivityType.STUDYING -> context.getString(
                         R.string.tama_activity_gain_education,
                         (hoursPassed * 5).toInt()
                     )
-                    com.example.llamadroid.tama.data.ActivityType.TRAINING -> {
+                    com.blackbox.ai.tama.data.ActivityType.TRAINING -> {
                         val hourlyPay = TamaTrainingCatalog.tierById(pet.currentWorkJobId)?.hourlyPay ?: 8
                         context.getString(
                             R.string.tama_activity_gain_training,
@@ -5183,7 +5183,7 @@ fun TamaPetDisplay(
                             (hoursPassed * hourlyPay).toInt()
                         )
                     }
-                    com.example.llamadroid.tama.data.ActivityType.RELAXING -> context.getString(
+                    com.blackbox.ai.tama.data.ActivityType.RELAXING -> context.getString(
                         R.string.tama_activity_gain_happiness,
                         (hoursPassed * 40).toInt(),
                         (hoursPassed * TAMA_RELAX_INTROSPECTION_PER_HOUR).toInt()
@@ -6948,7 +6948,7 @@ private fun statusLabel(status: String): String {
 }
 
 @Composable
-private fun tamaModelLabel(model: com.example.llamadroid.data.db.ModelEntity): String {
+private fun tamaModelLabel(model: com.blackbox.ai.data.db.ModelEntity): String {
     val entry = resolveOnnxCatalogEntry(model)
     return if (entry != null) {
         val providerLabel = when (entry.provider) {

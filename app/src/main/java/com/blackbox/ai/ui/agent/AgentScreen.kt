@@ -103,7 +103,7 @@ fun AgentScreen(navController: NavController) {
     // Services
     val ollamaService = remember { AgentForegroundService.getOllamaService(context) }
     val agentService = remember { AgentForegroundService.getAgentService(context) }
-    val db = remember { com.example.llamadroid.data.db.AppDatabase.getDatabase(context) }
+    val db = remember { com.blackbox.ai.data.db.AppDatabase.getDatabase(context) }
     val knowledgeBaseRepository = remember { KnowledgeBaseRepository(context, db) }
     val settingsRepository = remember { SettingsRepository(context) }
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -370,7 +370,7 @@ fun AgentScreen(navController: NavController) {
     }
 
     fun newestConversationIdExcluding(excludedId: Long? = null): Long? {
-        return com.example.llamadroid.ui.agent.newestConversationIdExcluding(
+        return com.blackbox.ai.ui.agent.newestConversationIdExcluding(
             conversations.map { it.id },
             excludedId
         )
@@ -660,7 +660,7 @@ fun AgentScreen(navController: NavController) {
                 AgentService.updateMessage(msg.id) { it.copy(isPlanApproved = true) }
                 AgentService.addDebugLog(context.getString(R.string.agent_plan_approved))
                 AgentService.markMemoryDirty("An implementation plan was approved. Record the chosen direction in project memory before finishing.")
-                com.example.llamadroid.service.UnifiedNotificationManager.dismissAgentAttention()
+                com.blackbox.ai.service.UnifiedNotificationManager.dismissAgentAttention()
                 
                 // Send official tool result back to LLM
                 AgentService.addMessage(AgentService.Companion.ChatMessage(
@@ -676,15 +676,15 @@ fun AgentScreen(navController: NavController) {
             } else {
                 AgentService.updateMessage(msg.id) { it.copy(isPlanApproved = false) }
                 AgentService.addDebugLog(context.getString(R.string.agent_plan_rejected))
-                com.example.llamadroid.service.UnifiedNotificationManager.dismissAgentAttention()
+                com.blackbox.ai.service.UnifiedNotificationManager.dismissAgentAttention()
                 scope.launch {
                     agentService.persistVisibleRuntimeStateNow("Plan rejected by user.")
                 }
             }
         } else if (approved) {
             AgentService.updateMessage(msg.id) { it.copy(needsApproval = false, isApproved = true) }
-            com.example.llamadroid.service.UnifiedNotificationManager.dismissAgentAttention()
-            val toolCall = msg.pendingToolCall ?: com.example.llamadroid.service.OllamaService.ToolCall(
+            com.blackbox.ai.service.UnifiedNotificationManager.dismissAgentAttention()
+            val toolCall = msg.pendingToolCall ?: com.blackbox.ai.service.OllamaService.ToolCall(
                 name = msg.toolName ?: "",
                 arguments = msg.toolArgs ?: emptyMap(),
                 id = null
@@ -695,7 +695,7 @@ fun AgentScreen(navController: NavController) {
             AgentService.executeToolCall(context, ollamaService, settingsRepository, agentService, toolCall, isForced = true)
         } else {
             AgentService.updateMessage(msg.id) { it.copy(needsApproval = false, isApproved = false) }
-            com.example.llamadroid.service.UnifiedNotificationManager.dismissAgentAttention()
+            com.blackbox.ai.service.UnifiedNotificationManager.dismissAgentAttention()
             val toolName = msg.toolName ?: context.getString(R.string.agent_generic_tool)
             val denialContent = if (denyReason.isNotBlank()) {
                 "DENIED by user: $toolName. Reason: $denyReason"
@@ -724,7 +724,7 @@ fun AgentScreen(navController: NavController) {
     fun createNewConversation(projectName: String = context.getString(R.string.agent_project_default_prefix) + System.currentTimeMillis()) {
         scope.launch {
             val safeName = projectName.trim().replace(Regex("[^a-zA-Z0-9_-]"), "_").take(50).ifBlank { context.getString(R.string.agent_project_default_prefix) + System.currentTimeMillis() }
-            val newId = db.agentChatDao().insertConversation(com.example.llamadroid.data.db.AgentConversationEntity(title = projectName, projectFolder = safeName))
+            val newId = db.agentChatDao().insertConversation(com.blackbox.ai.data.db.AgentConversationEntity(title = projectName, projectFolder = safeName))
             restoreToken += 1
             runtimeConversationId = newId
             selectedConversationId = newId

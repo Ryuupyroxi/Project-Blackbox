@@ -26,7 +26,7 @@ import kotlin.system.exitProcess
 
 private const val REMOVED_LLM_TRAINING_CLEANUP_PREFS = "removed_feature_cleanup"
 private const val REMOVED_LLM_TRAINING_CLEANUP_DONE = "trainer_cleanup_done_v54"
-private const val REMOVED_LLM_TRAINING_WORKER_CLASS = "com.example.llamadroid.service.TrainerRunWorker"
+private const val REMOVED_LLM_TRAINING_WORKER_CLASS = "com.blackbox.ai.service.TrainerRunWorker"
 private const val WORK_MANAGER_DB_NAME = "androidx.work.workdb"
 
 class LlamaApplication : Application() {
@@ -56,7 +56,7 @@ class LlamaApplication : Application() {
         
         // Request native libs installation immediately (Simulate Fast-Follow)
         // REMOVED: Managed by MainActivity failsafe to avoid double-prompting and race conditions
-        // com.example.llamadroid.util.DynamicFeatureManager.installAllFeatures(this)
+        // com.blackbox.ai.util.DynamicFeatureManager.installAllFeatures(this)
     }
     
     override fun attachBaseContext(base: Context) {

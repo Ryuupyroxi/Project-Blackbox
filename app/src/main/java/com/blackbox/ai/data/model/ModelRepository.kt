@@ -5,32 +5,32 @@ import android.net.Uri
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 
-import com.example.llamadroid.data.api.HfModelDto
-import com.example.llamadroid.data.api.HuggingFaceService
-import com.example.llamadroid.data.db.ModelDao
-import com.example.llamadroid.data.db.ModelEntity
-import com.example.llamadroid.data.db.ModelType
-import com.example.llamadroid.data.db.parseOnnxCapabilities
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.data.db.ONNX_CAPABILITY_TXT2IMG
-import com.example.llamadroid.sd.buildSdCompatProfiles
-import com.example.llamadroid.sd.defaultCompatProfilesFor
-import com.example.llamadroid.sd.defaultCapabilitiesForFamily
-import com.example.llamadroid.sd.inferSdFamily
-import com.example.llamadroid.onnx.ONNX_ASSET_KIND_BACKGROUND_REMOVAL_FILE
-import com.example.llamadroid.onnx.ONNX_ASSET_KIND_SDAI_CATALOG_BUNDLE
-import com.example.llamadroid.onnx.ONNX_ASSET_KIND_SUPERTONIC_CATALOG_BUNDLE
-import com.example.llamadroid.onnx.ONNX_INSTALL_KIND_FILE
-import com.example.llamadroid.onnx.ONNX_INSTALL_KIND_ARCHIVE_BUNDLE
-import com.example.llamadroid.onnx.ONNX_INSTALL_KIND_HF_TREE_BUNDLE
-import com.example.llamadroid.onnx.ONNX_PIPELINE_FAMILY_SDAI_LOCAL_DIFFUSION
-import com.example.llamadroid.onnx.OnnxCatalogEntry
-import com.example.llamadroid.onnx.OnnxImportSupport
-import com.example.llamadroid.onnx.OnnxStorage
-import com.example.llamadroid.onnx.buildOnnxCatalogStableId
-import com.example.llamadroid.onnx.buildOnnxImageGenModelEntity
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.Downloader
+import com.blackbox.ai.data.api.HfModelDto
+import com.blackbox.ai.data.api.HuggingFaceService
+import com.blackbox.ai.data.db.ModelDao
+import com.blackbox.ai.data.db.ModelEntity
+import com.blackbox.ai.data.db.ModelType
+import com.blackbox.ai.data.db.parseOnnxCapabilities
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.data.db.ONNX_CAPABILITY_TXT2IMG
+import com.blackbox.ai.sd.buildSdCompatProfiles
+import com.blackbox.ai.sd.defaultCompatProfilesFor
+import com.blackbox.ai.sd.defaultCapabilitiesForFamily
+import com.blackbox.ai.sd.inferSdFamily
+import com.blackbox.ai.onnx.ONNX_ASSET_KIND_BACKGROUND_REMOVAL_FILE
+import com.blackbox.ai.onnx.ONNX_ASSET_KIND_SDAI_CATALOG_BUNDLE
+import com.blackbox.ai.onnx.ONNX_ASSET_KIND_SUPERTONIC_CATALOG_BUNDLE
+import com.blackbox.ai.onnx.ONNX_INSTALL_KIND_FILE
+import com.blackbox.ai.onnx.ONNX_INSTALL_KIND_ARCHIVE_BUNDLE
+import com.blackbox.ai.onnx.ONNX_INSTALL_KIND_HF_TREE_BUNDLE
+import com.blackbox.ai.onnx.ONNX_PIPELINE_FAMILY_SDAI_LOCAL_DIFFUSION
+import com.blackbox.ai.onnx.OnnxCatalogEntry
+import com.blackbox.ai.onnx.OnnxImportSupport
+import com.blackbox.ai.onnx.OnnxStorage
+import com.blackbox.ai.onnx.buildOnnxCatalogStableId
+import com.blackbox.ai.onnx.buildOnnxImageGenModelEntity
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.Downloader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,7 +42,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import java.io.File
-import com.example.llamadroid.data.db.buildOnnxCapabilities
+import com.blackbox.ai.data.db.buildOnnxCapabilities
 
 class ModelRepository(
     private val context: Context,
@@ -185,7 +185,7 @@ class ModelRepository(
         
         if (useExternalStorage) {
             // Use app's external files directory - accessible to native binaries
-            // Path: /storage/emulated/0/Android/data/com.example.llamadroid/files/models/...
+            // Path: /storage/emulated/0/Android/data/com.blackbox.ai/files/models/...
             val externalDir = context.getExternalFilesDir(null)
             if (externalDir != null) {
                 val folder = File(externalDir, "models/$subfolder")
@@ -241,7 +241,7 @@ class ModelRepository(
         // Start foreground service for background downloads with notification
         // Must be called on main thread for foreground service
         withContext(kotlinx.coroutines.Dispatchers.Main) {
-            com.example.llamadroid.service.DownloadService.startDownload(
+            com.blackbox.ai.service.DownloadService.startDownload(
                 context = context,
                 url = modelUrl,
                 destPath = destFile.absolutePath,
@@ -353,7 +353,7 @@ class ModelRepository(
         )
         
         // Start foreground service (this is called from main thread via onClick)
-        com.example.llamadroid.service.DownloadService.startDownload(
+        com.blackbox.ai.service.DownloadService.startDownload(
             context = context,
             url = modelUrl,
             destPath = destFile.absolutePath,
@@ -399,7 +399,7 @@ class ModelRepository(
             huggingFaceToken = if (entry.gated) huggingFaceToken() else null
         )
 
-        com.example.llamadroid.service.DownloadService.startDownload(
+        com.blackbox.ai.service.DownloadService.startDownload(
             context = context,
             url = entry.downloadUrl,
             destPath = tempDownload.absolutePath,
@@ -562,7 +562,7 @@ class ModelRepository(
             path: String,
             sizeBytes: Long,
             repoId: String,
-            installSource: com.example.llamadroid.onnx.OnnxInstallSource,
+            installSource: com.blackbox.ai.onnx.OnnxInstallSource,
             detectedCapabilities: Set<String>,
             referenceUri: String?,
             referencePath: String?
@@ -672,7 +672,7 @@ data class PendingDownload(
     val filename: String,
     val repoId: String,
     val progressKey: String,
-    val type: com.example.llamadroid.data.db.ModelType,
+    val type: com.blackbox.ai.data.db.ModelType,
     val destPath: String,
     val isVision: Boolean = false,
     val sdCapabilities: String? = null,
@@ -704,7 +704,7 @@ object PendingDownloadHolder {
         filename: String,
         repoId: String,
         progressKey: String = repoId,
-        type: com.example.llamadroid.data.db.ModelType,
+        type: com.blackbox.ai.data.db.ModelType,
         destPath: String,
         isVision: Boolean = false,
         sdCapabilities: String? = null,

@@ -5,35 +5,35 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
-import com.example.llamadroid.R
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.service.LlamaServerChatService
-import com.example.llamadroid.service.LiteRtConversationMessage
-import com.example.llamadroid.service.LiteRtTextGenerationClient
-import com.example.llamadroid.service.OllamaService
-import com.example.llamadroid.service.RemoteSummaryProtection
-import com.example.llamadroid.service.UnifiedNotificationManager
-import com.example.llamadroid.service.RemoteSummaryBackendConfig
-import com.example.llamadroid.service.RemoteSummaryClientFactory
-import com.example.llamadroid.service.RemoteSummaryMetadata
-import com.example.llamadroid.service.RemoteSummaryRequest
-import com.example.llamadroid.service.fileToDataUrl
-import com.example.llamadroid.service.inferImageMimeType
-import com.example.llamadroid.service.WhisperConfig
-import com.example.llamadroid.service.WhisperOutputFormat
-import com.example.llamadroid.service.WhisperService
-import com.example.llamadroid.tama.data.ActivityType
-import com.example.llamadroid.tama.data.GrowthStage
-import com.example.llamadroid.tama.data.PetSpeciesLine
-import com.example.llamadroid.tama.data.Personality
-import com.example.llamadroid.tama.data.TamaWorkCatalog
-import com.example.llamadroid.tama.data.TamaPet
-import com.example.llamadroid.tama.data.TAMA_RELAX_INTROSPECTION_PER_HOUR
-import com.example.llamadroid.tama.data.TAMA_TRAINING_EXERCISE_PER_HOUR
-import com.example.llamadroid.tama.data.TAMA_TRAINING_HAPPINESS_PER_HOUR
-import com.example.llamadroid.tama.data.TamaTrainingCatalog
-import com.example.llamadroid.tama.data.isEffectivelyMad
-import com.example.llamadroid.tama.db.*
+import com.blackbox.ai.R
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.service.LlamaServerChatService
+import com.blackbox.ai.service.LiteRtConversationMessage
+import com.blackbox.ai.service.LiteRtTextGenerationClient
+import com.blackbox.ai.service.OllamaService
+import com.blackbox.ai.service.RemoteSummaryProtection
+import com.blackbox.ai.service.UnifiedNotificationManager
+import com.blackbox.ai.service.RemoteSummaryBackendConfig
+import com.blackbox.ai.service.RemoteSummaryClientFactory
+import com.blackbox.ai.service.RemoteSummaryMetadata
+import com.blackbox.ai.service.RemoteSummaryRequest
+import com.blackbox.ai.service.fileToDataUrl
+import com.blackbox.ai.service.inferImageMimeType
+import com.blackbox.ai.service.WhisperConfig
+import com.blackbox.ai.service.WhisperOutputFormat
+import com.blackbox.ai.service.WhisperService
+import com.blackbox.ai.tama.data.ActivityType
+import com.blackbox.ai.tama.data.GrowthStage
+import com.blackbox.ai.tama.data.PetSpeciesLine
+import com.blackbox.ai.tama.data.Personality
+import com.blackbox.ai.tama.data.TamaWorkCatalog
+import com.blackbox.ai.tama.data.TamaPet
+import com.blackbox.ai.tama.data.TAMA_RELAX_INTROSPECTION_PER_HOUR
+import com.blackbox.ai.tama.data.TAMA_TRAINING_EXERCISE_PER_HOUR
+import com.blackbox.ai.tama.data.TAMA_TRAINING_HAPPINESS_PER_HOUR
+import com.blackbox.ai.tama.data.TamaTrainingCatalog
+import com.blackbox.ai.tama.data.isEffectivelyMad
+import com.blackbox.ai.tama.db.*
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -297,7 +297,7 @@ class TamaAgentService(
             runCatching {
                 val modelId = settingsRepo.tamaLiteRtModelId.value.takeIf { it > 0L }
                     ?: throw IllegalStateException(context.getString(R.string.litert_error_model_missing))
-                val model = com.example.llamadroid.data.db.AppDatabase.getDatabase(context)
+                val model = com.blackbox.ai.data.db.AppDatabase.getDatabase(context)
                     .liteRtModelDao()
                     .getById(modelId)
                     ?: throw IllegalStateException(context.getString(R.string.litert_error_model_missing))
@@ -763,9 +763,9 @@ class TamaAgentService(
 
     private suspend fun resolveWhisperModelPath(): String? {
         settingsRepo.tamaWhisperModelPath.value?.takeIf { it.isNotBlank() }?.let { return it }
-        return com.example.llamadroid.data.db.AppDatabase.getDatabase(context)
+        return com.blackbox.ai.data.db.AppDatabase.getDatabase(context)
             .modelDao()
-            .getModelsByTypesSync(listOf(com.example.llamadroid.data.db.ModelType.WHISPER))
+            .getModelsByTypesSync(listOf(com.blackbox.ai.data.db.ModelType.WHISPER))
             .firstOrNull()
             ?.path
     }
@@ -1017,8 +1017,8 @@ class TamaAgentService(
 
     private suspend fun latestDreamRecap(petId: String, sinceTimestamp: Long): DreamRecapContext? {
         val artworks = dao.getArtworks(petId)
-            .filter { it.kind == com.example.llamadroid.tama.data.TamaArtworkKind.DAILY_DREAM.name }
-            .filter { it.status == com.example.llamadroid.tama.data.TamaArtworkStatus.COMPLETED.name }
+            .filter { it.kind == com.blackbox.ai.tama.data.TamaArtworkKind.DAILY_DREAM.name }
+            .filter { it.status == com.blackbox.ai.tama.data.TamaArtworkStatus.COMPLETED.name }
             .filter { !it.albumId.isNullOrBlank() }
         if (artworks.isEmpty()) return null
 

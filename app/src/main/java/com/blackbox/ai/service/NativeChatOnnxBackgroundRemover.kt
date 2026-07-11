@@ -1,14 +1,14 @@
 package com.blackbox.ai.service
 
 import android.content.Context
-import com.example.llamadroid.R
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.ModelType
-import com.example.llamadroid.onnx.OnnxBackgroundRemovalConfig
-import com.example.llamadroid.onnx.OnnxBackgroundRemovalPipeline
-import com.example.llamadroid.onnx.OnnxRuntimeOptions
-import com.example.llamadroid.onnx.isOnnxBackgroundRemovalModel
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.R
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.ModelType
+import com.blackbox.ai.onnx.OnnxBackgroundRemovalConfig
+import com.blackbox.ai.onnx.OnnxBackgroundRemovalPipeline
+import com.blackbox.ai.onnx.OnnxRuntimeOptions
+import com.blackbox.ai.onnx.isOnnxBackgroundRemovalModel
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File

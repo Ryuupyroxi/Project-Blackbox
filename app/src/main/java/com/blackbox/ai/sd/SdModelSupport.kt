@@ -1,12 +1,12 @@
 package com.blackbox.ai.sd
 
-import com.example.llamadroid.data.db.ModelEntity
-import com.example.llamadroid.data.db.ModelType
-import com.example.llamadroid.data.db.SD_CAPABILITY_IMG2IMG
-import com.example.llamadroid.data.db.SD_CAPABILITY_TXT2IMG
-import com.example.llamadroid.data.db.SD_CAPABILITY_VID_GEN
-import com.example.llamadroid.data.db.buildSdCapabilities
-import com.example.llamadroid.data.db.hasSdCapability
+import com.blackbox.ai.data.db.ModelEntity
+import com.blackbox.ai.data.db.ModelType
+import com.blackbox.ai.data.db.SD_CAPABILITY_IMG2IMG
+import com.blackbox.ai.data.db.SD_CAPABILITY_TXT2IMG
+import com.blackbox.ai.data.db.SD_CAPABILITY_VID_GEN
+import com.blackbox.ai.data.db.buildSdCapabilities
+import com.blackbox.ai.data.db.hasSdCapability
 
 enum class SdModelFamily(val storedValue: String) {
     CHECKPOINT("checkpoint"),

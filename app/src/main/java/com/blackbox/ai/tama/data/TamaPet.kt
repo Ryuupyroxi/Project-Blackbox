@@ -3,7 +3,7 @@ package com.blackbox.ai.tama.data
 import java.util.UUID
 import java.util.Calendar
 import kotlinx.serialization.Serializable
-import com.example.llamadroid.tama.data.InventoryItem
+import com.blackbox.ai.tama.data.InventoryItem
 
 /**
  * Core Tama pet data model.

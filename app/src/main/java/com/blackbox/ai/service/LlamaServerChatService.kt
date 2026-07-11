@@ -2,7 +2,7 @@ package com.blackbox.ai.service
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.util.DebugLog
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader

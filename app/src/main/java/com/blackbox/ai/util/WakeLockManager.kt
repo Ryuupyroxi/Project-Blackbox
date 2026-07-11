@@ -2,7 +2,7 @@ package com.blackbox.ai.util
 
 import android.content.Context
 import android.os.PowerManager
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.util.DebugLog
 
 /**
  * Centralized wake lock manager for the app.

@@ -2,11 +2,11 @@ package com.blackbox.ai.service
 
 import android.content.Context
 import android.os.SystemClock
-import com.example.llamadroid.R
-import com.example.llamadroid.data.binary.BinaryRepository
-import com.example.llamadroid.util.AccelerationWorkload
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.DeviceAcceleration
+import com.blackbox.ai.R
+import com.blackbox.ai.data.binary.BinaryRepository
+import com.blackbox.ai.util.AccelerationWorkload
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.DeviceAcceleration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock

@@ -1580,7 +1580,7 @@ private fun OnnxSwitchRow(
 @Composable
 private fun OnnxRamProfileCard(
     ramProfile: OnnxRamProfile?,
-    normalizedCanvas: com.example.llamadroid.onnx.OnnxNormalizedCanvasSize?,
+    normalizedCanvas: com.blackbox.ai.onnx.OnnxNormalizedCanvasSize?,
     backendHint: String
 ) {
     Card(
@@ -2215,17 +2215,17 @@ private fun metadataLabelForMode(modeValue: String?, context: android.content.Co
 }
 
 private fun onnxProviderLabel(
-    provider: com.example.llamadroid.onnx.OnnxCatalogProvider,
+    provider: com.blackbox.ai.onnx.OnnxCatalogProvider,
     context: android.content.Context
 ): String {
     return when (provider) {
-        com.example.llamadroid.onnx.OnnxCatalogProvider.SDAI ->
+        com.blackbox.ai.onnx.OnnxCatalogProvider.SDAI ->
             context.getString(R.string.onnx_models_provider_sdai)
-        com.example.llamadroid.onnx.OnnxCatalogProvider.MANUXD32 ->
+        com.blackbox.ai.onnx.OnnxCatalogProvider.MANUXD32 ->
             context.getString(R.string.onnx_models_provider_manuxd32)
-        com.example.llamadroid.onnx.OnnxCatalogProvider.SUPERTONIC ->
+        com.blackbox.ai.onnx.OnnxCatalogProvider.SUPERTONIC ->
             context.getString(R.string.onnx_models_provider_supertonic)
-        com.example.llamadroid.onnx.OnnxCatalogProvider.BACKGROUND_REMOVAL ->
+        com.blackbox.ai.onnx.OnnxCatalogProvider.BACKGROUND_REMOVAL ->
             context.getString(R.string.onnx_models_provider_bgr)
     }
 }

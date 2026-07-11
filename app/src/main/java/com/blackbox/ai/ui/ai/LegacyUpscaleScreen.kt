@@ -141,7 +141,7 @@ fun LegacyUpscaleScreen(navController: NavController) {
     }
 
     LaunchedEffect(Unit) {
-        val pendingFile = com.example.llamadroid.data.SharedFileHolder.consumePendingFile()
+        val pendingFile = com.blackbox.ai.data.SharedFileHolder.consumePendingFile()
         if (pendingFile != null && pendingFile.mimeType.startsWith("image/")) {
             GenerationDiagnosticsStore.recordBreadcrumb(
                 source = LEGACY_UPSCALE_UI_DIAGNOSTIC_SOURCE,
@@ -899,7 +899,7 @@ fun LegacyUpscaleScreen(navController: NavController) {
 @Composable
 private fun LegacyUpscaleModelPicker(
     selectedPath: String?,
-    models: List<com.example.llamadroid.data.db.ModelEntity>,
+    models: List<com.blackbox.ai.data.db.ModelEntity>,
     onModelSelected: (String, String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }

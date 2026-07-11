@@ -1,20 +1,20 @@
 package com.blackbox.ai.tama.game
 
 import android.content.Context
-import com.example.llamadroid.R
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.service.UnifiedNotificationManager
-import com.example.llamadroid.tama.data.*
-import com.example.llamadroid.tama.db.*
-import com.example.llamadroid.tama.rpg.AdventureGateCatalog
-import com.example.llamadroid.tama.rpg.AdventureGateCombatEngine
-import com.example.llamadroid.tama.rpg.AdventureGateProfile
-import com.example.llamadroid.tama.notifications.TamaNotificationScheduler
-import com.example.llamadroid.tama.rpg.AdventureGateRepository
-import com.example.llamadroid.tama.rpg.AdventureGateStats
-import com.example.llamadroid.tama.rpg.AdventureGateSupplyKind
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.widget.TamaPetWidgetProvider
+import com.blackbox.ai.R
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.service.UnifiedNotificationManager
+import com.blackbox.ai.tama.data.*
+import com.blackbox.ai.tama.db.*
+import com.blackbox.ai.tama.rpg.AdventureGateCatalog
+import com.blackbox.ai.tama.rpg.AdventureGateCombatEngine
+import com.blackbox.ai.tama.rpg.AdventureGateProfile
+import com.blackbox.ai.tama.notifications.TamaNotificationScheduler
+import com.blackbox.ai.tama.rpg.AdventureGateRepository
+import com.blackbox.ai.tama.rpg.AdventureGateStats
+import com.blackbox.ai.tama.rpg.AdventureGateSupplyKind
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.widget.TamaPetWidgetProvider
 import androidx.room.withTransaction
 import java.io.File
 import java.io.BufferedInputStream
@@ -1262,7 +1262,7 @@ class TamaGameEngine(
         }
 
         val now = System.currentTimeMillis()
-        com.example.llamadroid.service.TamaDeepDreamService.start(
+        com.blackbox.ai.service.TamaDeepDreamService.start(
             context = context,
             petId = pet.id,
             signature = "deep:${TamaDailyDreamManager.formatDreamDate(pet.sleepStartTime ?: now)}:$now:force",
@@ -1742,12 +1742,12 @@ class TamaGameEngine(
         val newDiscovered = pet.discoveredLocationIds + location.id
         val newStats = pet.stats.copy(energy = pet.stats.energy - energyCost)
         val now = System.currentTimeMillis()
-        val (parkEncounter, parkGiftItem) = if (location.type == com.example.llamadroid.tama.data.LocationType.PARK) {
+        val (parkEncounter, parkGiftItem) = if (location.type == com.blackbox.ai.tama.data.LocationType.PARK) {
             buildParkEncounter(pet, now)
         } else {
             null to null
         }
-        val ambientNpcState = if (location.type == com.example.llamadroid.tama.data.LocationType.PARK) {
+        val ambientNpcState = if (location.type == com.blackbox.ai.tama.data.LocationType.PARK) {
             null
         } else {
             TamaAmbientNpcCatalog.createState(location.type, now)

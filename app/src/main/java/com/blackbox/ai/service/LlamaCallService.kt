@@ -13,14 +13,14 @@ import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.os.IBinder
 import androidx.core.content.ContextCompat
-import com.example.llamadroid.R
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.ModelType
-import com.example.llamadroid.data.model.LlamaServerEntity
-import com.example.llamadroid.data.repository.LlamaRepository
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.WakeLockManager
+import com.blackbox.ai.R
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.ModelType
+import com.blackbox.ai.data.model.LlamaServerEntity
+import com.blackbox.ai.data.repository.LlamaRepository
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.WakeLockManager
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -520,8 +520,8 @@ class LlamaCallService : Service() {
     }
 
     companion object {
-        const val ACTION_START = "com.example.llamadroid.action.START_LLAMA_CALL"
-        const val ACTION_HANG_UP = "com.example.llamadroid.action.HANG_UP_LLAMA_CALL"
+        const val ACTION_START = "com.blackbox.ai.action.START_LLAMA_CALL"
+        const val ACTION_HANG_UP = "com.blackbox.ai.action.HANG_UP_LLAMA_CALL"
         const val EXTRA_CHAT_ID = "CHAT_ID"
         const val EXTRA_SERVER_ID = "SERVER_ID"
         private const val CALL_SAMPLE_RATE = 16_000

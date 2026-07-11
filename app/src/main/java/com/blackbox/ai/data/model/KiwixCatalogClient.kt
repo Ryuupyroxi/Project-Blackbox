@@ -1,6 +1,6 @@
 package com.blackbox.ai.data.model
 
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.xmlpull.v1.XmlPullParser

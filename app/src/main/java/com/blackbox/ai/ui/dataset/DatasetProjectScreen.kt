@@ -30,24 +30,24 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
-import com.example.llamadroid.R
+import com.blackbox.ai.R
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.data.db.*
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.model.DatasetExporter
-import com.example.llamadroid.data.model.DatasetFormat
-import com.example.llamadroid.service.DatasetForegroundService
-import com.example.llamadroid.service.DatasetProcessor
-import com.example.llamadroid.service.OllamaService
-import com.example.llamadroid.service.RemoteSummaryBackendConfig
-import com.example.llamadroid.service.RemoteSummaryClientFactory
-import com.example.llamadroid.service.normalizeDatasetBackend
-import com.example.llamadroid.ui.components.SliderWithInput
-import com.example.llamadroid.ui.components.IntSliderWithInput
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.data.db.*
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.model.DatasetExporter
+import com.blackbox.ai.data.model.DatasetFormat
+import com.blackbox.ai.service.DatasetForegroundService
+import com.blackbox.ai.service.DatasetProcessor
+import com.blackbox.ai.service.OllamaService
+import com.blackbox.ai.service.RemoteSummaryBackendConfig
+import com.blackbox.ai.service.RemoteSummaryClientFactory
+import com.blackbox.ai.service.normalizeDatasetBackend
+import com.blackbox.ai.ui.components.SliderWithInput
+import com.blackbox.ai.ui.components.IntSliderWithInput
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -498,7 +498,7 @@ private suspend fun exportQAToFile(
     selectedIds: Set<Long> = emptySet()
 ) {
     try {
-        com.example.llamadroid.util.DebugLog.log("[Export] Starting export, selected=${selectedIds.size}, total=${qaList.size}")
+        com.blackbox.ai.util.DebugLog.log("[Export] Starting export, selected=${selectedIds.size}, total=${qaList.size}")
         
         // If specific items selected, export those; otherwise export all with score >= 3
         val toExport = if (selectedIds.isNotEmpty()) {
@@ -507,11 +507,11 @@ private suspend fun exportQAToFile(
             qaList.filter { (it.score ?: 0) >= 3 && it.answer != null }
         }
         
-        com.example.llamadroid.util.DebugLog.log("[Export] Items to export: ${toExport.size}")
+        com.blackbox.ai.util.DebugLog.log("[Export] Items to export: ${toExport.size}")
         
         val entries = toExport.map { qa ->
-            com.example.llamadroid.data.model.DatasetEntry(
-                source = com.example.llamadroid.data.model.DatasetSource.MANUAL,
+            com.blackbox.ai.data.model.DatasetEntry(
+                source = com.blackbox.ai.data.model.DatasetSource.MANUAL,
                 sourceName = "Generated",
                 instruction = qa.question,
                 input = "",
@@ -520,7 +520,7 @@ private suspend fun exportQAToFile(
         }
         
         val output = DatasetExporter.toAlpaca(entries)
-        com.example.llamadroid.util.DebugLog.log("[Export] JSON size: ${output.length} chars")
+        com.blackbox.ai.util.DebugLog.log("[Export] JSON size: ${output.length} chars")
         
         withContext(Dispatchers.IO) {
             context.contentResolver.openOutputStream(uri)?.use { os ->
@@ -528,10 +528,10 @@ private suspend fun exportQAToFile(
             }
         }
         
-        com.example.llamadroid.util.DebugLog.log("[Export] Export completed successfully")
+        com.blackbox.ai.util.DebugLog.log("[Export] Export completed successfully")
         android.widget.Toast.makeText(context, context.getString(R.string.dataset_export_success, toExport.size), android.widget.Toast.LENGTH_SHORT).show()
     } catch (e: Exception) {
-        com.example.llamadroid.util.DebugLog.log("[Export] ERROR: ${e.message}")
+        com.blackbox.ai.util.DebugLog.log("[Export] ERROR: ${e.message}")
         e.printStackTrace()
         android.widget.Toast.makeText(context, context.getString(R.string.dataset_export_failed, e.message), android.widget.Toast.LENGTH_LONG).show()
     }

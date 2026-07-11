@@ -1,6 +1,6 @@
 package com.blackbox.ai.service
 
-import com.example.llamadroid.data.db.CustomToolEntity
+import com.blackbox.ai.data.db.CustomToolEntity
 import org.json.JSONArray
 import org.json.JSONObject
 import java.net.InetAddress
@@ -666,7 +666,7 @@ internal object AgentRuntimeSupport {
     }
 
     fun stripHtmlTags(html: String): String {
-        return com.example.llamadroid.service.stripHtmlTags(html)
+        return com.blackbox.ai.service.stripHtmlTags(html)
     }
 
     fun isSequentialBatchBlockedTool(toolName: String): Boolean {

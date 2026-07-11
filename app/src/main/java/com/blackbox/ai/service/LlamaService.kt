@@ -14,15 +14,15 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.net.InetSocketAddress
 import java.net.ServerSocket
-import com.example.llamadroid.R
-import com.example.llamadroid.util.AccelerationWorkload
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.DeviceAcceleration
-import com.example.llamadroid.util.NativeProcessCleanup
-import com.example.llamadroid.util.WakeLockManager
+import com.blackbox.ai.R
+import com.blackbox.ai.util.AccelerationWorkload
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.DeviceAcceleration
+import com.blackbox.ai.util.NativeProcessCleanup
+import com.blackbox.ai.util.WakeLockManager
 import android.net.wifi.WifiManager
-import com.example.llamadroid.data.binary.BinaryRepository
-import com.example.llamadroid.util.GGUFParser
+import com.blackbox.ai.data.binary.BinaryRepository
+import com.blackbox.ai.util.GGUFParser
 
 class LlamaService : Service() {
     
@@ -253,7 +253,7 @@ class LlamaService : Service() {
         val isMasterProfile = settingsProfile == SETTINGS_PROFILE_MASTER
 
         // Read settings from repository, but use overrides if provided.
-        val settingsRepo = com.example.llamadroid.data.SettingsRepository(applicationContext)
+        val settingsRepo = com.blackbox.ai.data.SettingsRepository(applicationContext)
         val threads = threadsOverride ?: if (isMasterProfile) DistributedService.masterThreads.value else settingsRepo.threads.value
         val batchSize = batchSizeOverride ?: if (isMasterProfile) DistributedService.masterBatchSize.value else settingsRepo.serverBatchSize.value
         val physicalBatchSize = physicalBatchSizeOverride ?: if (isMasterProfile) null else settingsRepo.serverPhysicalBatchSize.value
@@ -917,11 +917,11 @@ class LlamaService : Service() {
         }
 
         private const val MAX_SERVER_LOGS = 1000
-        private val _serverLogs = MutableStateFlow<List<com.example.llamadroid.util.LogEntry>>(emptyList())
+        private val _serverLogs = MutableStateFlow<List<com.blackbox.ai.util.LogEntry>>(emptyList())
         val serverLogs = _serverLogs.asStateFlow()
 
         fun addServerLog(message: String) {
-            val entry = com.example.llamadroid.util.LogEntry(System.currentTimeMillis(), message)
+            val entry = com.blackbox.ai.util.LogEntry(System.currentTimeMillis(), message)
             val current = _serverLogs.value
             _serverLogs.value = (current + entry).takeLast(MAX_SERVER_LOGS)
         }

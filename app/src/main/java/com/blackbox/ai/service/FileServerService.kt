@@ -21,9 +21,9 @@ import java.net.URLEncoder
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.concurrent.thread
-import com.example.llamadroid.util.AIConstants
-import com.example.llamadroid.util.FormatUtils
-import com.example.llamadroid.util.WakeLockManager
+import com.blackbox.ai.util.AIConstants
+import com.blackbox.ai.util.FormatUtils
+import com.blackbox.ai.util.WakeLockManager
 
 /**
  * Service that hosts an HTTP file server for sharing files from a user-selected folder.

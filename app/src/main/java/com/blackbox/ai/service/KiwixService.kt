@@ -4,11 +4,11 @@ import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.data.binary.BinaryRepository
-import com.example.llamadroid.util.AIConstants
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.WakeLockManager
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.data.binary.BinaryRepository
+import com.blackbox.ai.util.AIConstants
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.WakeLockManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

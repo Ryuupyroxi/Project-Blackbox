@@ -262,7 +262,7 @@ fun ImageGenScreen(navController: NavController, initialMode: Int = 0) {
 
     // Check for shared file (from share intent)
     LaunchedEffect(Unit) {
-        val pendingFile = com.example.llamadroid.data.SharedFileHolder.consumePendingFile()
+        val pendingFile = com.blackbox.ai.data.SharedFileHolder.consumePendingFile()
         if (pendingFile != null && pendingFile.mimeType.startsWith("image/")) {
             try {
                 val targetMode = when (resolveInitialImageGenMode(pendingFile.targetScreen)) {
@@ -2300,7 +2300,7 @@ private suspend fun prepareImageInputForMode(
 
 private fun filterSdComponents(
     models: List<ModelEntity>,
-    family: com.example.llamadroid.sd.SdModelFamily?,
+    family: com.blackbox.ai.sd.SdModelFamily?,
     variant: String?
 ): List<ModelEntity> {
     if (family == null) return emptyList()

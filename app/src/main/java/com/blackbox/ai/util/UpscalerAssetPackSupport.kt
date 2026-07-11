@@ -3,7 +3,7 @@ package com.blackbox.ai.util
 import android.content.Context
 import android.content.res.AssetManager
 import android.util.Log
-import com.example.llamadroid.service.GenerationDiagnosticsStore
+import com.blackbox.ai.service.GenerationDiagnosticsStore
 import com.google.android.play.core.assetpacks.AssetPackManagerFactory
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
 import kotlinx.coroutines.Dispatchers

@@ -5,9 +5,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.ZimEntity
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.ZimEntity
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

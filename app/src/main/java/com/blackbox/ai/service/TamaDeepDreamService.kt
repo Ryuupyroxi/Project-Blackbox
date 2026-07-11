@@ -6,16 +6,16 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.content.ContextCompat
-import com.example.llamadroid.R
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.tama.game.PetMapper
-import com.example.llamadroid.tama.game.TamaArtworkManager
-import com.example.llamadroid.tama.game.TamaDailyDreamManager
-import com.example.llamadroid.tama.game.TamaDeepDreamRunClaimAction
-import com.example.llamadroid.tama.game.TamaDeepDreamRunCoordinator
-import com.example.llamadroid.tama.db.TamaArtworkEntity
-import com.example.llamadroid.tama.db.TamaDatabase
-import com.example.llamadroid.tama.notifications.TamaNotificationScheduler
+import com.blackbox.ai.R
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.tama.game.PetMapper
+import com.blackbox.ai.tama.game.TamaArtworkManager
+import com.blackbox.ai.tama.game.TamaDailyDreamManager
+import com.blackbox.ai.tama.game.TamaDeepDreamRunClaimAction
+import com.blackbox.ai.tama.game.TamaDeepDreamRunCoordinator
+import com.blackbox.ai.tama.db.TamaArtworkEntity
+import com.blackbox.ai.tama.db.TamaDatabase
+import com.blackbox.ai.tama.notifications.TamaNotificationScheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -36,7 +36,7 @@ class TamaDeepDreamService : Service() {
     private var activePetId: String? = null
 
     companion object {
-        private const val ACTION_PROCESS_DEEP_DREAM = "com.example.llamadroid.action.PROCESS_TAMA_DEEP_DREAM"
+        private const val ACTION_PROCESS_DEEP_DREAM = "com.blackbox.ai.action.PROCESS_TAMA_DEEP_DREAM"
         private const val EXTRA_PET_ID = "pet_id"
         private const val EXTRA_SIGNATURE = "signature"
         private const val EXTRA_FORCE = "force"
@@ -261,7 +261,7 @@ class TamaDeepDreamService : Service() {
     }
 
     private suspend fun applyQueuedAlbumToPet(
-        tamaDao: com.example.llamadroid.tama.db.TamaDao,
+        tamaDao: com.blackbox.ai.tama.db.TamaDao,
         petId: String,
         sleepStartTime: Long,
         newAlbumId: String,
@@ -282,7 +282,7 @@ class TamaDeepDreamService : Service() {
     }
 
     private suspend fun deleteAlbum(
-        tamaDao: com.example.llamadroid.tama.db.TamaDao,
+        tamaDao: com.blackbox.ai.tama.db.TamaDao,
         petId: String,
         albumId: String
     ) {
@@ -295,13 +295,13 @@ class TamaDeepDreamService : Service() {
     }
 
     private suspend fun deleteLatestSleepDreamIfNeeded(
-        tamaDao: com.example.llamadroid.tama.db.TamaDao,
+        tamaDao: com.blackbox.ai.tama.db.TamaDao,
         petId: String,
         sinceMillis: Long
     ) {
         tamaDao.getArtworks(petId)
             .asSequence()
-            .filter { it.kind == com.example.llamadroid.tama.data.TamaArtworkKind.DREAM.name }
+            .filter { it.kind == com.blackbox.ai.tama.data.TamaArtworkKind.DREAM.name }
             .filter { it.sourceActivity == "sleeping" }
             .filter { it.createdAt >= sinceMillis }
             .maxByOrNull(TamaArtworkEntity::createdAt)
@@ -358,7 +358,7 @@ class TamaDeepDreamService : Service() {
         stopSelf(startId)
     }
 
-    private fun buildForceSignature(pet: com.example.llamadroid.tama.data.TamaPet, now: Long): String {
+    private fun buildForceSignature(pet: com.blackbox.ai.tama.data.TamaPet, now: Long): String {
         val dreamDate = TamaDailyDreamManager.formatDreamDate(pet.sleepStartTime ?: now)
         return "deep:$dreamDate:$now:force"
     }

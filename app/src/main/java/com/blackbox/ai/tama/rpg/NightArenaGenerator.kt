@@ -1,6 +1,6 @@
 package com.blackbox.ai.tama.rpg
 
-import com.example.llamadroid.R
+import com.blackbox.ai.R
 import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneId

@@ -1,8 +1,8 @@
 package com.blackbox.ai.service
 
-import com.example.llamadroid.LlamaApplication
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.WakeLockManager
+import com.blackbox.ai.LlamaApplication
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.WakeLockManager
 import java.net.URI
 import java.util.concurrent.atomic.AtomicInteger
 

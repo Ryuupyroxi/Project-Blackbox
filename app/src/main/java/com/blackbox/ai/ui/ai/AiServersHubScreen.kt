@@ -389,7 +389,7 @@ private fun AiServerConfigCard(
     displayName: String,
     type: AiServerType?,
     runtimeState: AiServerRuntimeState?,
-    logs: List<com.example.llamadroid.util.LogEntry>,
+    logs: List<com.blackbox.ai.util.LogEntry>,
     logsExpanded: Boolean,
     portDraft: String,
     portError: Boolean,
@@ -639,7 +639,7 @@ private fun QrAndUrlPanel(
 
 @Composable
 private fun LogsPanel(
-    logs: List<com.example.llamadroid.util.LogEntry>,
+    logs: List<com.blackbox.ai.util.LogEntry>,
     expanded: Boolean,
     onToggle: () -> Unit,
     onCopy: () -> Unit,

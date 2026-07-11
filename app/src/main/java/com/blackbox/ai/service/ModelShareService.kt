@@ -7,8 +7,8 @@ import android.net.wifi.WifiManager
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.ModelEntity
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.ModelEntity
 import fi.iki.elonen.NanoHTTPD
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow

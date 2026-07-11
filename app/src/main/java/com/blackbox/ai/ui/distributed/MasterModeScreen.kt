@@ -70,7 +70,7 @@ import com.blackbox.ai.service.RemoteMasterServer
 fun MasterModeScreen(navController: NavController) {
     val context = LocalContext.current
     val db = remember { AppDatabase.getDatabase(context) }
-    val settingsRepo = remember { com.example.llamadroid.data.SettingsRepository(context) }
+    val settingsRepo = remember { com.blackbox.ai.data.SettingsRepository(context) }
     val coroutineScope = rememberCoroutineScope()
     
     // Collect saved workers from database
@@ -118,10 +118,10 @@ fun MasterModeScreen(navController: NavController) {
     
     // Debug: log what models we have
     LaunchedEffect(allModels) {
-        com.example.llamadroid.util.DebugLog.log("[MasterMode] Total models in DB: ${allModels.size}")
+        com.blackbox.ai.util.DebugLog.log("[MasterMode] Total models in DB: ${allModels.size}")
         allModels.forEach {
             val fileExists = java.io.File(it.path).exists()
-            com.example.llamadroid.util.DebugLog.log("[MasterMode] Model: ${it.filename}, type=${it.type}, downloaded=${it.isDownloaded}, fileExists=$fileExists")
+            com.blackbox.ai.util.DebugLog.log("[MasterMode] Model: ${it.filename}, type=${it.type}, downloaded=${it.isDownloaded}, fileExists=$fileExists")
         }
     }
     
@@ -237,9 +237,9 @@ fun MasterModeScreen(navController: NavController) {
     
     // Debug: Log discovered services
     LaunchedEffect(discoveredServices.size) {
-        com.example.llamadroid.util.DebugLog.log("[MasterMode] Discovered services count: ${discoveredServices.size}")
+        com.blackbox.ai.util.DebugLog.log("[MasterMode] Discovered services count: ${discoveredServices.size}")
         discoveredServices.forEach { 
-            com.example.llamadroid.util.DebugLog.log("[MasterMode] Service: ${it.serviceName}, Host: ${it.host}, Port: ${it.port}")
+            com.blackbox.ai.util.DebugLog.log("[MasterMode] Service: ${it.serviceName}, Host: ${it.host}, Port: ${it.port}")
         }
     }
     
@@ -3050,7 +3050,7 @@ fun RemoteMasterCard(modifier: Modifier = Modifier) {
                                             val sRes = httpClient.newCall(sReq).execute()
                                             if (sRes.isSuccessful) sRes.body?.string()?.let { DistributedService.setRemoteClientStatusStr(it) }
                                         } catch (e: Exception) {
-                                            com.example.llamadroid.util.DebugLog.log("Remote restart error: ${e.message}")
+                                            com.blackbox.ai.util.DebugLog.log("Remote restart error: ${e.message}")
                                         } finally { clientRestarting = false }
                                     }
                                 },
@@ -3074,7 +3074,7 @@ fun RemoteMasterCard(modifier: Modifier = Modifier) {
                                                 .build()
                                             httpClient.newCall(req).execute()
                                         } catch (e: Exception) {
-                                            com.example.llamadroid.util.DebugLog.log("Remote stop error: ${e.message}")
+                                            com.blackbox.ai.util.DebugLog.log("Remote stop error: ${e.message}")
                                         }
                                     }
                                 },
@@ -3259,7 +3259,7 @@ fun RemoteMasterCard(modifier: Modifier = Modifier) {
                                             .build()
                                         httpClient.newCall(req).execute()
                                     } catch (e: Exception) {
-                                        com.example.llamadroid.util.DebugLog.log("Remote speculative error: ${e.message}")
+                                        com.blackbox.ai.util.DebugLog.log("Remote speculative error: ${e.message}")
                                     } finally { clientSpecUpdating = false }
                                 }
                             },
@@ -3322,7 +3322,7 @@ fun RemoteMasterCard(modifier: Modifier = Modifier) {
                                                 val sReq = okhttp3.Request.Builder().url("https://$clientIp/status").header("X-Auth-Token", authToken).build()
                                                 val sRes = httpClient.newCall(sReq).execute()
                                                 if (sRes.isSuccessful) sRes.body?.string()?.let { DistributedService.setRemoteClientStatusStr(it) }
-                                            } catch (e: Exception) { com.example.llamadroid.util.DebugLog.log("Remote delete error: ${e.message}") }
+                                            } catch (e: Exception) { com.blackbox.ai.util.DebugLog.log("Remote delete error: ${e.message}") }
                                             finally { deleteInProgress = false }
                                         }
                                     }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) { Text(stringResource(R.string.action_delete), color = MaterialTheme.colorScheme.onError) }
@@ -3642,7 +3642,7 @@ fun RemoteMasterCard(modifier: Modifier = Modifier) {
                                 val statusRes = httpClient.newCall(statusReq).execute()
                                 if (statusRes.isSuccessful) statusRes.body?.string()?.let { DistributedService.setRemoteClientStatusStr(it) }
                             }
-                        } catch (e: Exception) { com.example.llamadroid.util.DebugLog.log("Remote switch error: ${e.message}") }
+                        } catch (e: Exception) { com.blackbox.ai.util.DebugLog.log("Remote switch error: ${e.message}") }
                         finally { clientSwitching = false }
                     }
                 }) { Text(stringResource(R.string.action_yes)) }

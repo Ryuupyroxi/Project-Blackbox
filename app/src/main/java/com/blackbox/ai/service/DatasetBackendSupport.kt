@@ -1,9 +1,9 @@
 package com.blackbox.ai.service
 
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.data.api.CompletionRequest
-import com.example.llamadroid.data.api.LlamaServerApi
-import com.example.llamadroid.data.db.DatasetProjectEntity
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.data.api.CompletionRequest
+import com.blackbox.ai.data.api.LlamaServerApi
+import com.blackbox.ai.data.db.DatasetProjectEntity
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
 import okhttp3.Callback

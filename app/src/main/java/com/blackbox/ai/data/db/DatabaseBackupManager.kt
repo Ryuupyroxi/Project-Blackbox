@@ -3,9 +3,9 @@ package com.blackbox.ai.data.db
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
-import com.example.llamadroid.R
-import com.example.llamadroid.tama.db.TamaDatabase
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.R
+import com.blackbox.ai.tama.db.TamaDatabase
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File

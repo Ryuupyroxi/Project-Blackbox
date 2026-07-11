@@ -5,23 +5,23 @@ import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
-import com.example.llamadroid.R
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.onnx.OnnxImageGenConfig
-import com.example.llamadroid.onnx.OnnxImageGenMode
-import com.example.llamadroid.onnx.OnnxRuntimeBackend
-import com.example.llamadroid.onnx.OnnxRuntimeOptions
-import com.example.llamadroid.onnx.OnnxTxt2ImgPipeline
-import com.example.llamadroid.onnx.isOnnxTxt2ImgBundle
-import com.example.llamadroid.service.UnifiedNotificationManager.TaskType
-import com.example.llamadroid.tama.game.PetMapper
-import com.example.llamadroid.tama.game.TamaAgentService
-import com.example.llamadroid.tama.game.TamaDeepDreamRunCoordinator
-import com.example.llamadroid.tama.data.TamaArtworkStatus
-import com.example.llamadroid.tama.data.TamaPet
-import com.example.llamadroid.tama.db.TamaArtworkEntity
-import com.example.llamadroid.tama.db.TamaDatabase
+import com.blackbox.ai.R
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.onnx.OnnxImageGenConfig
+import com.blackbox.ai.onnx.OnnxImageGenMode
+import com.blackbox.ai.onnx.OnnxRuntimeBackend
+import com.blackbox.ai.onnx.OnnxRuntimeOptions
+import com.blackbox.ai.onnx.OnnxTxt2ImgPipeline
+import com.blackbox.ai.onnx.isOnnxTxt2ImgBundle
+import com.blackbox.ai.service.UnifiedNotificationManager.TaskType
+import com.blackbox.ai.tama.game.PetMapper
+import com.blackbox.ai.tama.game.TamaAgentService
+import com.blackbox.ai.tama.game.TamaDeepDreamRunCoordinator
+import com.blackbox.ai.tama.data.TamaArtworkStatus
+import com.blackbox.ai.tama.data.TamaPet
+import com.blackbox.ai.tama.db.TamaArtworkEntity
+import com.blackbox.ai.tama.db.TamaDatabase
 import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -94,7 +94,7 @@ class TamaArtworkGenerationService : Service() {
                 errorMessage = null
             )
             tamaDao.saveArtwork(startedArtwork)
-            if (startedArtwork.kind == com.example.llamadroid.tama.data.TamaArtworkKind.DAILY_DREAM.name) {
+            if (startedArtwork.kind == com.blackbox.ai.tama.data.TamaArtworkKind.DAILY_DREAM.name) {
                 startedArtwork.albumId?.let { albumId ->
                     TamaDeepDreamRunCoordinator.markArtworkRunningForAlbum(
                         database = tamaDatabase,
@@ -177,7 +177,7 @@ class TamaArtworkGenerationService : Service() {
         tamaDatabase: TamaDatabase,
         artwork: TamaArtworkEntity
     ) {
-        if (artwork.kind != com.example.llamadroid.tama.data.TamaArtworkKind.DAILY_DREAM.name) return
+        if (artwork.kind != com.blackbox.ai.tama.data.TamaArtworkKind.DAILY_DREAM.name) return
         val albumId = artwork.albumId ?: return
         val run = tamaDatabase.tamaDao().getDeepDreamRunByAlbumId(albumId) ?: return
         TamaDeepDreamRunCoordinator.reconcileAlbumState(
@@ -189,10 +189,10 @@ class TamaArtworkGenerationService : Service() {
     }
 
     private suspend fun maybeRefreshDeepDreamSummary(
-        tamaDao: com.example.llamadroid.tama.db.TamaDao,
+        tamaDao: com.blackbox.ai.tama.db.TamaDao,
         artwork: TamaArtworkEntity
     ) {
-        if (artwork.kind != com.example.llamadroid.tama.data.TamaArtworkKind.DAILY_DREAM.name) return
+        if (artwork.kind != com.blackbox.ai.tama.data.TamaArtworkKind.DAILY_DREAM.name) return
         val albumId = artwork.albumId ?: return
         val albumArtworks = tamaDao.getArtworks(artwork.petId)
             .filter { it.albumId == albumId }
@@ -229,7 +229,7 @@ class TamaArtworkGenerationService : Service() {
     }
 
     private fun titleForArtwork(artwork: TamaArtworkEntity): String {
-        return if (artwork.kind == com.example.llamadroid.tama.data.TamaArtworkKind.DAILY_DREAM.name) {
+        return if (artwork.kind == com.blackbox.ai.tama.data.TamaArtworkKind.DAILY_DREAM.name) {
             getString(R.string.tama_deep_dream_service_title)
         } else {
             getString(R.string.tama_pic_gen_service_title)
@@ -237,7 +237,7 @@ class TamaArtworkGenerationService : Service() {
     }
 
     private fun statusTextForArtwork(artwork: TamaArtworkEntity): String {
-        return if (artwork.kind == com.example.llamadroid.tama.data.TamaArtworkKind.DAILY_DREAM.name) {
+        return if (artwork.kind == com.blackbox.ai.tama.data.TamaArtworkKind.DAILY_DREAM.name) {
             val albumIndex = artwork.albumIndex + 1
             val albumTotal = 4
             getString(R.string.tama_deep_dream_generating_slide, albumIndex, albumTotal)
@@ -247,7 +247,7 @@ class TamaArtworkGenerationService : Service() {
     }
 
     companion object {
-        private const val ACTION_PROCESS_QUEUE = "com.example.llamadroid.action.PROCESS_TAMA_ARTWORK_QUEUE"
+        private const val ACTION_PROCESS_QUEUE = "com.blackbox.ai.action.PROCESS_TAMA_ARTWORK_QUEUE"
 
         fun createProcessQueueIntent(context: Context): Intent =
             Intent(context, TamaArtworkGenerationService::class.java).apply {

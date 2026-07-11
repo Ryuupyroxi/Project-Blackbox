@@ -4,22 +4,22 @@ import android.content.Context
 import android.net.Uri
 import android.os.Environment
 import androidx.documentfile.provider.DocumentFile
-import com.example.llamadroid.R
-import com.example.llamadroid.data.api.HuggingFaceService
-import com.example.llamadroid.data.dao.LiteRtModelDao
-import com.example.llamadroid.data.db.ModelType
-import com.example.llamadroid.data.model.DownloadProgressHolder
-import com.example.llamadroid.data.model.LITERT_BACKEND_AUTO
-import com.example.llamadroid.data.model.LITERT_BACKEND_CPU
-import com.example.llamadroid.data.model.LiteRtModelEntity
-import com.example.llamadroid.data.model.PendingDownload
-import com.example.llamadroid.data.model.PendingDownloadHolder
-import com.example.llamadroid.data.model.liteRtAudioSupportFromText
-import com.example.llamadroid.data.model.liteRtEngineMaxTokensFromText
-import com.example.llamadroid.data.model.liteRtVisionSupportFromText
-import com.example.llamadroid.data.model.normalizeLiteRtBackend
-import com.example.llamadroid.service.DownloadService
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.R
+import com.blackbox.ai.data.api.HuggingFaceService
+import com.blackbox.ai.data.dao.LiteRtModelDao
+import com.blackbox.ai.data.db.ModelType
+import com.blackbox.ai.data.model.DownloadProgressHolder
+import com.blackbox.ai.data.model.LITERT_BACKEND_AUTO
+import com.blackbox.ai.data.model.LITERT_BACKEND_CPU
+import com.blackbox.ai.data.model.LiteRtModelEntity
+import com.blackbox.ai.data.model.PendingDownload
+import com.blackbox.ai.data.model.PendingDownloadHolder
+import com.blackbox.ai.data.model.liteRtAudioSupportFromText
+import com.blackbox.ai.data.model.liteRtEngineMaxTokensFromText
+import com.blackbox.ai.data.model.liteRtVisionSupportFromText
+import com.blackbox.ai.data.model.normalizeLiteRtBackend
+import com.blackbox.ai.service.DownloadService
+import com.blackbox.ai.util.DebugLog
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -574,7 +574,7 @@ class LiteRtModelRepository(
         }
     }
 
-    private suspend fun resolveCatalogPackage(entry: LiteRtCatalogEntry): com.example.llamadroid.data.api.HfTreeItemDto {
+    private suspend fun resolveCatalogPackage(entry: LiteRtCatalogEntry): com.blackbox.ai.data.api.HfTreeItemDto {
         val files = try {
             hfService.getRepoTree(entry.repoId, recursive = true)
         } catch (e: HttpException) {
@@ -585,7 +585,7 @@ class LiteRtModelRepository(
                 val lower = item.path.lowercase(Locale.US)
                 lower.endsWith(".litertlm") || lower.endsWith(".zip")
             }
-            .sortedWith(compareByDescending<com.example.llamadroid.data.api.HfTreeItemDto> {
+            .sortedWith(compareByDescending<com.blackbox.ai.data.api.HfTreeItemDto> {
                 it.path.lowercase(Locale.US).endsWith(".litertlm")
             }.thenByDescending { it.size })
         return entry.preferredFileName

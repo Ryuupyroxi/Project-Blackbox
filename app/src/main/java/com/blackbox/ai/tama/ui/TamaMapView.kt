@@ -26,13 +26,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
-import com.example.llamadroid.R
-import com.example.llamadroid.tama.data.TamaAmbientNpcCatalog
-import com.example.llamadroid.tama.data.TamaAmbientNpcState
-import com.example.llamadroid.tama.data.TamaLocation
-import com.example.llamadroid.tama.data.LocationType
-import com.example.llamadroid.tama.data.localizedDescription
-import com.example.llamadroid.tama.data.localizedName
+import com.blackbox.ai.R
+import com.blackbox.ai.tama.data.TamaAmbientNpcCatalog
+import com.blackbox.ai.tama.data.TamaAmbientNpcState
+import com.blackbox.ai.tama.data.TamaLocation
+import com.blackbox.ai.tama.data.LocationType
+import com.blackbox.ai.tama.data.localizedDescription
+import com.blackbox.ai.tama.data.localizedName
 
 private const val UNKNOWN_LOCATION_ICON_ASSET = "tama/map/unknown.png"
 
@@ -81,7 +81,7 @@ fun TamaMapView(
                         val location = locations.find { it.x == x && it.y == y }
                         // Home is always discovered
                         val isDiscovered = location != null && (
-                            location.type == com.example.llamadroid.tama.data.LocationType.HOME ||
+                            location.type == com.blackbox.ai.tama.data.LocationType.HOME ||
                             discoveredLocationIds.contains(location.id)
                         )
                         LocationTile(

@@ -1,9 +1,9 @@
 package com.blackbox.ai.tama.game
 
 import android.content.Context
-import com.example.llamadroid.tama.data.*
-import com.example.llamadroid.tama.db.*
-import com.example.llamadroid.tama.notifications.TamaNotificationScheduler
+import com.blackbox.ai.tama.data.*
+import com.blackbox.ai.tama.db.*
+import com.blackbox.ai.tama.notifications.TamaNotificationScheduler
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.decodeFromString

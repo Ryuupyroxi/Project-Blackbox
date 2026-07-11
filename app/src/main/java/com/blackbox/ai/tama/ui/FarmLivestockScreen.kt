@@ -57,23 +57,23 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.llamadroid.R
-import com.example.llamadroid.tama.data.FarmLivestockSlot
-import com.example.llamadroid.tama.data.FarmLivestockType
-import com.example.llamadroid.tama.data.FarmTradeItemCatalog
-import com.example.llamadroid.tama.data.InventoryItem
-import com.example.llamadroid.tama.data.ItemType
-import com.example.llamadroid.tama.data.LIVESTOCK_FEED_ASSET_PATH
-import com.example.llamadroid.tama.data.LIVESTOCK_FEED_ITEM_ID
-import com.example.llamadroid.tama.data.TamaPet
-import com.example.llamadroid.tama.data.emptyLivestockSlots
-import com.example.llamadroid.tama.data.hungryLivestockCount
-import com.example.llamadroid.tama.data.livestockNeedsFeed
-import com.example.llamadroid.tama.data.livestockStructureCapacity
-import com.example.llamadroid.tama.data.occupiedLivestockCount
-import com.example.llamadroid.tama.data.storedLivestockOutput
-import com.example.llamadroid.tama.game.FarmRepository
-import com.example.llamadroid.tama.game.TamaGameEngine
+import com.blackbox.ai.R
+import com.blackbox.ai.tama.data.FarmLivestockSlot
+import com.blackbox.ai.tama.data.FarmLivestockType
+import com.blackbox.ai.tama.data.FarmTradeItemCatalog
+import com.blackbox.ai.tama.data.InventoryItem
+import com.blackbox.ai.tama.data.ItemType
+import com.blackbox.ai.tama.data.LIVESTOCK_FEED_ASSET_PATH
+import com.blackbox.ai.tama.data.LIVESTOCK_FEED_ITEM_ID
+import com.blackbox.ai.tama.data.TamaPet
+import com.blackbox.ai.tama.data.emptyLivestockSlots
+import com.blackbox.ai.tama.data.hungryLivestockCount
+import com.blackbox.ai.tama.data.livestockNeedsFeed
+import com.blackbox.ai.tama.data.livestockStructureCapacity
+import com.blackbox.ai.tama.data.occupiedLivestockCount
+import com.blackbox.ai.tama.data.storedLivestockOutput
+import com.blackbox.ai.tama.game.FarmRepository
+import com.blackbox.ai.tama.game.TamaGameEngine
 import java.util.Locale
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -275,7 +275,7 @@ private fun FarmLivestockScreen(
                                             )
                                             gameEngine.logEvent(
                                                 pet.id,
-                                                com.example.llamadroid.tama.data.EventType.OTHER,
+                                                com.blackbox.ai.tama.data.EventType.OTHER,
                                                 context.getString(
                                                     if (type == FarmLivestockType.BARN) R.string.tama_event_collected_milk else R.string.tama_event_collected_eggs,
                                                     collected
@@ -425,7 +425,7 @@ private fun FarmLivestockScreen(
                                     }
                                     gameEngine.logEvent(
                                         pet.id,
-                                        com.example.llamadroid.tama.data.EventType.OTHER,
+                                        com.blackbox.ai.tama.data.EventType.OTHER,
                                         context.getString(
                                             if (type == FarmLivestockType.BARN) R.string.tama_event_fed_cow else R.string.tama_event_fed_chicken
                                         )

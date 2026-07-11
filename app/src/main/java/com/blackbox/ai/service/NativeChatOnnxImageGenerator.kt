@@ -1,17 +1,17 @@
 package com.blackbox.ai.service
 
 import android.content.Context
-import com.example.llamadroid.R
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.ModelType
-import com.example.llamadroid.onnx.OnnxGeneratedImageMetadata
-import com.example.llamadroid.onnx.OnnxImageGenConfig
-import com.example.llamadroid.onnx.OnnxImageGenMode
-import com.example.llamadroid.onnx.OnnxRuntimeOptions
-import com.example.llamadroid.onnx.OnnxStorage
-import com.example.llamadroid.onnx.OnnxTxt2ImgPipeline
-import com.example.llamadroid.onnx.isOnnxTxt2ImgBundle
-import com.example.llamadroid.onnx.normalizeOnnxCanvasSize
+import com.blackbox.ai.R
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.ModelType
+import com.blackbox.ai.onnx.OnnxGeneratedImageMetadata
+import com.blackbox.ai.onnx.OnnxImageGenConfig
+import com.blackbox.ai.onnx.OnnxImageGenMode
+import com.blackbox.ai.onnx.OnnxRuntimeOptions
+import com.blackbox.ai.onnx.OnnxStorage
+import com.blackbox.ai.onnx.OnnxTxt2ImgPipeline
+import com.blackbox.ai.onnx.isOnnxTxt2ImgBundle
+import com.blackbox.ai.onnx.normalizeOnnxCanvasSize
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Locale
@@ -78,7 +78,7 @@ class NativeChatOnnxImageGenerator(
                 ),
                 onProgress = { _, status ->
                     status.takeIf { it.isNotBlank() }?.let {
-                        com.example.llamadroid.util.DebugLog.log("[NativeChatImage] $it")
+                        com.blackbox.ai.util.DebugLog.log("[NativeChatImage] $it")
                     }
                 }
             )

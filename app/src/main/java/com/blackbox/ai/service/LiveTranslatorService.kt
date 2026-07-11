@@ -13,17 +13,17 @@ import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.os.IBinder
 import androidx.core.content.ContextCompat
-import com.example.llamadroid.R
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.LIVE_TRANSLATOR_SPEAKER_ONE
-import com.example.llamadroid.data.db.LIVE_TRANSLATOR_SPEAKER_TWO
-import com.example.llamadroid.data.db.LiveTranslatorSessionEntity
-import com.example.llamadroid.data.db.LiveTranslatorTemplateEntity
-import com.example.llamadroid.data.db.LiveTranslatorTurnEntity
-import com.example.llamadroid.onnx.OnnxTtsRequest
-import com.example.llamadroid.onnx.SupertonicTtsPipeline
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.WakeLockManager
+import com.blackbox.ai.R
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.LIVE_TRANSLATOR_SPEAKER_ONE
+import com.blackbox.ai.data.db.LIVE_TRANSLATOR_SPEAKER_TWO
+import com.blackbox.ai.data.db.LiveTranslatorSessionEntity
+import com.blackbox.ai.data.db.LiveTranslatorTemplateEntity
+import com.blackbox.ai.data.db.LiveTranslatorTurnEntity
+import com.blackbox.ai.onnx.OnnxTtsRequest
+import com.blackbox.ai.onnx.SupertonicTtsPipeline
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.WakeLockManager
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -507,7 +507,7 @@ class LiveTranslatorService : Service() {
     ): Result<WhisperResult> {
         val modelPath = template.whisperModelPath
             ?.takeIf { it.isNotBlank() && File(it).exists() }
-            ?: database.modelDao().getModelsByTypesSync(listOf(com.example.llamadroid.data.db.ModelType.WHISPER))
+            ?: database.modelDao().getModelsByTypesSync(listOf(com.blackbox.ai.data.db.ModelType.WHISPER))
                 .firstOrNull()
                 ?.path
             ?: throw IllegalStateException(getString(R.string.whisper_error_no_model))
@@ -531,7 +531,7 @@ class LiveTranslatorService : Service() {
     ): Result<WhisperResult> {
         val modelPath = whisperModelPath
             ?.takeIf { it.isNotBlank() && File(it).exists() }
-            ?: database.modelDao().getModelsByTypesSync(listOf(com.example.llamadroid.data.db.ModelType.WHISPER))
+            ?: database.modelDao().getModelsByTypesSync(listOf(com.blackbox.ai.data.db.ModelType.WHISPER))
                 .firstOrNull()
                 ?.path
             ?: throw IllegalStateException(getString(R.string.whisper_error_no_model))
@@ -728,9 +728,9 @@ class LiveTranslatorService : Service() {
     }
 
     companion object {
-        const val ACTION_START = "com.example.llamadroid.action.START_LIVE_TRANSLATOR"
-        const val ACTION_STOP = "com.example.llamadroid.action.STOP_LIVE_TRANSLATOR"
-        const val ACTION_SET_NEXT_SPEAKER = "com.example.llamadroid.action.SET_LIVE_TRANSLATOR_NEXT_SPEAKER"
+        const val ACTION_START = "com.blackbox.ai.action.START_LIVE_TRANSLATOR"
+        const val ACTION_STOP = "com.blackbox.ai.action.STOP_LIVE_TRANSLATOR"
+        const val ACTION_SET_NEXT_SPEAKER = "com.blackbox.ai.action.SET_LIVE_TRANSLATOR_NEXT_SPEAKER"
         const val EXTRA_TEMPLATE_ID = "TEMPLATE_ID"
         const val EXTRA_SESSION_ID = "SESSION_ID"
         const val EXTRA_SPEAKER = "SPEAKER"
@@ -767,7 +767,7 @@ class LiveTranslatorService : Service() {
                 putExtra(EXTRA_WHISPER_THREADS, whisperThreads)
             }
 
-        const val ACTION_SAMPLE_LANGUAGE = "com.example.llamadroid.action.SAMPLE_LIVE_TRANSLATOR_LANGUAGE"
+        const val ACTION_SAMPLE_LANGUAGE = "com.blackbox.ai.action.SAMPLE_LIVE_TRANSLATOR_LANGUAGE"
         const val EXTRA_WHISPER_MODEL_PATH = "WHISPER_MODEL_PATH"
         const val EXTRA_WHISPER_THREADS = "WHISPER_THREADS"
     }

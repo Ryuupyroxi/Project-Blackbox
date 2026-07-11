@@ -75,8 +75,8 @@ class AgentViewModel(
     val conversations: StateFlow<List<AgentConversationEntity>> = _conversations.asStateFlow()
 
     // ========== ACTIVE CUSTOM AGENT ==========
-    private var _activeCustomAgent: com.example.llamadroid.data.db.CustomAgentEntity? = null
-    val activeCustomAgent: com.example.llamadroid.data.db.CustomAgentEntity?
+    private var _activeCustomAgent: com.blackbox.ai.data.db.CustomAgentEntity? = null
+    val activeCustomAgent: com.blackbox.ai.data.db.CustomAgentEntity?
         get() = _activeCustomAgent
 
     init {
@@ -287,7 +287,7 @@ class AgentViewModel(
 
     // ========== ACTIVE AGENT MANAGEMENT ==========
     
-    fun setActiveCustomAgent(agent: com.example.llamadroid.data.db.CustomAgentEntity?) {
+    fun setActiveCustomAgent(agent: com.blackbox.ai.data.db.CustomAgentEntity?) {
         _activeCustomAgent = agent
     }
 

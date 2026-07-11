@@ -3,9 +3,9 @@ package com.blackbox.ai.service
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import com.example.llamadroid.data.model.TermuxTools
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.data.model.TermuxTools
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.util.DebugLog
 import com.jcraft.jsch.ChannelExec
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.Session

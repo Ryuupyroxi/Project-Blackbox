@@ -1,6 +1,6 @@
 package com.blackbox.ai.tama.data
 
-import com.example.llamadroid.R
+import com.blackbox.ai.R
 
 const val TAMA_TRAINING_EXERCISE_PER_HOUR = TAMA_STUDY_EDUCATION_PER_HOUR
 const val TAMA_TRAINING_HAPPINESS_PER_HOUR = 10f

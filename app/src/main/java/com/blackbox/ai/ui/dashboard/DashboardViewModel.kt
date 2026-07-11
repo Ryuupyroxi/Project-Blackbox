@@ -48,7 +48,7 @@ class DashboardViewModel(
                     val code = connection.responseCode
                     if (code == 200) {
                         // Silently update state - no logging to avoid spam
-                        com.example.llamadroid.service.LlamaService.Companion.updateState(ServerState.Running(8080))
+                        com.blackbox.ai.service.LlamaService.Companion.updateState(ServerState.Running(8080))
                     }
                     connection.disconnect()
                 } catch (e: Exception) {
@@ -60,7 +60,7 @@ class DashboardViewModel(
     }
 
     fun startServer(context: Context, modelPath: String? = null) {
-        val settingsRepo = com.example.llamadroid.data.SettingsRepository(context)
+        val settingsRepo = com.blackbox.ai.data.SettingsRepository(context)
         try {
             DebugLog.log("Dashboard: Starting server...")
             val intent = android.content.Intent(context, LlamaService::class.java).apply {

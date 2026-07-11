@@ -8,10 +8,10 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import com.example.llamadroid.data.db.ModelEntity
-import com.example.llamadroid.util.CpuFeatures
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.WakeLockManager
+import com.blackbox.ai.data.db.ModelEntity
+import com.blackbox.ai.util.CpuFeatures
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.WakeLockManager
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -19,9 +19,9 @@ import java.net.InetSocketAddress
 import java.net.Socket
 
 import java.net.NetworkInterface
-import com.example.llamadroid.util.SystemMonitor
-import com.example.llamadroid.service.UnifiedNotificationManager.TaskType
-import com.example.llamadroid.LlamaApplication
+import com.blackbox.ai.util.SystemMonitor
+import com.blackbox.ai.service.UnifiedNotificationManager.TaskType
+import com.blackbox.ai.LlamaApplication
 
 /**
  * Distributed inference modes
@@ -69,8 +69,8 @@ class DistributedService : Service() {
         private const val TAG = "DistributedService"
         const val RPC_DEFAULT_PORT = 50052
         
-        const val ACTION_START_WORKER = "com.example.llamadroid.START_WORKER"
-        const val ACTION_STOP_WORKER = "com.example.llamadroid.STOP_WORKER"
+        const val ACTION_START_WORKER = "com.blackbox.ai.START_WORKER"
+        const val ACTION_STOP_WORKER = "com.blackbox.ai.STOP_WORKER"
         const val EXTRA_PORT = "port"
         const val EXTRA_RAM_MB = "ram_mb"
         const val EXTRA_THREADS = "threads"
@@ -615,7 +615,7 @@ class DistributedService : Service() {
             context.startService(intent)
         }
         // Helper for NSD
-        private var nsdHelper: com.example.llamadroid.util.NsdHelper? = null
+        private var nsdHelper: com.blackbox.ai.util.NsdHelper? = null
         
         // Discovered services from NSD
         private val _discoveredServices = MutableStateFlow<List<android.net.nsd.NsdServiceInfo>>(emptyList())
@@ -625,7 +625,7 @@ class DistributedService : Service() {
         
         private fun ensureNsdHelper(context: Context) {
             if (nsdHelper == null) {
-                nsdHelper = com.example.llamadroid.util.NsdHelper(context.applicationContext)
+                nsdHelper = com.blackbox.ai.util.NsdHelper(context.applicationContext)
                 // Forward discovery events with a managed job
                 nsdCollectionJob = CoroutineScope(Dispatchers.IO).launch {
                     nsdHelper!!.discoveredServices.collect { services ->

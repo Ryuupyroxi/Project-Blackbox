@@ -10,75 +10,75 @@ import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
 import android.util.Base64
-import com.example.llamadroid.data.RemoteSummarySettingsSnapshot
-import com.example.llamadroid.data.SettingsRepository
+import com.blackbox.ai.data.RemoteSummarySettingsSnapshot
+import com.blackbox.ai.data.SettingsRepository
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
-import com.example.llamadroid.data.db.AiServerArtifactEntity
-import com.example.llamadroid.data.db.AiServerConfigEntity
-import com.example.llamadroid.data.db.AiServerPermissionEntity
-import com.example.llamadroid.data.db.AiServerSessionEntity
-import com.example.llamadroid.data.db.AiServerUserEntity
-import com.example.llamadroid.data.db.AiServerWebChatEntity
-import com.example.llamadroid.data.db.AiServerWebMessageAttachmentEntity
-import com.example.llamadroid.data.db.AiServerWebMessageEntity
-import com.example.llamadroid.data.db.AiServerWebProviderEntity
-import com.example.llamadroid.data.db.AiServerWebToolEventEntity
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.NoteEntity
-import com.example.llamadroid.data.db.ModelEntity
-import com.example.llamadroid.data.db.ModelType
-import com.example.llamadroid.data.db.ONNX_CAPABILITY_BACKGROUND_REMOVAL
-import com.example.llamadroid.data.db.ONNX_CAPABILITY_IMG2IMG
-import com.example.llamadroid.data.db.ONNX_CAPABILITY_TTS
-import com.example.llamadroid.data.db.ONNX_CAPABILITY_TXT2IMG
-import com.example.llamadroid.data.db.SD_CAPABILITY_IMG2IMG
-import com.example.llamadroid.data.db.SD_CAPABILITY_TXT2IMG
-import com.example.llamadroid.data.db.SD_CAPABILITY_UPSCALE
-import com.example.llamadroid.data.db.SD_CAPABILITY_VID_GEN
-import com.example.llamadroid.data.db.hasOnnxCapability
-import com.example.llamadroid.data.db.hasSdCapability
-import com.example.llamadroid.data.db.PromptType
-import com.example.llamadroid.data.model.LITERT_BACKEND_AUTO
-import com.example.llamadroid.data.model.LITERT_BACKEND_CPU
-import com.example.llamadroid.data.model.LITERT_BACKEND_GPU
-import com.example.llamadroid.data.model.DatasetEntry
-import com.example.llamadroid.data.model.DatasetExporter
-import com.example.llamadroid.data.model.DatasetFormat
-import com.example.llamadroid.data.model.DatasetSource
-import com.example.llamadroid.data.model.LiteRtModelEntity
-import com.example.llamadroid.data.model.LlamaChatEntity
-import com.example.llamadroid.data.model.LlamaServerEntity
-import com.example.llamadroid.data.model.buildLlamaServerBaseUrl
-import com.example.llamadroid.data.model.normalizeLlamaServerEngine
-import com.example.llamadroid.ui.dataset.DEFAULT_ANSWER_PROMPT
-import com.example.llamadroid.ui.dataset.DEFAULT_CLEAN_PROMPT
-import com.example.llamadroid.ui.dataset.DEFAULT_QUESTION_PROMPT
-import com.example.llamadroid.ui.dataset.DEFAULT_REVIEW_PROMPT
-import com.example.llamadroid.onnx.OnnxBackgroundRemovalConfig
-import com.example.llamadroid.onnx.OnnxBackendOverride
-import com.example.llamadroid.onnx.OnnxExecutionMode
-import com.example.llamadroid.onnx.OnnxGraphOptimizationLevel
-import com.example.llamadroid.onnx.OnnxImageGenConfig
-import com.example.llamadroid.onnx.OnnxImageGenMode
-import com.example.llamadroid.onnx.ONNX_IMAGE_GEN_DEFAULT_STRENGTH
-import com.example.llamadroid.onnx.OnnxRuntimeBackend
-import com.example.llamadroid.onnx.OnnxRuntimeOptions
-import com.example.llamadroid.onnx.OnnxStorage
-import com.example.llamadroid.onnx.SUPERTONIC_DEFAULT_LANGUAGE
-import com.example.llamadroid.onnx.SUPERTONIC_DEFAULT_SPEED
-import com.example.llamadroid.onnx.SUPERTONIC_DEFAULT_TOTAL_STEPS
-import com.example.llamadroid.onnx.resolveSupertonicVoices
-import com.example.llamadroid.sd.SdLoraApplyMode
-import com.example.llamadroid.service.AiServerArtifactTypes.AUDIO
-import com.example.llamadroid.service.AiServerArtifactTypes.DATASET
-import com.example.llamadroid.service.AiServerArtifactTypes.DOCUMENT
-import com.example.llamadroid.service.AiServerArtifactTypes.IMAGE
-import com.example.llamadroid.service.AiServerArtifactTypes.VIDEO
-import com.example.llamadroid.data.db.NoteType
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.widget.NoteDisplayWidgetProvider
-import com.example.llamadroid.widget.OrganizerCalendarWidgetProvider
+import com.blackbox.ai.data.db.AiServerArtifactEntity
+import com.blackbox.ai.data.db.AiServerConfigEntity
+import com.blackbox.ai.data.db.AiServerPermissionEntity
+import com.blackbox.ai.data.db.AiServerSessionEntity
+import com.blackbox.ai.data.db.AiServerUserEntity
+import com.blackbox.ai.data.db.AiServerWebChatEntity
+import com.blackbox.ai.data.db.AiServerWebMessageAttachmentEntity
+import com.blackbox.ai.data.db.AiServerWebMessageEntity
+import com.blackbox.ai.data.db.AiServerWebProviderEntity
+import com.blackbox.ai.data.db.AiServerWebToolEventEntity
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.NoteEntity
+import com.blackbox.ai.data.db.ModelEntity
+import com.blackbox.ai.data.db.ModelType
+import com.blackbox.ai.data.db.ONNX_CAPABILITY_BACKGROUND_REMOVAL
+import com.blackbox.ai.data.db.ONNX_CAPABILITY_IMG2IMG
+import com.blackbox.ai.data.db.ONNX_CAPABILITY_TTS
+import com.blackbox.ai.data.db.ONNX_CAPABILITY_TXT2IMG
+import com.blackbox.ai.data.db.SD_CAPABILITY_IMG2IMG
+import com.blackbox.ai.data.db.SD_CAPABILITY_TXT2IMG
+import com.blackbox.ai.data.db.SD_CAPABILITY_UPSCALE
+import com.blackbox.ai.data.db.SD_CAPABILITY_VID_GEN
+import com.blackbox.ai.data.db.hasOnnxCapability
+import com.blackbox.ai.data.db.hasSdCapability
+import com.blackbox.ai.data.db.PromptType
+import com.blackbox.ai.data.model.LITERT_BACKEND_AUTO
+import com.blackbox.ai.data.model.LITERT_BACKEND_CPU
+import com.blackbox.ai.data.model.LITERT_BACKEND_GPU
+import com.blackbox.ai.data.model.DatasetEntry
+import com.blackbox.ai.data.model.DatasetExporter
+import com.blackbox.ai.data.model.DatasetFormat
+import com.blackbox.ai.data.model.DatasetSource
+import com.blackbox.ai.data.model.LiteRtModelEntity
+import com.blackbox.ai.data.model.LlamaChatEntity
+import com.blackbox.ai.data.model.LlamaServerEntity
+import com.blackbox.ai.data.model.buildLlamaServerBaseUrl
+import com.blackbox.ai.data.model.normalizeLlamaServerEngine
+import com.blackbox.ai.ui.dataset.DEFAULT_ANSWER_PROMPT
+import com.blackbox.ai.ui.dataset.DEFAULT_CLEAN_PROMPT
+import com.blackbox.ai.ui.dataset.DEFAULT_QUESTION_PROMPT
+import com.blackbox.ai.ui.dataset.DEFAULT_REVIEW_PROMPT
+import com.blackbox.ai.onnx.OnnxBackgroundRemovalConfig
+import com.blackbox.ai.onnx.OnnxBackendOverride
+import com.blackbox.ai.onnx.OnnxExecutionMode
+import com.blackbox.ai.onnx.OnnxGraphOptimizationLevel
+import com.blackbox.ai.onnx.OnnxImageGenConfig
+import com.blackbox.ai.onnx.OnnxImageGenMode
+import com.blackbox.ai.onnx.ONNX_IMAGE_GEN_DEFAULT_STRENGTH
+import com.blackbox.ai.onnx.OnnxRuntimeBackend
+import com.blackbox.ai.onnx.OnnxRuntimeOptions
+import com.blackbox.ai.onnx.OnnxStorage
+import com.blackbox.ai.onnx.SUPERTONIC_DEFAULT_LANGUAGE
+import com.blackbox.ai.onnx.SUPERTONIC_DEFAULT_SPEED
+import com.blackbox.ai.onnx.SUPERTONIC_DEFAULT_TOTAL_STEPS
+import com.blackbox.ai.onnx.resolveSupertonicVoices
+import com.blackbox.ai.sd.SdLoraApplyMode
+import com.blackbox.ai.service.AiServerArtifactTypes.AUDIO
+import com.blackbox.ai.service.AiServerArtifactTypes.DATASET
+import com.blackbox.ai.service.AiServerArtifactTypes.DOCUMENT
+import com.blackbox.ai.service.AiServerArtifactTypes.IMAGE
+import com.blackbox.ai.service.AiServerArtifactTypes.VIDEO
+import com.blackbox.ai.data.db.NoteType
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.widget.NoteDisplayWidgetProvider
+import com.blackbox.ai.widget.OrganizerCalendarWidgetProvider
 import fi.iki.elonen.NanoHTTPD
 import fi.iki.elonen.NanoHTTPD.Response
 import kotlinx.coroutines.CoroutineScope
@@ -2717,10 +2717,10 @@ class AiToolServerService : Service() {
         private fun providerBaseUrl(engine: String, rawBaseUrl: String): String {
             if (engine == SettingsRepository.PDF_BACKEND_LITERT) return ""
             val fallback = when (engine) {
-                SettingsRepository.PDF_BACKEND_OLLAMA -> com.example.llamadroid.util.AIConstants.Urls.OLLAMA_DEFAULT
+                SettingsRepository.PDF_BACKEND_OLLAMA -> com.blackbox.ai.util.AIConstants.Urls.OLLAMA_DEFAULT
                 SettingsRepository.PDF_BACKEND_LLAMA_SWAP -> SettingsRepository.PDF_LLAMA_SWAP_DEFAULT_URL
                 SettingsRepository.PDF_BACKEND_LLAMA_SERVER -> SettingsRepository.PDF_LLAMA_SERVER_DEFAULT_URL
-                else -> com.example.llamadroid.util.AIConstants.Urls.OLLAMA_DEFAULT
+                else -> com.blackbox.ai.util.AIConstants.Urls.OLLAMA_DEFAULT
             }
             return normalizeHttpBaseUrl(rawBaseUrl.ifBlank { fallback })
         }
@@ -2784,7 +2784,7 @@ class AiToolServerService : Service() {
                 ownerUserId = ownerUserId,
                 name = "Ollama localhost",
                 engine = SettingsRepository.PDF_BACKEND_OLLAMA,
-                baseUrl = com.example.llamadroid.util.AIConstants.Urls.OLLAMA_DEFAULT,
+                baseUrl = com.blackbox.ai.util.AIConstants.Urls.OLLAMA_DEFAULT,
                 createdAt = now,
                 updatedAt = now
             )
@@ -3187,7 +3187,7 @@ class AiToolServerService : Service() {
                 alarmCanceler = { alarmId -> OrganizerAlarmScheduler.cancelAlarm(applicationContext, alarmId) },
                 organizerChanged = { OrganizerCalendarWidgetProvider.refreshAll(applicationContext) },
                 notesChanged = { NoteDisplayWidgetProvider.refreshAll(applicationContext) },
-                knowledgeBaseRepository = com.example.llamadroid.data.repository.KnowledgeBaseRepository(applicationContext, db),
+                knowledgeBaseRepository = com.blackbox.ai.data.repository.KnowledgeBaseRepository(applicationContext, db),
                 imageGenerator = NativeChatUnifiedImageGenerator(applicationContext, db),
                 backgroundRemover = NativeChatOnnxBackgroundRemover(applicationContext, db),
                 pdfTextExtractor = { pdfBytes, maxChars ->
@@ -3686,7 +3686,7 @@ class AiToolServerService : Service() {
                     .put("fields", JSONObject()
                         .put("tts_text", ttsFields(includeFile = false))
                         .put("tts_document", ttsFields(includeFile = true)))
-                    .put("languages", JSONArray(com.example.llamadroid.onnx.supertonicLanguageCodes))
+                    .put("languages", JSONArray(com.blackbox.ai.onnx.supertonicLanguageCodes))
                     .put("defaults", JSONObject()
                         .put("tts_text", JSONObject().put("language", SUPERTONIC_DEFAULT_LANGUAGE).put("speed", SUPERTONIC_DEFAULT_SPEED.toDouble()).put("totalSteps", SUPERTONIC_DEFAULT_TOTAL_STEPS))
                         .put("tts_document", JSONObject().put("language", SUPERTONIC_DEFAULT_LANGUAGE).put("speed", SUPERTONIC_DEFAULT_SPEED.toDouble()).put("totalSteps", SUPERTONIC_DEFAULT_TOTAL_STEPS)))
@@ -3780,7 +3780,7 @@ class AiToolServerService : Service() {
                     .put("engines", JSONArray(listOf(engineJson("web_chat", "Chat", "Chat", "web_chat_send"))))
                     .put("modes", JSONArray(listOf(modeJson("web_chat_send", "web_chat", "Chat", "Chat", "Send a message.", "Envia un mensaje."))))
                     .put("fields", JSONObject().put("web_chat_send", llamaFields()))
-                    .put("languages", JSONArray(com.example.llamadroid.onnx.supertonicLanguageCodes))
+                    .put("languages", JSONArray(com.blackbox.ai.onnx.supertonicLanguageCodes))
                     .put("defaults", JSONObject().put("web_chat_send", JSONObject()
                         .put("temperature", 0.7)
                         .put("contextTokens", 8192)
@@ -4175,7 +4175,7 @@ class AiToolServerService : Service() {
                 fieldJson("summaryLlamaServerUrl", "text", "llama-server URL", "URL llama-server", defaultValue = SettingsRepository.PDF_LLAMA_SERVER_DEFAULT_URL, visibleField = "summaryBackend", visibleEquals = SettingsRepository.PDF_BACKEND_LLAMA_SERVER, section = "Summarizer"),
                 fieldJson("summaryLlamaServerModelLabel", "text", "llama-server model", "Modelo llama-server", visibleField = "summaryBackend", visibleEquals = SettingsRepository.PDF_BACKEND_LLAMA_SERVER, section = "Summarizer"),
                 fieldJson("summaryLlamaServerContextTokens", "number", "llama-server context", "Contexto llama-server", defaultValue = -1, min = -1.0, step = 1.0, visibleField = "summaryBackend", visibleEquals = SettingsRepository.PDF_BACKEND_LLAMA_SERVER, section = "Summarizer"),
-                fieldJson("summaryOllamaUrl", "text", "Ollama URL", "URL Ollama", defaultValue = com.example.llamadroid.util.AIConstants.Urls.OLLAMA_DEFAULT, visibleField = "summaryBackend", visibleEquals = SettingsRepository.PDF_BACKEND_OLLAMA, section = "Summarizer"),
+                fieldJson("summaryOllamaUrl", "text", "Ollama URL", "URL Ollama", defaultValue = com.blackbox.ai.util.AIConstants.Urls.OLLAMA_DEFAULT, visibleField = "summaryBackend", visibleEquals = SettingsRepository.PDF_BACKEND_OLLAMA, section = "Summarizer"),
                 fieldJson("summaryOllamaModel", "text", "Ollama model", "Modelo Ollama", visibleField = "summaryBackend", visibleEquals = SettingsRepository.PDF_BACKEND_OLLAMA, section = "Summarizer"),
                 fieldJson("summaryLlamaSwapUrl", "text", "llama-swap URL", "URL llama-swap", defaultValue = SettingsRepository.PDF_LLAMA_SWAP_DEFAULT_URL, visibleField = "summaryBackend", visibleEquals = SettingsRepository.PDF_BACKEND_LLAMA_SWAP, section = "Summarizer"),
                 fieldJson("summaryLlamaSwapModel", "text", "llama-swap model", "Modelo llama-swap", visibleField = "summaryBackend", visibleEquals = SettingsRepository.PDF_BACKEND_LLAMA_SWAP, section = "Summarizer"),
@@ -4330,7 +4330,7 @@ class AiToolServerService : Service() {
         ))
 
         private fun languageOptions(): List<Pair<String, String>> =
-            com.example.llamadroid.onnx.supertonicLanguageCodes.map { it to it }
+            com.blackbox.ai.onnx.supertonicLanguageCodes.map { it to it }
 
         private inline fun <reified T : Enum<T>> enumOptions(): List<Pair<String, String>> =
             enumValues<T>().map { it.name to it.name.replace('_', ' ') }

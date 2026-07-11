@@ -83,7 +83,7 @@ fun AgentWorkspaceScreen(navController: NavController) {
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
     var showTerminalDialog by remember { mutableStateOf(false) }
-    var stopProjectShellSummary by remember { mutableStateOf<com.example.llamadroid.service.ProjectShellSessionSummary?>(null) }
+    var stopProjectShellSummary by remember { mutableStateOf<com.blackbox.ai.service.ProjectShellSessionSummary?>(null) }
     
     // File viewer state
     var viewingFile by remember { mutableStateOf<FileInfo?>(null) }
@@ -1121,7 +1121,7 @@ fun ImageViewerDialog(
 @Composable
 fun WorkspaceTerminalDialog(
     workspaceRoot: String,
-    state: com.example.llamadroid.service.WorkspaceTerminalUiState?,
+    state: com.blackbox.ai.service.WorkspaceTerminalUiState?,
     onDismiss: () -> Unit,
     onSend: (String) -> Unit,
     onInterrupt: () -> Unit,

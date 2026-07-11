@@ -5,9 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.content.ContextCompat
-import com.example.llamadroid.R
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.WakeLockManager
+import com.blackbox.ai.R
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.WakeLockManager
 
 /**
  * Keeps resource-heavy media workflow jobs in Android foreground-service priority.
@@ -76,8 +76,8 @@ class MediaTranslationForegroundService : Service() {
     }
 
     companion object {
-        private const val ACTION_START = "com.example.llamadroid.action.MEDIA_TRANSLATION_FOREGROUND_START"
-        private const val ACTION_STOP = "com.example.llamadroid.action.MEDIA_TRANSLATION_FOREGROUND_STOP"
+        private const val ACTION_START = "com.blackbox.ai.action.MEDIA_TRANSLATION_FOREGROUND_START"
+        private const val ACTION_STOP = "com.blackbox.ai.action.MEDIA_TRANSLATION_FOREGROUND_STOP"
         private const val EXTRA_TITLE = "title"
 
         fun start(context: Context, title: String) {

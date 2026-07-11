@@ -3,18 +3,18 @@ package com.blackbox.ai.service
 import android.content.Context
 import android.os.PowerManager
 import android.widget.Toast
-import com.example.llamadroid.data.RemoteSummarySettingsSnapshot
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.NoteEntity
-import com.example.llamadroid.data.db.NoteType
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.data.RemoteSummarySettingsSnapshot
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.NoteEntity
+import com.blackbox.ai.data.db.NoteType
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import java.io.File
-import com.example.llamadroid.R
+import com.blackbox.ai.R
 
 /**
  * Service to summarize video content using:
@@ -391,7 +391,7 @@ object VideoSumupService {
     
     private fun extractAudio(context: Context, videoPath: String, outputPath: String): Result<Unit> {
         return try {
-            val binaryRepo = com.example.llamadroid.data.binary.BinaryRepository(context)
+            val binaryRepo = com.blackbox.ai.data.binary.BinaryRepository(context)
             val ffmpeg = binaryRepo.getFFmpegBinary()
             if (ffmpeg == null || !ffmpeg.exists()) return Result.failure(Exception("FFmpeg not found"))
             
@@ -417,7 +417,7 @@ object VideoSumupService {
     
     private fun transcribe(context: Context, audioPath: String, modelPath: String, language: String, threads: Int): Result<String> {
         return try {
-            val binaryRepo = com.example.llamadroid.data.binary.BinaryRepository(context)
+            val binaryRepo = com.blackbox.ai.data.binary.BinaryRepository(context)
             val whisper = binaryRepo.getWhisperCliBinary()
             if (whisper == null || !whisper.exists()) return Result.failure(Exception("Whisper not found"))
             

@@ -7,11 +7,11 @@ import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import androidx.core.content.ContextCompat
-import com.example.llamadroid.R
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.repository.KnowledgeBaseIndexProgress
-import com.example.llamadroid.data.repository.KnowledgeBaseRepository
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.R
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.repository.KnowledgeBaseIndexProgress
+import com.blackbox.ai.data.repository.KnowledgeBaseRepository
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -244,14 +244,14 @@ class KnowledgeBaseIndexingService : Service() {
     }
 
     companion object {
-        private const val ACTION_IMPORT_FILE = "com.example.llamadroid.KB_IMPORT_FILE"
-        private const val ACTION_IMPORT_QUEUED_FILE = "com.example.llamadroid.KB_IMPORT_QUEUED_FILE"
-        private const val ACTION_IMPORT_NOTE = "com.example.llamadroid.KB_IMPORT_NOTE"
-        private const val ACTION_IMPORT_WEB = "com.example.llamadroid.KB_IMPORT_WEB"
-        private const val ACTION_REINDEX_SOURCE = "com.example.llamadroid.KB_REINDEX_SOURCE"
-        private const val ACTION_REINDEX_BASE = "com.example.llamadroid.KB_REINDEX_BASE"
-        private const val ACTION_RESUME_SOURCE = "com.example.llamadroid.KB_RESUME_SOURCE"
-        private const val ACTION_RESUME_BASE = "com.example.llamadroid.KB_RESUME_BASE"
+        private const val ACTION_IMPORT_FILE = "com.blackbox.ai.KB_IMPORT_FILE"
+        private const val ACTION_IMPORT_QUEUED_FILE = "com.blackbox.ai.KB_IMPORT_QUEUED_FILE"
+        private const val ACTION_IMPORT_NOTE = "com.blackbox.ai.KB_IMPORT_NOTE"
+        private const val ACTION_IMPORT_WEB = "com.blackbox.ai.KB_IMPORT_WEB"
+        private const val ACTION_REINDEX_SOURCE = "com.blackbox.ai.KB_REINDEX_SOURCE"
+        private const val ACTION_REINDEX_BASE = "com.blackbox.ai.KB_REINDEX_BASE"
+        private const val ACTION_RESUME_SOURCE = "com.blackbox.ai.KB_RESUME_SOURCE"
+        private const val ACTION_RESUME_BASE = "com.blackbox.ai.KB_RESUME_BASE"
         private const val EXTRA_BASE_ID = "base_id"
         private const val EXTRA_SOURCE_ID = "source_id"
         private const val EXTRA_NOTE_ID = "note_id"

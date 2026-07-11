@@ -5,10 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
-import com.example.llamadroid.data.binary.BinaryRepository
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.UpscalerAssetPackSupport
-import com.example.llamadroid.util.WakeLockManager
+import com.blackbox.ai.data.binary.BinaryRepository
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.UpscalerAssetPackSupport
+import com.blackbox.ai.util.WakeLockManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -629,8 +629,8 @@ class VideoUpscalerService : Service() {
     }
     
     companion object {
-        private const val ACTION_START_UPSCALE = "com.example.llamadroid.action.START_VIDEO_UPSCALE"
-        private const val ACTION_CANCEL_UPSCALE = "com.example.llamadroid.action.CANCEL_VIDEO_UPSCALE"
+        private const val ACTION_START_UPSCALE = "com.blackbox.ai.action.START_VIDEO_UPSCALE"
+        private const val ACTION_CANCEL_UPSCALE = "com.blackbox.ai.action.CANCEL_VIDEO_UPSCALE"
         private const val EXTRA_INPUT_PATH = "extra_video_upscale_input"
         private const val EXTRA_OUTPUT_PATH = "extra_video_upscale_output"
         private const val EXTRA_ENGINE = "extra_video_upscale_engine"
@@ -687,7 +687,7 @@ data class VideoInfo(
         }
     
     val sizeFormatted: String
-        get() = com.example.llamadroid.util.FormatUtils.Technical.formatBytes(sizeBytes)
+        get() = com.blackbox.ai.util.FormatUtils.Technical.formatBytes(sizeBytes)
     
     val resolution: String get() = "${width}x${height}"
 }

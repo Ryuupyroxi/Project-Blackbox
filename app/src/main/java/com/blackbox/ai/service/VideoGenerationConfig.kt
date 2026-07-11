@@ -1,7 +1,7 @@
 package com.blackbox.ai.service
 
 import android.os.Parcelable
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.parcelize.Parcelize

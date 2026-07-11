@@ -2,7 +2,7 @@ package com.blackbox.ai.tama.adventure
 
 import android.content.Context
 import androidx.annotation.StringRes
-import com.example.llamadroid.R
+import com.blackbox.ai.R
 
 /**
  * Types of dungeons available for text adventures.

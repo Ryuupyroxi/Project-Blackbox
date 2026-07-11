@@ -7,21 +7,21 @@ import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
 import androidx.documentfile.provider.DocumentFile
-import com.example.llamadroid.R
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.onnx.OnnxImageGenConfig
-import com.example.llamadroid.onnx.OnnxImageGenMode
-import com.example.llamadroid.onnx.OnnxGeneratedImageMetadata
-import com.example.llamadroid.onnx.OnnxImg2ImgPipeline
-import com.example.llamadroid.onnx.OnnxImg2ImgPreprocessInfo
-import com.example.llamadroid.onnx.OnnxStorage
-import com.example.llamadroid.onnx.OnnxTxt2ImgPipeline
-import com.example.llamadroid.onnx.computeOnnxImg2ImgEffectiveSteps
-import com.example.llamadroid.onnx.estimateOnnxRamProfile
-import com.example.llamadroid.onnx.toDisplayLines
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.FormatUtils
-import com.example.llamadroid.util.getParcelableExtraCompat
+import com.blackbox.ai.R
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.onnx.OnnxImageGenConfig
+import com.blackbox.ai.onnx.OnnxImageGenMode
+import com.blackbox.ai.onnx.OnnxGeneratedImageMetadata
+import com.blackbox.ai.onnx.OnnxImg2ImgPipeline
+import com.blackbox.ai.onnx.OnnxImg2ImgPreprocessInfo
+import com.blackbox.ai.onnx.OnnxStorage
+import com.blackbox.ai.onnx.OnnxTxt2ImgPipeline
+import com.blackbox.ai.onnx.computeOnnxImg2ImgEffectiveSteps
+import com.blackbox.ai.onnx.estimateOnnxRamProfile
+import com.blackbox.ai.onnx.toDisplayLines
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.FormatUtils
+import com.blackbox.ai.util.getParcelableExtraCompat
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -60,7 +60,7 @@ private data class CompletedOnnxGeneration(
     val outputFile: File,
     val seedUsed: Long,
     val warningMessage: String?,
-    val runtimeSummary: com.example.llamadroid.onnx.OnnxRuntimeExecutionSummary,
+    val runtimeSummary: com.blackbox.ai.onnx.OnnxRuntimeExecutionSummary,
     val preprocessInfo: OnnxImg2ImgPreprocessInfo? = null
 )
 

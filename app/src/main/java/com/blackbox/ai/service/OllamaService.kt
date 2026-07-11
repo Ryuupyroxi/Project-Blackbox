@@ -1,8 +1,8 @@
 package com.blackbox.ai.service
 
 import android.content.Context
-import com.example.llamadroid.util.AIConstants
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.util.AIConstants
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

@@ -58,17 +58,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.llamadroid.R
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.service.AdventureForegroundService
-import com.example.llamadroid.tama.adventure.AdventureSession
-import com.example.llamadroid.tama.adventure.AdventureStage
-import com.example.llamadroid.tama.adventure.DungeonType
-import com.example.llamadroid.tama.adventure.StorySchematic
-import com.example.llamadroid.tama.adventure.localizedName
-import com.example.llamadroid.tama.db.AdventureSessionEntity
-import com.example.llamadroid.tama.db.AdventureStageEntity
-import com.example.llamadroid.tama.db.TamaDatabase
+import com.blackbox.ai.R
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.service.AdventureForegroundService
+import com.blackbox.ai.tama.adventure.AdventureSession
+import com.blackbox.ai.tama.adventure.AdventureStage
+import com.blackbox.ai.tama.adventure.DungeonType
+import com.blackbox.ai.tama.adventure.StorySchematic
+import com.blackbox.ai.tama.adventure.localizedName
+import com.blackbox.ai.tama.db.AdventureSessionEntity
+import com.blackbox.ai.tama.db.AdventureStageEntity
+import com.blackbox.ai.tama.db.TamaDatabase
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -175,7 +175,7 @@ fun AdventureScreen(
                             scope.launch {
                                 val petId = activePet?.id ?: return@launch
                                 localErrorMessage = null
-                                com.example.llamadroid.tama.adventure.AdventureService(
+                                com.blackbox.ai.tama.adventure.AdventureService(
                                     database = database,
                                     settingsRepository = settingsRepository,
                                     context = context

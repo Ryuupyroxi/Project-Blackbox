@@ -124,7 +124,7 @@ fun VideoSumupScreen(navController: NavController) {
         else -> ollamaUrl.isNotBlank() && !ollamaModel.isNullOrBlank()
     }
 
-    fun persistMetadata(metadata: com.example.llamadroid.service.RemoteSummaryMetadata) {
+    fun persistMetadata(metadata: com.blackbox.ai.service.RemoteSummaryMetadata) {
         if (SettingsRepository.isLlamaServerBackend(metadata.backend)) {
             settingsRepo.setVideoSummaryLlamaServerModelLabel(metadata.serverModelLabel)
             settingsRepo.setVideoSummaryLlamaServerContextTokens(metadata.serverContextTokens)

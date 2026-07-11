@@ -61,7 +61,7 @@ fun DashboardScreen(
     val context = LocalContext.current
     val systemMonitor = remember { SystemMonitor(context) }
     val viewModel = remember { DashboardViewModel(systemMonitor) }
-    val settingsRepo = remember { com.example.llamadroid.data.SettingsRepository(context) }
+    val settingsRepo = remember { com.blackbox.ai.data.SettingsRepository(context) }
     val appDatabase = remember { AppDatabase.getDatabase(context) }
     val knowledgeBaseRepository = remember { KnowledgeBaseRepository(context, appDatabase) }
     
@@ -685,11 +685,11 @@ fun DashboardScreen(
         }
         
         // Kiwix Server Card
-        var kiwixService by remember { mutableStateOf<com.example.llamadroid.service.KiwixService?>(null) }
+        var kiwixService by remember { mutableStateOf<com.blackbox.ai.service.KiwixService?>(null) }
         val kiwixConnection = remember {
             object : ServiceConnection {
                 override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
-                    kiwixService = (binder as? com.example.llamadroid.service.KiwixService.LocalBinder)?.getService()
+                    kiwixService = (binder as? com.blackbox.ai.service.KiwixService.LocalBinder)?.getService()
                 }
                 override fun onServiceDisconnected(name: ComponentName?) {
                     kiwixService = null
@@ -698,7 +698,7 @@ fun DashboardScreen(
         }
         
         DisposableEffect(context) {
-            val intent = Intent(context, com.example.llamadroid.service.KiwixService::class.java)
+            val intent = Intent(context, com.blackbox.ai.service.KiwixService::class.java)
             context.bindService(intent, kiwixConnection, Context.BIND_AUTO_CREATE)
             onDispose {
                 context.unbindService(kiwixConnection)
@@ -770,7 +770,7 @@ fun DashboardScreen(
                         if (kiwixRunning) {
                             kiwixService?.stopServer()
                         } else {
-                            context.startForegroundService(Intent(context, com.example.llamadroid.service.KiwixService::class.java))
+                            context.startForegroundService(Intent(context, com.blackbox.ai.service.KiwixService::class.java))
                             scope.launch {
                                 kotlinx.coroutines.delay(500)
                                 kiwixService?.startServer(installedZims.map { it.path })
@@ -881,7 +881,7 @@ fun DashboardScreen(
                 )
                 
                 Button(
-                    onClick = { navController.navigate(com.example.llamadroid.ui.navigation.Screen.DistributedHub.route) },
+                    onClick = { navController.navigate(com.blackbox.ai.ui.navigation.Screen.DistributedHub.route) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp)
                 ) {

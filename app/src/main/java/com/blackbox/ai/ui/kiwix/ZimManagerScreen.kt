@@ -203,7 +203,7 @@ fun InstalledZimsTab(repo: ZimRepository, navController: NavController) {
                             android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
                         )
                     } catch (e: Exception) {
-                        com.example.llamadroid.util.DebugLog.log("[ZIM] Could not take persistable permission: ${e.message}")
+                        com.blackbox.ai.util.DebugLog.log("[ZIM] Could not take persistable permission: ${e.message}")
                     }
                     
                     // Get filename from SAF
@@ -246,7 +246,7 @@ fun InstalledZimsTab(repo: ZimRepository, navController: NavController) {
                             }
                         }
                     } catch (e: Exception) {
-                        com.example.llamadroid.util.DebugLog.log("[ZIM] Could not resolve path: ${e.message}")
+                        com.blackbox.ai.util.DebugLog.log("[ZIM] Could not resolve path: ${e.message}")
                     }
                     
                     // Check if resolved path is accessible
@@ -260,7 +260,7 @@ fun InstalledZimsTab(repo: ZimRepository, navController: NavController) {
                         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                             android.widget.Toast.makeText(context, context.getString(R.string.zim_using_ref, filename), android.widget.Toast.LENGTH_SHORT).show()
                         }
-                        com.example.llamadroid.util.DebugLog.log("[ZIM] Using direct path: $resolvedPath")
+                        com.blackbox.ai.util.DebugLog.log("[ZIM] Using direct path: $resolvedPath")
                     } else {
                         // Fallback: copy to app storage
                         val destFile = File(zimDir, filename)
@@ -275,12 +275,12 @@ fun InstalledZimsTab(repo: ZimRepository, navController: NavController) {
                         finalPath = destFile.absolutePath
                         fileSize = destFile.length()
                         wasCopied = true
-                        com.example.llamadroid.util.DebugLog.log("[ZIM] Copied to: $finalPath")
+                        com.blackbox.ai.util.DebugLog.log("[ZIM] Copied to: $finalPath")
                     }
                     
                     // Register in database
-                    val db = com.example.llamadroid.data.db.AppDatabase.getDatabase(context)
-                    val zimEntity = com.example.llamadroid.data.db.ZimEntity(
+                    val db = com.blackbox.ai.data.db.AppDatabase.getDatabase(context)
+                    val zimEntity = com.blackbox.ai.data.db.ZimEntity(
                         id = java.util.UUID.randomUUID().toString(),
                         filename = filename,
                         path = finalPath,
@@ -307,7 +307,7 @@ fun InstalledZimsTab(repo: ZimRepository, navController: NavController) {
                         android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
-                    com.example.llamadroid.util.DebugLog.log("[ZIM] Import failed: ${e.message}")
+                    com.blackbox.ai.util.DebugLog.log("[ZIM] Import failed: ${e.message}")
                     kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                         android.widget.Toast.makeText(context, context.getString(R.string.zim_import_failed, e.message), android.widget.Toast.LENGTH_LONG).show()
                     }
@@ -359,7 +359,7 @@ fun InstalledZimsTab(repo: ZimRepository, navController: NavController) {
                             android.widget.Toast.makeText(context, context.getString(R.string.zim_exported_success, zim.filename), android.widget.Toast.LENGTH_SHORT).show()
                         }
                         
-                        com.example.llamadroid.util.DebugLog.log("[ZIM] Exported: ${zim.filename} to Downloads")
+                        com.blackbox.ai.util.DebugLog.log("[ZIM] Exported: ${zim.filename} to Downloads")
                     }
                 } else {
                     // Legacy fallback for API < 29
@@ -376,10 +376,10 @@ fun InstalledZimsTab(repo: ZimRepository, navController: NavController) {
                         android.widget.Toast.makeText(context, context.getString(R.string.zim_exported_success, zim.filename), android.widget.Toast.LENGTH_SHORT).show()
                     }
                     
-                    com.example.llamadroid.util.DebugLog.log("[ZIM] Exported: ${zim.filename} to Downloads (legacy)")
+                    com.blackbox.ai.util.DebugLog.log("[ZIM] Exported: ${zim.filename} to Downloads (legacy)")
                 }
             } catch (e: Exception) {
-                com.example.llamadroid.util.DebugLog.log("[ZIM] Export failed: ${e.message}")
+                com.blackbox.ai.util.DebugLog.log("[ZIM] Export failed: ${e.message}")
                 kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                     android.widget.Toast.makeText(context, context.getString(R.string.zim_export_failed, e.message), android.widget.Toast.LENGTH_LONG).show()
                 }
@@ -544,7 +544,7 @@ fun ZimShareDialog(
                     }
                 }
             } catch (e: Exception) {
-                com.example.llamadroid.util.DebugLog.log("[ZIM] Failed to get IP: ${e.message}")
+                com.blackbox.ai.util.DebugLog.log("[ZIM] Failed to get IP: ${e.message}")
             }
         }
     }
@@ -757,9 +757,9 @@ fun CatalogTab(repo: ZimRepository, zimFolderUri: String?) {
                                     val downloadId = downloadManager.enqueue(request)
                                     
                                     // Register pending download for completion handler
-                                    com.example.llamadroid.service.ZimDownloadReceiver.registerPendingDownload(
+                                    com.blackbox.ai.service.ZimDownloadReceiver.registerPendingDownload(
                                         downloadId,
-                                        com.example.llamadroid.service.ZimDownloadReceiver.Companion.PendingZimDownload(
+                                        com.blackbox.ai.service.ZimDownloadReceiver.Companion.PendingZimDownload(
                                             id = entry.id,
                                             title = entry.title,
                                             description = entry.description,
@@ -781,14 +781,14 @@ fun CatalogTab(repo: ZimRepository, zimFolderUri: String?) {
                                         android.widget.Toast.LENGTH_SHORT
                                     ).show()
                                     
-                                    com.example.llamadroid.util.DebugLog.log("[KIWIX] Started download ID=$downloadId for ${entry.title}, size=${entry.size}")
+                                    com.blackbox.ai.util.DebugLog.log("[KIWIX] Started download ID=$downloadId for ${entry.title}, size=${entry.size}")
                                 } catch (e: Exception) {
                                     android.widget.Toast.makeText(
                                         context,
                                         context.getString(R.string.zim_download_failed, e.message),
                                         android.widget.Toast.LENGTH_LONG
                                     ).show()
-                                    com.example.llamadroid.util.DebugLog.log("[KIWIX] Download failed: ${e.message}")
+                                    com.blackbox.ai.util.DebugLog.log("[KIWIX] Download failed: ${e.message}")
                                 }
                             }
                         )
@@ -1065,11 +1065,11 @@ fun ZimShareTab() {
     val installedZims by db.zimDao().getAllZims().collectAsState(initial = emptyList())
     
     // Service connection for ZimShareService
-    var shareService by remember { mutableStateOf<com.example.llamadroid.service.ZimShareService?>(null) }
+    var shareService by remember { mutableStateOf<com.blackbox.ai.service.ZimShareService?>(null) }
     val serviceConnection = remember {
         object : android.content.ServiceConnection {
             override fun onServiceConnected(name: android.content.ComponentName?, binder: android.os.IBinder?) {
-                shareService = (binder as? com.example.llamadroid.service.ZimShareService.LocalBinder)?.getService()
+                shareService = (binder as? com.blackbox.ai.service.ZimShareService.LocalBinder)?.getService()
             }
             override fun onServiceDisconnected(name: android.content.ComponentName?) {
                 shareService = null
@@ -1078,7 +1078,7 @@ fun ZimShareTab() {
     }
     
     DisposableEffect(context) {
-        val intent = android.content.Intent(context, com.example.llamadroid.service.ZimShareService::class.java)
+        val intent = android.content.Intent(context, com.blackbox.ai.service.ZimShareService::class.java)
         context.bindService(intent, serviceConnection, android.content.Context.BIND_AUTO_CREATE)
         onDispose {
             context.unbindService(serviceConnection)
@@ -1164,7 +1164,7 @@ fun ZimShareTab() {
                             if (isRunning) {
                                 shareService?.stopServer()
                             } else {
-                                val intent = android.content.Intent(context, com.example.llamadroid.service.ZimShareService::class.java)
+                                val intent = android.content.Intent(context, com.blackbox.ai.service.ZimShareService::class.java)
                                 context.startForegroundService(intent)
                                 scope.launch {
                                     kotlinx.coroutines.delay(500)

@@ -2,9 +2,9 @@ package com.blackbox.ai.service
 
 import android.content.Context
 import android.os.Build
-import com.example.llamadroid.BuildConfig
-import com.example.llamadroid.data.model.LiteRtModelEntity
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.BuildConfig
+import com.blackbox.ai.data.model.LiteRtModelEntity
+import com.blackbox.ai.util.DebugLog
 import java.security.MessageDigest
 import java.util.concurrent.ConcurrentHashMap
 

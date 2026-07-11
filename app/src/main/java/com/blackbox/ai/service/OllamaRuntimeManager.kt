@@ -1,10 +1,10 @@
 package com.blackbox.ai.service
 
 import android.content.Context
-import com.example.llamadroid.R
-import com.example.llamadroid.data.db.AiRuntimeJobEntity
-import com.example.llamadroid.data.repository.OllamaRepository
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.R
+import com.blackbox.ai.data.db.AiRuntimeJobEntity
+import com.blackbox.ai.data.repository.OllamaRepository
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job

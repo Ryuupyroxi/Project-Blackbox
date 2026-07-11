@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 fun ProjectManagementScreen(
     projectFolder: String,
     conversationId: Long,
-    agentService: com.example.llamadroid.service.AgentService,
+    agentService: com.blackbox.ai.service.AgentService,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current

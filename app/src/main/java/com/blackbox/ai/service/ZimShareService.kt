@@ -6,8 +6,8 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.ZimEntity
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.ZimEntity
 import fi.iki.elonen.NanoHTTPD
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow

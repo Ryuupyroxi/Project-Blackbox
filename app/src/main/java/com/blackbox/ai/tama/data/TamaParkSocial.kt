@@ -1,7 +1,7 @@
 package com.blackbox.ai.tama.data
 
 import android.content.Context
-import com.example.llamadroid.R
+import com.blackbox.ai.R
 import java.util.Calendar
 import java.util.Locale
 import kotlin.math.roundToLong

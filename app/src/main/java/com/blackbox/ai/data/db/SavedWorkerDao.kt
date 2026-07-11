@@ -1,7 +1,7 @@
 package com.blackbox.ai.data.db
 
 import androidx.room.*
-import com.example.llamadroid.data.model.SavedWorker
+import com.blackbox.ai.data.model.SavedWorker
 import kotlinx.coroutines.flow.Flow
 
 /**

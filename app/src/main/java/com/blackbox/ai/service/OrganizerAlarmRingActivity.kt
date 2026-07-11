@@ -43,12 +43,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
-import com.example.llamadroid.LlamaApplication
-import com.example.llamadroid.R
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.OrganizerAlarmEntity
-import com.example.llamadroid.ui.theme.LlamaDroidTheme
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.LlamaApplication
+import com.blackbox.ai.R
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.OrganizerAlarmEntity
+import com.blackbox.ai.ui.theme.LlamaDroidTheme
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -133,7 +133,7 @@ class OrganizerAlarmRingActivity : ComponentActivity() {
 
         private fun buildIntent(context: Context, alarmId: Long): Intent =
             Intent(context, OrganizerAlarmRingActivity::class.java).apply {
-                action = "com.example.llamadroid.organizer.ALARM_RING"
+                action = "com.blackbox.ai.organizer.ALARM_RING"
                 putExtra(EXTRA_ALARM_ID, alarmId)
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }

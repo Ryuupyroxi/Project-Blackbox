@@ -1,11 +1,11 @@
 package com.blackbox.ai.service
 
-import com.example.llamadroid.sd.SdComponentRole
-import com.example.llamadroid.sd.SdModelFamily
-import com.example.llamadroid.sd.SdImageInputMode
-import com.example.llamadroid.sd.resolveSdFamilySpec
-import com.example.llamadroid.sd.inferSdFamily
-import com.example.llamadroid.data.db.ModelType
+import com.blackbox.ai.sd.SdComponentRole
+import com.blackbox.ai.sd.SdModelFamily
+import com.blackbox.ai.sd.SdImageInputMode
+import com.blackbox.ai.sd.resolveSdFamilySpec
+import com.blackbox.ai.sd.inferSdFamily
+import com.blackbox.ai.data.db.ModelType
 import java.io.File
 
 data class SdBinaryCapabilities(

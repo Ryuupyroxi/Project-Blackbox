@@ -6,17 +6,17 @@ import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
 import androidx.documentfile.provider.DocumentFile
-import com.example.llamadroid.R
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.onnx.OnnxBackgroundRemovalConfig
-import com.example.llamadroid.onnx.OnnxBackgroundRemovalMetadata
-import com.example.llamadroid.onnx.OnnxBackgroundRemovalPipeline
-import com.example.llamadroid.onnx.OnnxBackgroundRemovalRuntimeState
-import com.example.llamadroid.onnx.OnnxBackgroundRemovalStage
-import com.example.llamadroid.onnx.OnnxBackgroundRemovalStorage
-import com.example.llamadroid.onnx.toDisplayLines
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.getParcelableExtraCompat
+import com.blackbox.ai.R
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.onnx.OnnxBackgroundRemovalConfig
+import com.blackbox.ai.onnx.OnnxBackgroundRemovalMetadata
+import com.blackbox.ai.onnx.OnnxBackgroundRemovalPipeline
+import com.blackbox.ai.onnx.OnnxBackgroundRemovalRuntimeState
+import com.blackbox.ai.onnx.OnnxBackgroundRemovalStage
+import com.blackbox.ai.onnx.OnnxBackgroundRemovalStorage
+import com.blackbox.ai.onnx.toDisplayLines
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.getParcelableExtraCompat
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -385,8 +385,8 @@ class OnnxBackgroundRemovalService : Service() {
     }
 
     companion object {
-        private const val ACTION_START = "com.example.llamadroid.action.START_ONNX_BGR"
-        private const val ACTION_CANCEL = "com.example.llamadroid.action.CANCEL_ONNX_BGR"
+        private const val ACTION_START = "com.blackbox.ai.action.START_ONNX_BGR"
+        private const val ACTION_CANCEL = "com.blackbox.ai.action.CANCEL_ONNX_BGR"
         private const val EXTRA_CONFIG = "config"
 
         fun start(context: Context, config: OnnxBackgroundRemovalConfig) {

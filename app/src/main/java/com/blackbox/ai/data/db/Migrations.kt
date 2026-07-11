@@ -2,9 +2,9 @@ package com.blackbox.ai.data.db
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.llamadroid.data.RemoteBackendUrlSupport
-import com.example.llamadroid.quadtrix.QuadtrixOptionKeys
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.data.RemoteBackendUrlSupport
+import com.blackbox.ai.quadtrix.QuadtrixOptionKeys
+import com.blackbox.ai.util.DebugLog
 
 /**
  * Database migrations for AppDatabase.

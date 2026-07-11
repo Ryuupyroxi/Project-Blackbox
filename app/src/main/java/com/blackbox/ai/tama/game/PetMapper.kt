@@ -1,7 +1,7 @@
 package com.blackbox.ai.tama.game
 
-import com.example.llamadroid.tama.data.*
-import com.example.llamadroid.tama.db.TamaPetEntity
+import com.blackbox.ai.tama.data.*
+import com.blackbox.ai.tama.db.TamaPetEntity
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 

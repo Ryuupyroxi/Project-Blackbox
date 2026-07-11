@@ -21,13 +21,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.llamadroid.tama.data.GrowthStage
-import com.example.llamadroid.tama.data.PetSpeciesLine
-import com.example.llamadroid.tama.data.PetSpriteState
-import com.example.llamadroid.tama.data.TamaRoomCatalog
-import com.example.llamadroid.tama.data.TamaPet
-import com.example.llamadroid.tama.data.mapPetActionToSpriteState
-import com.example.llamadroid.tama.data.resolvePetSpriteAssetPath
+import com.blackbox.ai.tama.data.GrowthStage
+import com.blackbox.ai.tama.data.PetSpeciesLine
+import com.blackbox.ai.tama.data.PetSpriteState
+import com.blackbox.ai.tama.data.TamaRoomCatalog
+import com.blackbox.ai.tama.data.TamaPet
+import com.blackbox.ai.tama.data.mapPetActionToSpriteState
+import com.blackbox.ai.tama.data.resolvePetSpriteAssetPath
 
 private const val PET_FRAME_DURATION_MS = 560
 private const val WALK_FRAME_DURATION_MS = 240

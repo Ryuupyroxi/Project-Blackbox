@@ -1,11 +1,11 @@
 package com.blackbox.ai.service
 
 import android.content.Context
-import com.example.llamadroid.R
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.data.model.LlamaScheduledTaskEntity
-import com.example.llamadroid.data.model.LlamaServerEntity
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.R
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.data.model.LlamaScheduledTaskEntity
+import com.blackbox.ai.data.model.LlamaServerEntity
+import com.blackbox.ai.util.DebugLog
 import com.google.gson.Gson
 import java.io.File
 import kotlinx.coroutines.CancellationException

@@ -1,6 +1,6 @@
 package com.blackbox.ai.service
 
-import com.example.llamadroid.data.db.AiRuntimeJobEntity
+import com.blackbox.ai.data.db.AiRuntimeJobEntity
 import org.json.JSONArray
 import org.json.JSONObject
 

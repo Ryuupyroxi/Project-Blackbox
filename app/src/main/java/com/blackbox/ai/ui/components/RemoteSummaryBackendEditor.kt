@@ -57,7 +57,7 @@ private fun normalizeLiteRtBackend(value: String?): String {
     }
 }
 
-private fun com.example.llamadroid.data.model.LiteRtModelEntity.advertisedLiteRtMaxContextTokens(): Int? =
+private fun com.blackbox.ai.data.model.LiteRtModelEntity.advertisedLiteRtMaxContextTokens(): Int? =
     maxContextTokens?.takeIf { it > 0 }
 
 @Composable

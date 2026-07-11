@@ -117,7 +117,7 @@ private val SD_MANAGER_SELECTION_TYPES = SDModelSelectionType.entries
 fun SDModelsScreen(navController: NavController) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val scope = rememberCoroutineScope()
-    val settingsRepo = remember { com.example.llamadroid.data.SettingsRepository(context) }
+    val settingsRepo = remember { com.blackbox.ai.data.SettingsRepository(context) }
     val db = remember { AppDatabase.getDatabase(context) }
     val repository = remember { ModelRepository(context, db.modelDao()) }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -632,7 +632,7 @@ fun SDModelsScreen(navController: NavController) {
             1 -> DownloadingTab(
                 downloadProgress = downloadProgress,
                 onCancel = { filename ->
-                    com.example.llamadroid.util.Downloader.cancelDownload(filename)
+                    com.blackbox.ai.util.Downloader.cancelDownload(filename)
                     DownloadProgressHolder.removeProgress(filename)
                 }
             )
@@ -670,7 +670,7 @@ private fun InstalledSDModelsTab(
     imageVisionModels: List<ModelEntity>,
     onDelete: (ModelEntity) -> Unit,
     repository: ModelRepository,
-    settingsRepo: com.example.llamadroid.data.SettingsRepository,
+    settingsRepo: com.blackbox.ai.data.SettingsRepository,
     onOpenOnnxModels: () -> Unit
 ) {
     val context = LocalContext.current
@@ -1621,14 +1621,14 @@ private suspend fun importSDModel(
         var finalPath: String
         
         // Check if we have "All files access" permission for direct path access
-        val hasAllFilesAccess = com.example.llamadroid.util.StoragePermissionHelper.hasAllFilesAccess()
+        val hasAllFilesAccess = com.blackbox.ai.util.StoragePermissionHelper.hasAllFilesAccess()
         
         // Try to resolve SAF URI to a real file path (for SD card/external storage)
-        val directPath = com.example.llamadroid.util.FilePathResolver.getPathFromUri(context, uri)
+        val directPath = com.blackbox.ai.util.FilePathResolver.getPathFromUri(context, uri)
         
-        if (directPath != null && hasAllFilesAccess && com.example.llamadroid.util.FilePathResolver.isPathAccessible(directPath)) {
+        if (directPath != null && hasAllFilesAccess && com.blackbox.ai.util.FilePathResolver.isPathAccessible(directPath)) {
             // We can access the file directly! No copy needed.
-            com.example.llamadroid.util.DebugLog.log("[SD-IMPORT] Using direct path (no copy): $directPath")
+            com.blackbox.ai.util.DebugLog.log("[SD-IMPORT] Using direct path (no copy): $directPath")
             finalPath = directPath
             
             kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
@@ -1642,7 +1642,7 @@ private suspend fun importSDModel(
         } else {
             // Fallback: Copy the file to app storage
             if (directPath != null && !hasAllFilesAccess) {
-                com.example.llamadroid.util.DebugLog.log("[SD-IMPORT] Direct path available but missing 'All files access' permission, copying...")
+                com.blackbox.ai.util.DebugLog.log("[SD-IMPORT] Direct path available but missing 'All files access' permission, copying...")
                 kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                     android.widget.Toast.makeText(
                         context, 
@@ -1701,9 +1701,9 @@ private suspend fun importSDModel(
         )
         
         repository.insertModel(modelEntity)
-        com.example.llamadroid.util.DebugLog.log("[SD-IMPORT] Imported: $filename as ${type.name}")
+        com.blackbox.ai.util.DebugLog.log("[SD-IMPORT] Imported: $filename as ${type.name}")
     } catch (e: Exception) {
-        com.example.llamadroid.util.DebugLog.log("[SD-IMPORT] Failed: ${e.message}")
+        com.blackbox.ai.util.DebugLog.log("[SD-IMPORT] Failed: ${e.message}")
         e.printStackTrace()
     }
 }

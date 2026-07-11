@@ -2,17 +2,17 @@ package com.blackbox.ai.data
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.llamadroid.data.model.LITERT_BACKEND_AUTO
-import com.example.llamadroid.data.model.normalizeLiteRtBackend
-import com.example.llamadroid.onnx.OnnxBackendOverride
-import com.example.llamadroid.onnx.OnnxCatalogProvider
-import com.example.llamadroid.onnx.OnnxExecutionMode
-import com.example.llamadroid.onnx.OnnxGraphOptimizationLevel
-import com.example.llamadroid.onnx.OnnxRuntimeBackend
-import com.example.llamadroid.service.LlamaSpeculativeMode
-import com.example.llamadroid.tama.data.TamaPicGenDefaults
-import com.example.llamadroid.util.AIConstants
-import com.example.llamadroid.util.PromptUtils
+import com.blackbox.ai.data.model.LITERT_BACKEND_AUTO
+import com.blackbox.ai.data.model.normalizeLiteRtBackend
+import com.blackbox.ai.onnx.OnnxBackendOverride
+import com.blackbox.ai.onnx.OnnxCatalogProvider
+import com.blackbox.ai.onnx.OnnxExecutionMode
+import com.blackbox.ai.onnx.OnnxGraphOptimizationLevel
+import com.blackbox.ai.onnx.OnnxRuntimeBackend
+import com.blackbox.ai.service.LlamaSpeculativeMode
+import com.blackbox.ai.tama.data.TamaPicGenDefaults
+import com.blackbox.ai.util.AIConstants
+import com.blackbox.ai.util.PromptUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.Locale
@@ -1271,14 +1271,14 @@ class SettingsRepository(private val context: Context) {
     fun setPdfSummaryTargetLanguage(value: String) = pdfSummarySettings.setTargetLanguage(value)
 
     private fun defaultPdfTranslationLanguage(): String {
-        return com.example.llamadroid.service.PDFTranslationLogic.defaultTranslationLanguageForAppLanguage(
+        return com.blackbox.ai.service.PDFTranslationLogic.defaultTranslationLanguageForAppLanguage(
             prefs.getString("selected_language", "system")
         )
     }
 
     val pdfTranslationSettings = RemoteSummarySettingsGroup(
         keyPrefix = "pdf_translation",
-        defaultSummaryPrompt = com.example.llamadroid.service.PDFTranslationLogic.DEFAULT_PAGE_TRANSLATION_SYSTEM_PROMPT,
+        defaultSummaryPrompt = com.blackbox.ai.service.PDFTranslationLogic.DEFAULT_PAGE_TRANSLATION_SYSTEM_PROMPT,
         defaultMergePrompt = null,
         defaultLlamaServerUrl = PDF_LLAMA_SERVER_DEFAULT_URL,
         fallbackChunkContextKey = "pdf_context_size",

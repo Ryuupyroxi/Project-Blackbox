@@ -1,7 +1,7 @@
 package com.blackbox.ai.quadtrix
 
-import com.example.llamadroid.data.db.QuadtrixMetricEntity
-import com.example.llamadroid.data.db.QuadtrixProfileEntity
+import com.blackbox.ai.data.db.QuadtrixMetricEntity
+import com.blackbox.ai.data.db.QuadtrixProfileEntity
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder

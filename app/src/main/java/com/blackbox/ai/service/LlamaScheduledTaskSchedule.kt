@@ -1,7 +1,7 @@
 package com.blackbox.ai.service
 
-import com.example.llamadroid.data.model.LlamaScheduledTaskEntity
-import com.example.llamadroid.data.model.LlamaScheduledTaskScheduleType
+import com.blackbox.ai.data.model.LlamaScheduledTaskEntity
+import com.blackbox.ai.data.model.LlamaScheduledTaskScheduleType
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate

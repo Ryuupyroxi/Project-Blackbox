@@ -785,7 +785,7 @@ fun GeneralSettingsScreen(navController: NavController) {
             // All Files Access (for direct SD card model access)
             item {
                 var hasAllFilesAccess by remember { 
-                    mutableStateOf(com.example.llamadroid.util.StoragePermissionHelper.hasAllFilesAccess()) 
+                    mutableStateOf(com.blackbox.ai.util.StoragePermissionHelper.hasAllFilesAccess()) 
                 }
                 
                 Card(
@@ -821,10 +821,10 @@ fun GeneralSettingsScreen(navController: NavController) {
                         if (!hasAllFilesAccess) {
                             Button(
                                 onClick = {
-                                    com.example.llamadroid.util.StoragePermissionHelper.requestAllFilesAccess(context)
+                                    com.blackbox.ai.util.StoragePermissionHelper.requestAllFilesAccess(context)
                                     // Re-check after a delay
                                     android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                                        hasAllFilesAccess = com.example.llamadroid.util.StoragePermissionHelper.hasAllFilesAccess()
+                                        hasAllFilesAccess = com.blackbox.ai.util.StoragePermissionHelper.hasAllFilesAccess()
                                     }, 1000)
                                 },
                                 modifier = Modifier.fillMaxWidth()

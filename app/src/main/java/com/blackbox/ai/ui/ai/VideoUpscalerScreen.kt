@@ -51,7 +51,7 @@ fun VideoUpscalerScreen(navController: NavController) {
     var showDownloadDialog by remember { mutableStateOf(!hasRequiredAssets) }
     
     if (showDownloadDialog) {
-        com.example.llamadroid.ui.components.AssetDownloadDialog(
+        com.blackbox.ai.ui.components.AssetDownloadDialog(
             onDismiss = { 
                 // If dismissed without downloading, go back
                 if (!hasRequiredAssets) navController.popBackStack() 
@@ -118,7 +118,7 @@ fun VideoUpscalerScreen(navController: NavController) {
     var pendingSharedVideoPath by remember { mutableStateOf<String?>(null) }
     
     LaunchedEffect(Unit) {
-        val pendingFile = com.example.llamadroid.data.SharedFileHolder.consumePendingFile()
+        val pendingFile = com.blackbox.ai.data.SharedFileHolder.consumePendingFile()
         if (pendingFile != null && pendingFile.mimeType.startsWith("video/")) {
             try {
                 val inputStream = context.contentResolver.openInputStream(pendingFile.uri)

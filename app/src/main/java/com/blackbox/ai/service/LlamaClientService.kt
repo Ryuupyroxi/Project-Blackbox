@@ -6,26 +6,26 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
-import com.example.llamadroid.data.api.LlamaApi
-import com.example.llamadroid.data.api.LlamaChatRequest
-import com.example.llamadroid.data.api.LlamaChatMessage
-import com.example.llamadroid.data.api.LlamaChatResponse
-import com.example.llamadroid.data.api.LlamaStreamOptions
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.ModelType
-import com.example.llamadroid.data.model.LITERT_BACKEND_AUTO
-import com.example.llamadroid.data.model.LITERT_BACKEND_CPU
-import com.example.llamadroid.data.model.LITERT_BACKEND_GPU
-import com.example.llamadroid.data.model.LiteRtModelEntity
-import com.example.llamadroid.data.model.LlamaChatEntity
-import com.example.llamadroid.data.model.LlamaMessageEntity
-import com.example.llamadroid.data.model.LlamaServerEntity
-import com.example.llamadroid.data.model.defaultLiteRtChatContextTokens
-import com.example.llamadroid.data.model.hasEmbeddedAudioTranscript
-import com.example.llamadroid.data.model.isLikelyLiteRtGpuPackage
-import com.example.llamadroid.data.model.mergeUserTextWithAudioTranscript
-import com.example.llamadroid.data.model.normalizeLiteRtBackend
+import com.blackbox.ai.data.api.LlamaApi
+import com.blackbox.ai.data.api.LlamaChatRequest
+import com.blackbox.ai.data.api.LlamaChatMessage
+import com.blackbox.ai.data.api.LlamaChatResponse
+import com.blackbox.ai.data.api.LlamaStreamOptions
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.ModelType
+import com.blackbox.ai.data.model.LITERT_BACKEND_AUTO
+import com.blackbox.ai.data.model.LITERT_BACKEND_CPU
+import com.blackbox.ai.data.model.LITERT_BACKEND_GPU
+import com.blackbox.ai.data.model.LiteRtModelEntity
+import com.blackbox.ai.data.model.LlamaChatEntity
+import com.blackbox.ai.data.model.LlamaMessageEntity
+import com.blackbox.ai.data.model.LlamaServerEntity
+import com.blackbox.ai.data.model.defaultLiteRtChatContextTokens
+import com.blackbox.ai.data.model.hasEmbeddedAudioTranscript
+import com.blackbox.ai.data.model.isLikelyLiteRtGpuPackage
+import com.blackbox.ai.data.model.mergeUserTextWithAudioTranscript
+import com.blackbox.ai.data.model.normalizeLiteRtBackend
 import kotlinx.coroutines.*
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,9 +34,9 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-import com.example.llamadroid.R
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.WakeLockManager
+import com.blackbox.ai.R
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.WakeLockManager
 import com.google.gson.Gson
 import org.json.JSONArray
 import org.json.JSONObject
@@ -44,13 +44,13 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 import java.net.URI
-import com.example.llamadroid.data.repository.LlamaRepository
-import com.example.llamadroid.onnx.OnnxTtsRequest
-import com.example.llamadroid.onnx.SUPERTONIC_DEFAULT_LANGUAGE
-import com.example.llamadroid.onnx.SupertonicTtsPipeline
-import com.example.llamadroid.onnx.stripTextForTts
-import com.example.llamadroid.widget.NoteDisplayWidgetProvider
-import com.example.llamadroid.widget.OrganizerCalendarWidgetProvider
+import com.blackbox.ai.data.repository.LlamaRepository
+import com.blackbox.ai.onnx.OnnxTtsRequest
+import com.blackbox.ai.onnx.SUPERTONIC_DEFAULT_LANGUAGE
+import com.blackbox.ai.onnx.SupertonicTtsPipeline
+import com.blackbox.ai.onnx.stripTextForTts
+import com.blackbox.ai.widget.NoteDisplayWidgetProvider
+import com.blackbox.ai.widget.OrganizerCalendarWidgetProvider
 import kotlinx.coroutines.flow.first
 import kotlin.coroutines.resume
 
@@ -396,7 +396,7 @@ class LlamaClientService : Service() {
             alarmCanceler = { alarmId -> OrganizerAlarmScheduler.cancelAlarm(applicationContext, alarmId) },
             organizerChanged = { OrganizerCalendarWidgetProvider.refreshAll(applicationContext) },
             notesChanged = { NoteDisplayWidgetProvider.refreshAll(applicationContext) },
-            knowledgeBaseRepository = com.example.llamadroid.data.repository.KnowledgeBaseRepository(applicationContext, database),
+            knowledgeBaseRepository = com.blackbox.ai.data.repository.KnowledgeBaseRepository(applicationContext, database),
             imageGenerator = NativeChatUnifiedImageGenerator(applicationContext, database),
             backgroundRemover = NativeChatOnnxBackgroundRemover(applicationContext, database),
             pdfTextExtractor = { pdfBytes, maxChars ->
@@ -977,7 +977,7 @@ class LlamaClientService : Service() {
     private suspend fun streamLlamaServerResponse(
         chatId: Long,
         taskId: Int,
-        chat: com.example.llamadroid.data.model.LlamaChatEntity,
+        chat: com.blackbox.ai.data.model.LlamaChatEntity,
         server: LlamaServerEntity,
         history: List<LlamaMessageEntity>,
         assistantMsgId: Long,
@@ -1124,7 +1124,7 @@ class LlamaClientService : Service() {
     private suspend fun streamOllamaResponse(
         chatId: Long,
         taskId: Int,
-        chat: com.example.llamadroid.data.model.LlamaChatEntity,
+        chat: com.blackbox.ai.data.model.LlamaChatEntity,
         server: LlamaServerEntity,
         history: List<LlamaMessageEntity>,
         assistantMsgId: Long,
@@ -1207,7 +1207,7 @@ class LlamaClientService : Service() {
     private suspend fun streamLiteRtLmResponse(
         chatId: Long,
         taskId: Int,
-        chat: com.example.llamadroid.data.model.LlamaChatEntity,
+        chat: com.blackbox.ai.data.model.LlamaChatEntity,
         server: LlamaServerEntity,
         history: List<LlamaMessageEntity>,
         assistantMsgId: Long,
@@ -1342,7 +1342,7 @@ class LlamaClientService : Service() {
     private suspend fun streamNativeToolResponse(
         chatId: Long,
         taskId: Int,
-        chat: com.example.llamadroid.data.model.LlamaChatEntity,
+        chat: com.blackbox.ai.data.model.LlamaChatEntity,
         server: LlamaServerEntity,
         history: List<LlamaMessageEntity>,
         assistantMsgId: Long,
@@ -1777,7 +1777,7 @@ class LlamaClientService : Service() {
 
     private suspend fun chatWithLiteRtToolsStreaming(
         server: LlamaServerEntity,
-        chat: com.example.llamadroid.data.model.LlamaChatEntity,
+        chat: com.blackbox.ai.data.model.LlamaChatEntity,
         messages: List<OllamaService.ChatMessage>,
         tools: List<AgentTool>,
         thinkingEnabled: Boolean,
@@ -1914,7 +1914,7 @@ class LlamaClientService : Service() {
 
     private suspend fun streamLiteRtLmConversation(
         server: LlamaServerEntity,
-        chat: com.example.llamadroid.data.model.LlamaChatEntity,
+        chat: com.blackbox.ai.data.model.LlamaChatEntity,
         model: LiteRtModelEntity,
         params: Map<String, Any>,
         conversation: LiteRtConversationOverride,
@@ -1942,7 +1942,7 @@ class LlamaClientService : Service() {
 
     private suspend fun streamLiteRtLmPrompt(
         server: LlamaServerEntity,
-        chat: com.example.llamadroid.data.model.LlamaChatEntity,
+        chat: com.blackbox.ai.data.model.LlamaChatEntity,
         model: LiteRtModelEntity,
         params: Map<String, Any>,
         prompt: String,
@@ -2998,7 +2998,7 @@ class LlamaClientService : Service() {
     }
 
     private fun buildOllamaMessages(
-        chat: com.example.llamadroid.data.model.LlamaChatEntity,
+        chat: com.blackbox.ai.data.model.LlamaChatEntity,
         history: List<LlamaMessageEntity>,
         server: LlamaServerEntity
     ): List<OllamaService.ChatMessage> {

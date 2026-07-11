@@ -39,19 +39,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.llamadroid.R
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.ModelType
-import com.example.llamadroid.onnx.isOnnxTxt2ImgBundle
-import com.example.llamadroid.service.RemoteSummaryBackendConfig
-import com.example.llamadroid.service.RemoteSummaryClientFactory
-import com.example.llamadroid.service.RemoteSummaryMetadata
-import com.example.llamadroid.tama.adventure.DungeonType
-import com.example.llamadroid.tama.adventure.localizedName
-import com.example.llamadroid.ui.components.DraftFloatTextField
-import com.example.llamadroid.ui.components.DraftIntTextField
-import com.example.llamadroid.ui.components.RemoteSummaryBackendEditor
+import com.blackbox.ai.R
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.ModelType
+import com.blackbox.ai.onnx.isOnnxTxt2ImgBundle
+import com.blackbox.ai.service.RemoteSummaryBackendConfig
+import com.blackbox.ai.service.RemoteSummaryClientFactory
+import com.blackbox.ai.service.RemoteSummaryMetadata
+import com.blackbox.ai.tama.adventure.DungeonType
+import com.blackbox.ai.tama.adventure.localizedName
+import com.blackbox.ai.ui.components.DraftFloatTextField
+import com.blackbox.ai.ui.components.DraftIntTextField
+import com.blackbox.ai.ui.components.RemoteSummaryBackendEditor
 
 @Composable
 fun AdventureSettingsDialog(

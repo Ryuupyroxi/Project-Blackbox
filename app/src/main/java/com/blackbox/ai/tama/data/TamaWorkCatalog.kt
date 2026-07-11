@@ -1,6 +1,6 @@
 package com.blackbox.ai.tama.data
 
-import com.example.llamadroid.R
+import com.blackbox.ai.R
 
 data class TamaWorkDefinition(
     val id: String,

@@ -11,14 +11,14 @@ import android.os.IBinder
 import android.os.PowerManager
 import android.os.SystemClock
 import androidx.documentfile.provider.DocumentFile
-import com.example.llamadroid.R
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.data.binary.BinaryRepository
-import com.example.llamadroid.sd.SdComponentRole
-import com.example.llamadroid.util.AccelerationWorkload
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.DeviceAcceleration
-import com.example.llamadroid.util.getParcelableExtraCompat
+import com.blackbox.ai.R
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.data.binary.BinaryRepository
+import com.blackbox.ai.sd.SdComponentRole
+import com.blackbox.ai.util.AccelerationWorkload
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.DeviceAcceleration
+import com.blackbox.ai.util.getParcelableExtraCompat
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -1434,12 +1434,12 @@ class StableDiffusionService : Service() {
     }
 
     companion object {
-        private const val ACTION_START_GENERATION = "com.example.llamadroid.action.START_SD_GENERATION"
-        private const val ACTION_START_UPSCALE = "com.example.llamadroid.action.START_SD_UPSCALE"
-        private const val ACTION_START_WORKFLOW = "com.example.llamadroid.action.START_SD_WORKFLOW"
-        private const val ACTION_CANCEL_MODE = "com.example.llamadroid.action.CANCEL_SD_MODE"
-        private const val ACTION_CANCEL_WORKFLOW = "com.example.llamadroid.action.CANCEL_SD_WORKFLOW"
-        private const val ACTION_CANCEL_ALL = "com.example.llamadroid.action.CANCEL_ALL_SD"
+        private const val ACTION_START_GENERATION = "com.blackbox.ai.action.START_SD_GENERATION"
+        private const val ACTION_START_UPSCALE = "com.blackbox.ai.action.START_SD_UPSCALE"
+        private const val ACTION_START_WORKFLOW = "com.blackbox.ai.action.START_SD_WORKFLOW"
+        private const val ACTION_CANCEL_MODE = "com.blackbox.ai.action.CANCEL_SD_MODE"
+        private const val ACTION_CANCEL_WORKFLOW = "com.blackbox.ai.action.CANCEL_SD_WORKFLOW"
+        private const val ACTION_CANCEL_ALL = "com.blackbox.ai.action.CANCEL_ALL_SD"
         private const val EXTRA_CONFIG = "extra_sd_config"
         private const val EXTRA_UPSCALE_CONFIG = "extra_sd_upscale_config"
         private const val EXTRA_WORKFLOW_CONFIG = "extra_sd_workflow_config"

@@ -2,7 +2,7 @@ package com.blackbox.ai.tama.data
 
 import android.content.Context
 import androidx.annotation.StringRes
-import com.example.llamadroid.R
+import com.blackbox.ai.R
 
 enum class TamaPotionKind {
     STAGE,

@@ -10,10 +10,10 @@ import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.util.Base64
 import androidx.documentfile.provider.DocumentFile
-import com.example.llamadroid.R
-import com.example.llamadroid.data.RemoteSummarySettingsSnapshot
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.R
+import com.blackbox.ai.data.RemoteSummarySettingsSnapshot
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.util.DebugLog
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
@@ -831,7 +831,7 @@ class PDFService(private val context: Context) {
     private suspend fun applyTranslationCorrectionPass(
         pageBlocks: Map<Int, List<PdfPageBlockForTranslation>>,
         translations: LinkedHashMap<Pair<Int, Int>, String>,
-        snapshot: com.example.llamadroid.data.RemoteSummarySettingsSnapshot,
+        snapshot: com.blackbox.ai.data.RemoteSummarySettingsSnapshot,
         targetLanguage: String,
         client: RemoteSummaryClient,
         onProgress: ((PdfOcrTranslationProgress) -> Unit)?,
@@ -934,7 +934,7 @@ class PDFService(private val context: Context) {
         pageIndex: Int,
         totalPages: Int,
         blocks: List<PdfPageBlockForTranslation>,
-        snapshot: com.example.llamadroid.data.RemoteSummarySettingsSnapshot,
+        snapshot: com.blackbox.ai.data.RemoteSummarySettingsSnapshot,
         targetLanguage: String,
         useImageContext: Boolean,
         fallbackToTextOnly: Boolean,

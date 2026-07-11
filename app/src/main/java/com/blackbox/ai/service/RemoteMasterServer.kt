@@ -2,10 +2,10 @@ package com.blackbox.ai.service
 
 import android.content.Context
 import android.content.Intent
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.ModelEntity
-import com.example.llamadroid.data.db.ModelType
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.ModelEntity
+import com.blackbox.ai.data.db.ModelType
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -270,7 +270,7 @@ class RemoteMasterServer(
         val serverState = LlamaService.state.value
         
         // Disk space info
-        val modelDir = com.example.llamadroid.data.model.ModelRepository(context, AppDatabase.getDatabase(context).modelDao()).getModelDir(ModelType.LLM)
+        val modelDir = com.blackbox.ai.data.model.ModelRepository(context, AppDatabase.getDatabase(context).modelDao()).getModelDir(ModelType.LLM)
         val statFs = android.os.StatFs(modelDir.absolutePath)
         val availableBytes = statFs.availableBytes
         val totalBytes = statFs.totalBytes
@@ -550,7 +550,7 @@ class RemoteMasterServer(
             }
             
             // Get model directory
-            val modelRepo = com.example.llamadroid.data.model.ModelRepository(context, AppDatabase.getDatabase(context).modelDao())
+            val modelRepo = com.blackbox.ai.data.model.ModelRepository(context, AppDatabase.getDatabase(context).modelDao())
             val modelDir = modelRepo.getModelDir(ModelType.LLM)
             val destFile = java.io.File(modelDir, filename)
             
@@ -569,7 +569,7 @@ class RemoteMasterServer(
                 var lastBytes = 0L
                 
                 try {
-                    com.example.llamadroid.util.Downloader.download(url, destFile, context)
+                    com.blackbox.ai.util.Downloader.download(url, destFile, context)
                         .collect { progress ->
                             val now = System.currentTimeMillis()
                             // Actually compute from file content-length correctly
@@ -613,7 +613,7 @@ class RemoteMasterServer(
                                 
                                 // Parse layer count if GGUF
                                 try {
-                                    val modelInfo = com.example.llamadroid.util.GGUFParser.readModelInfo(destFile.absolutePath)
+                                    val modelInfo = com.blackbox.ai.util.GGUFParser.readModelInfo(destFile.absolutePath)
                                     if (modelInfo != null && modelInfo.layerCount > 0) {
                                         val updated = entity.copy(layerCount = modelInfo.layerCount)
                                         db.modelDao().insertModel(updated)
@@ -718,7 +718,7 @@ class RemoteMasterServer(
             val download = DistributedService.getRemoteDownload(filename)
                 ?: return Pair(404, JSONObject().put("error", "No active download for '$filename'"))
             
-            com.example.llamadroid.util.Downloader.cancelDownload(filename)
+            com.blackbox.ai.util.Downloader.cancelDownload(filename)
             DistributedService.updateRemoteDownload(filename, download.copy(status = "cancelled"))
             DistributedService.addRemoteLog("🚫 Download cancelled by $clientIp: $filename")
             
@@ -727,7 +727,7 @@ class RemoteMasterServer(
                 delay(2000)
                 DistributedService.removeRemoteDownload(filename)
                 // Delete partial file
-                val modelRepo = com.example.llamadroid.data.model.ModelRepository(context, AppDatabase.getDatabase(context).modelDao())
+                val modelRepo = com.blackbox.ai.data.model.ModelRepository(context, AppDatabase.getDatabase(context).modelDao())
                 val modelDir = modelRepo.getModelDir(ModelType.LLM)
                 val partialFile = java.io.File(modelDir, filename)
                 if (partialFile.exists()) partialFile.delete()
@@ -874,8 +874,8 @@ class RemoteMasterServer(
     private fun handleStopServer(clientIp: String): Pair<Int, JSONObject> {
         DistributedService.addRemoteLog("📡 Remote stop by $clientIp")
         
-        val intent = android.content.Intent(context, com.example.llamadroid.service.LlamaService::class.java).apply {
-            action = com.example.llamadroid.service.LlamaService.ACTION_STOP
+        val intent = android.content.Intent(context, com.blackbox.ai.service.LlamaService::class.java).apply {
+            action = com.blackbox.ai.service.LlamaService.ACTION_STOP
         }
         try {
             androidx.core.content.ContextCompat.startForegroundService(context, intent)
@@ -918,7 +918,7 @@ class RemoteMasterServer(
      * GET /logs - Get the recent server logs
      */
     private fun handleGetLogs(): Pair<Int, JSONObject> {
-        val logsList = com.example.llamadroid.service.LlamaService.Companion.serverLogs.value
+        val logsList = com.blackbox.ai.service.LlamaService.Companion.serverLogs.value
         val jsonArray = org.json.JSONArray()
         logsList.forEach { entry ->
             jsonArray.put(JSONObject().apply {
@@ -933,7 +933,7 @@ class RemoteMasterServer(
      * POST /clear-logs - Clear the server logs
      */
     private fun handleClearLogs(): Pair<Int, JSONObject> {
-        com.example.llamadroid.service.LlamaService.Companion.clearServerLogs()
+        com.blackbox.ai.service.LlamaService.Companion.clearServerLogs()
         return Pair(200, JSONObject().put("status", "cleared"))
     }
     

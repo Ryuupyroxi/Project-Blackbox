@@ -1,7 +1,7 @@
 package com.blackbox.ai.tama.game
 
-import com.example.llamadroid.service.PDFSummaryLogic
-import com.example.llamadroid.tama.db.TamaSummaryEntity
+import com.blackbox.ai.service.PDFSummaryLogic
+import com.blackbox.ai.tama.db.TamaSummaryEntity
 import org.json.JSONArray
 import org.json.JSONObject
 

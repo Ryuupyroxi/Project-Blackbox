@@ -1,8 +1,8 @@
 package com.blackbox.ai.tama.rpg
 
-import com.example.llamadroid.R
-import com.example.llamadroid.tama.data.TAMA_INTROSPECTION_HP_PER_STEP
-import com.example.llamadroid.tama.data.TAMA_INTROSPECTION_HP_STEP
+import com.blackbox.ai.R
+import com.blackbox.ai.tama.data.TAMA_INTROSPECTION_HP_PER_STEP
+import com.blackbox.ai.tama.data.TAMA_INTROSPECTION_HP_STEP
 
 object AdventureGateCatalog {
     const val WORLD_COUNT = 7

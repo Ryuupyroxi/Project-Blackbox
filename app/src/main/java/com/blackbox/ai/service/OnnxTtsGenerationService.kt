@@ -7,16 +7,16 @@ import android.net.Uri
 import android.os.IBinder
 import android.provider.OpenableColumns
 import androidx.documentfile.provider.DocumentFile
-import com.example.llamadroid.R
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.onnx.OnnxTtsRequest
-import com.example.llamadroid.onnx.OnnxTtsResult
-import com.example.llamadroid.onnx.OnnxTtsStorage
-import com.example.llamadroid.onnx.SupertonicTtsPipeline
-import com.example.llamadroid.onnx.extractReadableTextFromUri
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.FormatUtils
-import com.example.llamadroid.util.WakeLockManager
+import com.blackbox.ai.R
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.onnx.OnnxTtsRequest
+import com.blackbox.ai.onnx.OnnxTtsResult
+import com.blackbox.ai.onnx.OnnxTtsStorage
+import com.blackbox.ai.onnx.SupertonicTtsPipeline
+import com.blackbox.ai.onnx.extractReadableTextFromUri
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.FormatUtils
+import com.blackbox.ai.util.WakeLockManager
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -318,8 +318,8 @@ class OnnxTtsGenerationService : Service() {
     }
 
     companion object {
-        const val ACTION_START = "com.example.llamadroid.action.START_ONNX_TTS"
-        const val ACTION_CANCEL = "com.example.llamadroid.action.CANCEL_ONNX_TTS"
+        const val ACTION_START = "com.blackbox.ai.action.START_ONNX_TTS"
+        const val ACTION_CANCEL = "com.blackbox.ai.action.CANCEL_ONNX_TTS"
         private const val EXTRA_JOB_ID = "job_id"
         private const val SHARED_OUTPUT_DIR = "tts"
 

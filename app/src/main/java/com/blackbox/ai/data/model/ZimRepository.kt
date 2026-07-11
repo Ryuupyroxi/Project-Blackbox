@@ -1,9 +1,9 @@
 package com.blackbox.ai.data.model
 
 import android.content.Context
-import com.example.llamadroid.data.db.ZimDao
-import com.example.llamadroid.data.db.ZimEntity
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.data.db.ZimDao
+import com.blackbox.ai.data.db.ZimEntity
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext

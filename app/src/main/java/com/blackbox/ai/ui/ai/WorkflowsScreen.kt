@@ -131,7 +131,7 @@ fun WorkflowsScreen(navController: NavController) {
     var showDownloadDialog by remember { mutableStateOf(false) }
     
     if (showDownloadDialog) {
-        com.example.llamadroid.ui.components.AssetDownloadDialog(
+        com.blackbox.ai.ui.components.AssetDownloadDialog(
             onDismiss = { showDownloadDialog = false },
             onDownloadAll = {
                 showDownloadDialog = false
@@ -410,7 +410,7 @@ fun WorkflowsScreen(navController: NavController) {
     
     // ===== Consume shared audio/video files =====
     LaunchedEffect(Unit) {
-        val pendingFile = com.example.llamadroid.data.SharedFileHolder.consumePendingFile()
+        val pendingFile = com.blackbox.ai.data.SharedFileHolder.consumePendingFile()
         if (pendingFile != null && pendingFile.targetScreen == "workflows") {
             val mimeType = pendingFile.mimeType
             if (mimeType.startsWith("audio/") || mimeType.startsWith("video/")) {
@@ -756,7 +756,7 @@ fun WorkflowsScreen(navController: NavController) {
                                     language = whisperLanguage,
                                     threads = whisperThreads,
                                     saveToNotes = true,  // Service handles note saving now
-                                    noteType = com.example.llamadroid.data.db.NoteType.WORKFLOW,
+                                    noteType = com.blackbox.ai.data.db.NoteType.WORKFLOW,
                                     audioSourcePath = savedRecordingPath ?: audioPath  // Use saved recording if available
                                 )
                             }
@@ -1340,7 +1340,7 @@ private fun MangaTranslationWorkflowContent(
 ) {
     val scope = rememberCoroutineScope()
     val templates by db.workflowTemplateDao()
-        .getByType(com.example.llamadroid.data.db.WorkflowType.MANGA_TRANSLATION)
+        .getByType(com.blackbox.ai.data.db.WorkflowType.MANGA_TRANSLATION)
         .collectAsState(initial = emptyList())
     var templateName by remember { mutableStateOf("") }
 
@@ -1442,9 +1442,9 @@ private fun MangaTranslationWorkflowContent(
                     onClick = {
                         scope.launch {
                             db.workflowTemplateDao().insert(
-                                com.example.llamadroid.data.db.WorkflowTemplateEntity(
+                                com.blackbox.ai.data.db.WorkflowTemplateEntity(
                                     name = templateName.ifBlank { "Manga Translation" },
-                                    type = com.example.llamadroid.data.db.WorkflowType.MANGA_TRANSLATION,
+                                    type = com.blackbox.ai.data.db.WorkflowType.MANGA_TRANSLATION,
                                     configJson = """{"workflow":"manga_translation","version":2,"exportPdf":$exportPdf,"exportCbz":$exportCbz}"""
                                 )
                             )
@@ -2231,7 +2231,7 @@ private fun SubtitleTranslationWorkflowContent(
     val scope = rememberCoroutineScope()
     val whisperModels by db.modelDao().getModelsByType(ModelType.WHISPER).collectAsState(initial = emptyList())
     val templates by db.workflowTemplateDao()
-        .getByType(com.example.llamadroid.data.db.WorkflowType.SUBTITLE_TRANSLATION)
+        .getByType(com.blackbox.ai.data.db.WorkflowType.SUBTITLE_TRANSLATION)
         .collectAsState(initial = emptyList())
     var showTemplateMenu by remember { mutableStateOf(false) }
     var showSaveDialog by remember { mutableStateOf(false) }
@@ -2431,9 +2431,9 @@ private fun SubtitleTranslationWorkflowContent(
                             val nameToSave = saveName
                             scope.launch {
                                 db.workflowTemplateDao().insert(
-                                    com.example.llamadroid.data.db.WorkflowTemplateEntity(
+                                    com.blackbox.ai.data.db.WorkflowTemplateEntity(
                                         name = nameToSave,
-                                        type = com.example.llamadroid.data.db.WorkflowType.SUBTITLE_TRANSLATION,
+                                        type = com.blackbox.ai.data.db.WorkflowType.SUBTITLE_TRANSLATION,
                                         configJson = config
                                     )
                                 )
@@ -2863,7 +2863,7 @@ private fun MediaDubbingTranslationWorkflowContent(
         selectedTtsModel?.let { resolveSupertonicVoices(File(it.path)) }.orEmpty()
     }
     val templates by db.workflowTemplateDao()
-        .getByType(com.example.llamadroid.data.db.WorkflowType.MEDIA_DUB_TRANSLATION)
+        .getByType(com.blackbox.ai.data.db.WorkflowType.MEDIA_DUB_TRANSLATION)
         .collectAsState(initial = emptyList())
     var showTemplateMenu by remember { mutableStateOf(false) }
     var showSaveDialog by remember { mutableStateOf(false) }
@@ -3073,9 +3073,9 @@ private fun MediaDubbingTranslationWorkflowContent(
                             val nameToSave = saveName
                             scope.launch {
                                 db.workflowTemplateDao().insert(
-                                    com.example.llamadroid.data.db.WorkflowTemplateEntity(
+                                    com.blackbox.ai.data.db.WorkflowTemplateEntity(
                                         name = nameToSave,
-                                        type = com.example.llamadroid.data.db.WorkflowType.MEDIA_DUB_TRANSLATION,
+                                        type = com.blackbox.ai.data.db.WorkflowType.MEDIA_DUB_TRANSLATION,
                                         configJson = config
                                     )
                                 )
@@ -3933,8 +3933,8 @@ private fun Txt2ImgUpscaleWorkflowContent(
         var showSaveDialog by remember { mutableStateOf(false) }
         var showEditDialog by remember { mutableStateOf(false) }
         var templateName by remember { mutableStateOf("") }
-        var editingTemplate by remember { mutableStateOf<com.example.llamadroid.data.db.WorkflowTemplateEntity?>(null) }
-        val templates by db.workflowTemplateDao().getByType(com.example.llamadroid.data.db.WorkflowType.TXT2IMG_UPSCALE).collectAsState(initial = emptyList())
+        var editingTemplate by remember { mutableStateOf<com.blackbox.ai.data.db.WorkflowTemplateEntity?>(null) }
+        val templates by db.workflowTemplateDao().getByType(com.blackbox.ai.data.db.WorkflowType.TXT2IMG_UPSCALE).collectAsState(initial = emptyList())
         
         Row(
             modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
@@ -4100,9 +4100,9 @@ private fun Txt2ImgUpscaleWorkflowContent(
                                 }.toString()
                                 
                                 db.workflowTemplateDao().insert(
-                                    com.example.llamadroid.data.db.WorkflowTemplateEntity(
+                                    com.blackbox.ai.data.db.WorkflowTemplateEntity(
                                         name = nameToSave,
-                                        type = com.example.llamadroid.data.db.WorkflowType.TXT2IMG_UPSCALE,
+                                        type = com.blackbox.ai.data.db.WorkflowType.TXT2IMG_UPSCALE,
                                         configJson = configJson
                                     )
                                 )
@@ -4506,7 +4506,7 @@ private fun Txt2ImgUpscaleWorkflowContent(
 
 private fun filterWorkflowSdComponents(
     models: List<ModelEntity>,
-    family: com.example.llamadroid.sd.SdModelFamily?,
+    family: com.blackbox.ai.sd.SdModelFamily?,
     variant: String?
 ): List<ModelEntity> {
     if (family == null) return emptyList()
@@ -4720,8 +4720,8 @@ private fun TranscribeSummaryWorkflowContent(
         var showSaveDialog by remember { mutableStateOf(false) }
         var showEditDialog by remember { mutableStateOf(false) }
         var templateName by remember { mutableStateOf("") }
-        var editingTemplate by remember { mutableStateOf<com.example.llamadroid.data.db.WorkflowTemplateEntity?>(null) }
-        val templates by db.workflowTemplateDao().getByType(com.example.llamadroid.data.db.WorkflowType.TRANSCRIBE_SUMMARY).collectAsState(initial = emptyList())
+        var editingTemplate by remember { mutableStateOf<com.blackbox.ai.data.db.WorkflowTemplateEntity?>(null) }
+        val templates by db.workflowTemplateDao().getByType(com.blackbox.ai.data.db.WorkflowType.TRANSCRIBE_SUMMARY).collectAsState(initial = emptyList())
         
         Row(
             modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
@@ -4883,9 +4883,9 @@ private fun TranscribeSummaryWorkflowContent(
                                 }.toString()
                                 
                                 db.workflowTemplateDao().insert(
-                                    com.example.llamadroid.data.db.WorkflowTemplateEntity(
+                                    com.blackbox.ai.data.db.WorkflowTemplateEntity(
                                         name = nameToSave,
-                                        type = com.example.llamadroid.data.db.WorkflowType.TRANSCRIBE_SUMMARY,
+                                        type = com.blackbox.ai.data.db.WorkflowType.TRANSCRIBE_SUMMARY,
                                         configJson = configJson
                                     )
                                 )
@@ -5185,7 +5185,7 @@ private fun TranscribeSummaryWorkflowContent(
 
         if (partialSummaries.isNotEmpty()) {
             Spacer(modifier = Modifier.height(12.dp))
-            com.example.llamadroid.ui.components.SummaryMarkdownCard(
+            com.blackbox.ai.ui.components.SummaryMarkdownCard(
                 title = stringResource(R.string.pdf_partial_results_title),
                 markdown = partialSummaries.mapIndexed { index, part ->
                     "### ${context.getString(R.string.summary_partial_item_label, index + 1)}\n$part"
@@ -5196,7 +5196,7 @@ private fun TranscribeSummaryWorkflowContent(
         // Summary result
         if (summaryText.isNotBlank()) {
             Spacer(modifier = Modifier.height(12.dp))
-            com.example.llamadroid.ui.components.SummaryMarkdownCard(
+            com.blackbox.ai.ui.components.SummaryMarkdownCard(
                 title = stringResource(R.string.workflow_summary_label),
                 markdown = summaryText
             )
@@ -5204,7 +5204,7 @@ private fun TranscribeSummaryWorkflowContent(
 
         if (transcriptionText.isNotBlank()) {
             Spacer(modifier = Modifier.height(12.dp))
-            com.example.llamadroid.ui.components.SummaryMarkdownCard(
+            com.blackbox.ai.ui.components.SummaryMarkdownCard(
                 title = stringResource(R.string.transcript_section_title),
                 markdown = transcriptionText
             )

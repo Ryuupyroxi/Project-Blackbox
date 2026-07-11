@@ -5,19 +5,19 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
-import com.example.llamadroid.R
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.NoteEntity
-import com.example.llamadroid.data.db.NoteType
-import com.example.llamadroid.data.model.LlamaScheduledTaskLogEntity
-import com.example.llamadroid.data.model.LlamaScheduledTaskEntity
-import com.example.llamadroid.data.model.LlamaScheduledTaskLogStatus
-import com.example.llamadroid.data.model.LlamaServerEntity
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.WakeLockManager
-import com.example.llamadroid.widget.NoteDisplayWidgetProvider
-import com.example.llamadroid.widget.OrganizerCalendarWidgetProvider
+import com.blackbox.ai.R
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.NoteEntity
+import com.blackbox.ai.data.db.NoteType
+import com.blackbox.ai.data.model.LlamaScheduledTaskLogEntity
+import com.blackbox.ai.data.model.LlamaScheduledTaskEntity
+import com.blackbox.ai.data.model.LlamaScheduledTaskLogStatus
+import com.blackbox.ai.data.model.LlamaServerEntity
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.WakeLockManager
+import com.blackbox.ai.widget.NoteDisplayWidgetProvider
+import com.blackbox.ai.widget.OrganizerCalendarWidgetProvider
 import java.util.ArrayDeque
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -62,7 +62,7 @@ class LlamaScheduledTaskService : Service() {
             notesChanged = { NoteDisplayWidgetProvider.refreshAll(applicationContext) },
             imageGenerator = NativeChatOnnxImageGenerator(applicationContext, database),
             backgroundRemover = NativeChatOnnxBackgroundRemover(applicationContext, database),
-            knowledgeBaseRepository = com.example.llamadroid.data.repository.KnowledgeBaseRepository(applicationContext, database),
+            knowledgeBaseRepository = com.blackbox.ai.data.repository.KnowledgeBaseRepository(applicationContext, database),
             pdfTextExtractor = { pdfBytes, maxChars ->
                 com.tom_roush.pdfbox.android.PDFBoxResourceLoader.init(applicationContext)
                 extractNativePdfTextFromBytes(pdfBytes, maxChars)
@@ -402,7 +402,7 @@ class LlamaScheduledTaskService : Service() {
     }
 
     private suspend fun failLog(
-        taskDao: com.example.llamadroid.data.dao.LlamaScheduledTaskDao,
+        taskDao: com.blackbox.ai.data.dao.LlamaScheduledTaskDao,
         logId: Long,
         start: Long?,
         error: String
@@ -468,8 +468,8 @@ class LlamaScheduledTaskService : Service() {
     )
 
     companion object {
-        const val ACTION_RUN_TASK = "com.example.llamadroid.llama_scheduler.RUN_TASK"
-        const val ACTION_CANCEL_RUNNING_TASK = "com.example.llamadroid.llama_scheduler.CANCEL_RUNNING_TASK"
+        const val ACTION_RUN_TASK = "com.blackbox.ai.llama_scheduler.RUN_TASK"
+        const val ACTION_CANCEL_RUNNING_TASK = "com.blackbox.ai.llama_scheduler.CANCEL_RUNNING_TASK"
         private const val EXTRA_TASK_ID = "task_id"
         private const val EXTRA_SCHEDULED_AT = "scheduled_at"
         private const val EXTRA_LOG_ID = "log_id"

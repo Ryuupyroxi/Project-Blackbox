@@ -146,7 +146,7 @@ fun OnnxModelsScreen(navController: NavController) {
             onnxModels.forEach { model ->
                 validationMap[model.filename] = when {
                     model.type == ModelType.ONNX_TTS -> OnnxTtsBundleValidator.validateDirectory(File(model.path))
-                    model.isOnnxTxt2ImgBundle() -> com.example.llamadroid.onnx.OnnxBundleValidator.validateDirectory(File(model.path))
+                    model.isOnnxTxt2ImgBundle() -> com.blackbox.ai.onnx.OnnxBundleValidator.validateDirectory(File(model.path))
                     else -> OnnxBundleValidationResult(
                         isValid = File(model.path).isFile,
                         missingPaths = if (File(model.path).isFile) emptyList() else listOf(File(model.path).name),
@@ -303,7 +303,7 @@ fun OnnxModelsScreen(navController: NavController) {
                     downloadStatus = downloadStatus,
                     onCancel = { key ->
                         val filename = DownloadProgressHolder.getFilename(key) ?: key.removePrefix("onnx:")
-                        com.example.llamadroid.service.DownloadService.cancelDownload(context, filename)
+                        com.blackbox.ai.service.DownloadService.cancelDownload(context, filename)
                         DownloadProgressHolder.removeProgress(key)
                     }
                 )
@@ -986,7 +986,7 @@ private suspend fun importOnnxBundleFromTree(
                 sizeBytes = sizeBytes,
                 repoId = "custom-import/$bundleId",
                 installSource = OnnxInstallSource.CUSTOM_IMPORT,
-                supportedCapabilities = com.example.llamadroid.onnx.OnnxBundleValidator
+                supportedCapabilities = com.blackbox.ai.onnx.OnnxBundleValidator
                     .validateDirectory(finalRoot)
                     .supportedCapabilities,
                 referenceUri = treeUri.toString(),
@@ -1002,7 +1002,7 @@ private suspend fun importOnnxBundleFromTree(
 }
 
 private fun validateAnyOnnxBundle(root: File): OnnxBundleValidationResult {
-    val imageValidation = com.example.llamadroid.onnx.OnnxBundleValidator.validateDirectory(root)
+    val imageValidation = com.blackbox.ai.onnx.OnnxBundleValidator.validateDirectory(root)
     if (imageValidation.isValid) return imageValidation
     val ttsValidation = OnnxTtsBundleValidator.validateDirectory(root)
     return if (ttsValidation.isValid || ttsValidation.missingPaths.size < imageValidation.missingPaths.size) {

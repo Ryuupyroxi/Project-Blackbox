@@ -1,16 +1,16 @@
 package com.blackbox.ai.service
 
 import android.content.Context
-import com.example.llamadroid.R
-import com.example.llamadroid.data.model.LITERT_BACKEND_AUTO
-import com.example.llamadroid.data.model.LITERT_BACKEND_CPU
-import com.example.llamadroid.data.model.LITERT_BACKEND_GPU
-import com.example.llamadroid.data.model.LiteRtModelEntity
-import com.example.llamadroid.data.model.LlamaChatEntity
-import com.example.llamadroid.data.model.defaultLiteRtChatContextTokens
-import com.example.llamadroid.data.model.isLikelyLiteRtGpuPackage
-import com.example.llamadroid.data.model.normalizeLiteRtBackend
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.R
+import com.blackbox.ai.data.model.LITERT_BACKEND_AUTO
+import com.blackbox.ai.data.model.LITERT_BACKEND_CPU
+import com.blackbox.ai.data.model.LITERT_BACKEND_GPU
+import com.blackbox.ai.data.model.LiteRtModelEntity
+import com.blackbox.ai.data.model.LlamaChatEntity
+import com.blackbox.ai.data.model.defaultLiteRtChatContextTokens
+import com.blackbox.ai.data.model.isLikelyLiteRtGpuPackage
+import com.blackbox.ai.data.model.normalizeLiteRtBackend
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

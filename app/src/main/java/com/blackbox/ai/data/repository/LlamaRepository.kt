@@ -1,15 +1,15 @@
 package com.blackbox.ai.data.repository
 
-import com.example.llamadroid.data.dao.LlamaServerDao
-import com.example.llamadroid.data.dao.LlamaChatDao
-import com.example.llamadroid.data.dao.LlamaChatFolderDao
-import com.example.llamadroid.data.dao.LlamaChatPromptProfileDao
-import com.example.llamadroid.data.dao.LlamaMessageDao
-import com.example.llamadroid.data.model.LlamaServerEntity
-import com.example.llamadroid.data.model.LlamaChatEntity
-import com.example.llamadroid.data.model.LlamaChatFolderEntity
-import com.example.llamadroid.data.model.LlamaChatPromptProfileEntity
-import com.example.llamadroid.data.model.LlamaMessageEntity
+import com.blackbox.ai.data.dao.LlamaServerDao
+import com.blackbox.ai.data.dao.LlamaChatDao
+import com.blackbox.ai.data.dao.LlamaChatFolderDao
+import com.blackbox.ai.data.dao.LlamaChatPromptProfileDao
+import com.blackbox.ai.data.dao.LlamaMessageDao
+import com.blackbox.ai.data.model.LlamaServerEntity
+import com.blackbox.ai.data.model.LlamaChatEntity
+import com.blackbox.ai.data.model.LlamaChatFolderEntity
+import com.blackbox.ai.data.model.LlamaChatPromptProfileEntity
+import com.blackbox.ai.data.model.LlamaMessageEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

@@ -87,7 +87,7 @@ fun AudioTranscriptionScreen(navController: NavController) {
     
     // Check for shared file (from share intent)
     LaunchedEffect(Unit) {
-        val pendingFile = com.example.llamadroid.data.SharedFileHolder.consumePendingFile()
+        val pendingFile = com.blackbox.ai.data.SharedFileHolder.consumePendingFile()
         if (pendingFile != null) {
             // Copy URI to internal storage
             try {
@@ -150,7 +150,7 @@ fun AudioTranscriptionScreen(navController: NavController) {
                     isExtractingAudio = true
                     extractionProgress = context.getString(R.string.whisper_extracting_audio)
                     
-                    val binaryRepo = com.example.llamadroid.data.binary.BinaryRepository(context)
+                    val binaryRepo = com.blackbox.ai.data.binary.BinaryRepository(context)
                     val ffmpegBinary = binaryRepo.getFFmpegBinary()
                     val audioOutput = File(context.cacheDir, "whisper_extracted_audio.wav")
                     

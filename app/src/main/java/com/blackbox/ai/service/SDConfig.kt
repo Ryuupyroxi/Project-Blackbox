@@ -1,7 +1,7 @@
 package com.blackbox.ai.service
 
 import android.os.Parcelable
-import com.example.llamadroid.sd.SdLoraApplyMode
+import com.blackbox.ai.sd.SdLoraApplyMode
 import kotlinx.parcelize.Parcelize
 
 /**

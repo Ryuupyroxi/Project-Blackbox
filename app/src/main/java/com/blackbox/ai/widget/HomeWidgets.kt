@@ -11,11 +11,11 @@ import android.net.Uri
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import com.example.llamadroid.MainActivity
-import com.example.llamadroid.R
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.OrganizerEventEntity
-import com.example.llamadroid.ui.navigation.Screen
+import com.blackbox.ai.MainActivity
+import com.blackbox.ai.R
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.OrganizerEventEntity
+import com.blackbox.ai.ui.navigation.Screen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

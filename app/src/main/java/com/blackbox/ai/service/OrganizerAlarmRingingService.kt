@@ -5,8 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
-import com.example.llamadroid.data.db.OrganizerAlarmEntity
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.data.db.OrganizerAlarmEntity
+import com.blackbox.ai.util.DebugLog
 
 class OrganizerAlarmRingingService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
@@ -62,8 +62,8 @@ class OrganizerAlarmRingingService : Service() {
     }
 
     companion object {
-        private const val ACTION_RING = "com.example.llamadroid.organizer.ALARM_RING_SERVICE"
-        private const val ACTION_DISMISS = "com.example.llamadroid.organizer.ALARM_DISMISS"
+        private const val ACTION_RING = "com.blackbox.ai.organizer.ALARM_RING_SERVICE"
+        private const val ACTION_DISMISS = "com.blackbox.ai.organizer.ALARM_DISMISS"
         private const val EXTRA_ALARM_ID = "extra_alarm_id"
         private const val EXTRA_TITLE = "extra_title"
         private const val EXTRA_BODY = "extra_body"

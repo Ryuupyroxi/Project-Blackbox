@@ -1,6 +1,6 @@
 package com.blackbox.ai.data.model
 
-import com.example.llamadroid.util.AIConstants
+import com.blackbox.ai.util.AIConstants
 
 /**
  * Termux tool command catalog for the direct Ubuntu-over-SSH workflow.
@@ -118,7 +118,7 @@ object ToolInfoCards {
             "If needed: use --lowvram or --medvram flags"
         ),
         integration = "",
-        integrationResId = com.example.llamadroid.R.string.tool_a1111_integration,
+        integrationResId = com.blackbox.ai.R.string.tool_a1111_integration,
         features = listOf("Stable Diffusion WebUI", "Extensions", "ControlNet", "LoRA support"),
         githubUrl = "https://github.com/ManuXD32/stable-diffusion-webui"
     )
@@ -218,7 +218,7 @@ object TermuxTools {
         id = "ollama",
         name = "Ollama",
         emoji = "🦙",
-        descriptionResId = com.example.llamadroid.R.string.tool_ollama_desc,
+        descriptionResId = com.blackbox.ai.R.string.tool_ollama_desc,
         port = Ports.OLLAMA,
         installPath = "~/.ollama",  // Ollama data directory (contains models)
         modelsPath = ModelPaths.OLLAMA,
@@ -249,7 +249,7 @@ object TermuxTools {
         id = "open_webui",
         name = "Open WebUI",
         emoji = "🌐",
-        descriptionResId = com.example.llamadroid.R.string.tool_open_webui_desc,
+        descriptionResId = com.blackbox.ai.R.string.tool_open_webui_desc,
         port = Ports.OPEN_WEBUI,
         installPath = "~/miniconda3/envs/webui",
         modelsPath = ModelPaths.OLLAMA,
@@ -279,7 +279,7 @@ object TermuxTools {
         id = "big_agi",
         name = "Big-AGI",
         emoji = "🧠",
-        descriptionResId = com.example.llamadroid.R.string.tool_big_agi_desc,
+        descriptionResId = com.blackbox.ai.R.string.tool_big_agi_desc,
         port = Ports.BIG_AGI,
         installPath = "~/big-AGI",
         modelsPath = ModelPaths.NONE,
@@ -310,7 +310,7 @@ object TermuxTools {
         id = "oobabooga",
         name = "Oobabooga",
         emoji = "📝",
-        descriptionResId = com.example.llamadroid.R.string.tool_oobabooga_desc,
+        descriptionResId = com.blackbox.ai.R.string.tool_oobabooga_desc,
         port = Ports.OOBABOOGA,
         installPath = "~/text-generation-webui",
         modelsPath = ModelPaths.OOBABOOGA,
@@ -344,7 +344,7 @@ object TermuxTools {
         id = "fastsdcpu",
         name = "FastSD CPU",
         emoji = "🎨",
-        descriptionResId = com.example.llamadroid.R.string.tool_fastsdcpu_desc,
+        descriptionResId = com.blackbox.ai.R.string.tool_fastsdcpu_desc,
         port = Ports.FASTSDCPU,
         installPath = "~/fastsdcpu",
         modelsPath = ModelPaths.FASTSDCPU,
@@ -373,7 +373,7 @@ object TermuxTools {
         id = "fastsdcpu_mcp",
         name = "FastSD MCP Server",
         emoji = "🤖",
-        descriptionResId = com.example.llamadroid.R.string.tool_mcp_desc,
+        descriptionResId = com.blackbox.ai.R.string.tool_mcp_desc,
         port = Ports.FASTSDCPU_MCP,
         installPath = "~/fastsdcpu",  // Same as main FastSD
         modelsPath = ModelPaths.FASTSDCPU,
@@ -404,7 +404,7 @@ object TermuxTools {
         id = "a1111",
         name = "Automatic 1111",
         emoji = "🖼️",
-        descriptionResId = com.example.llamadroid.R.string.tool_a1111_desc,
+        descriptionResId = com.blackbox.ai.R.string.tool_a1111_desc,
         port = Ports.A1111,
         installPath = "/home/auto/stable-diffusion-webui",  // Installed under auto user
         modelsPath = ModelPaths.A1111,

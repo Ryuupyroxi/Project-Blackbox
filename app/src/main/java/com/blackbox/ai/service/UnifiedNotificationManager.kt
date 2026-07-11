@@ -14,14 +14,14 @@ import android.os.Build
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.example.llamadroid.MainActivity
-import com.example.llamadroid.ui.navigation.Screen
-import com.example.llamadroid.R
-import com.example.llamadroid.tama.data.FarmLivestockType
-import com.example.llamadroid.tama.data.PetSpeciesLine
-import com.example.llamadroid.tama.data.PetSpriteState
-import com.example.llamadroid.tama.data.TamaPet
-import com.example.llamadroid.tama.data.resolvePetSpriteAssetPath
+import com.blackbox.ai.MainActivity
+import com.blackbox.ai.ui.navigation.Screen
+import com.blackbox.ai.R
+import com.blackbox.ai.tama.data.FarmLivestockType
+import com.blackbox.ai.tama.data.PetSpeciesLine
+import com.blackbox.ai.tama.data.PetSpriteState
+import com.blackbox.ai.tama.data.TamaPet
+import com.blackbox.ai.tama.data.resolvePetSpriteAssetPath
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.concurrent.ConcurrentHashMap
@@ -47,7 +47,7 @@ object UnifiedNotificationManager {
     private const val TAMA_CHAT_REPLY_CHANNEL_ID = "tama_chat_replies"
     private const val TAMA_STUDY_CHANNEL_ID = "tama_study_timers"
     private const val ORGANIZER_ALARM_CHANNEL_ID = "organizer_alarms"
-    private const val GROUP_KEY = "com.example.llamadroid.AI_TASKS"
+    private const val GROUP_KEY = "com.blackbox.ai.AI_TASKS"
     private const val SUMMARY_ID = 0
     private const val COMPLETION_ID = 99
     private const val TAMA_SLEEP_NOTIFICATION_BASE = 420_000
@@ -1343,7 +1343,7 @@ object UnifiedNotificationManager {
     private fun createOpenTamaPendingIntent(requestCode: Int): PendingIntent {
         val intent = Intent(appContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            putExtra(MainActivity.EXTRA_OPEN_ROUTE, com.example.llamadroid.ui.navigation.Screen.Tama.route)
+            putExtra(MainActivity.EXTRA_OPEN_ROUTE, com.blackbox.ai.ui.navigation.Screen.Tama.route)
         }
         return PendingIntent.getActivity(
             appContext,
@@ -1356,7 +1356,7 @@ object UnifiedNotificationManager {
     private fun createOpenTamaChatPendingIntent(requestCode: Int): PendingIntent {
         val intent = Intent(appContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            putExtra(MainActivity.EXTRA_OPEN_ROUTE, com.example.llamadroid.ui.navigation.Screen.TamaChat.route)
+            putExtra(MainActivity.EXTRA_OPEN_ROUTE, com.blackbox.ai.ui.navigation.Screen.TamaChat.route)
         }
         return PendingIntent.getActivity(
             appContext,

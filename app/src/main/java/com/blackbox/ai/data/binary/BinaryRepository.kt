@@ -4,11 +4,11 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.util.Log
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.util.CpuFeatures
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.DeviceAcceleration
-import com.example.llamadroid.util.DynamicFeatureManager
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.util.CpuFeatures
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.DeviceAcceleration
+import com.blackbox.ai.util.DynamicFeatureManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -176,7 +176,7 @@ class BinaryRepository(private val context: Context) {
         nativeLibraryCandidateDirs().forEach(::addFromDir)
 
         listOf(
-            "com.example.llamadroid.feature.llm.snapdragon.opencl"
+            "com.blackbox.ai.feature.llm.snapdragon.opencl"
         ).forEach { pkgName ->
             runCatching {
                 val featureContext = context.createPackageContext(pkgName, 0)
@@ -304,14 +304,14 @@ class BinaryRepository(private val context: Context) {
         val featureSearchTiers = tiersToTry
         val featurePackages = buildList {
             if (acceleratorNames.isNotEmpty()) {
-                add("com.example.llamadroid.feature.llm.snapdragon.opencl")
+                add("com.blackbox.ai.feature.llm.snapdragon.opencl")
             }
             featureSearchTiers.forEach { tier ->
-                add("com.example.llamadroid.feature.llm.$tier")
-                add("com.example.llamadroid.feature.media.$tier")
-                add("com.example.llamadroid.feature.kiwix.$tier")
+                add("com.blackbox.ai.feature.llm.$tier")
+                add("com.blackbox.ai.feature.media.$tier")
+                add("com.blackbox.ai.feature.kiwix.$tier")
             }
-            add("com.example.llamadroid.feature.upscaler")
+            add("com.blackbox.ai.feature.upscaler")
         }.distinct()
 
         for (pkgName in featurePackages) {
@@ -453,7 +453,7 @@ class BinaryRepository(private val context: Context) {
         nativeLibraryCandidateDirs().forEach { paths.add(it.absolutePath) }
         
         // Add centralized asset binaries directory (Fallback)
-        val assetBinDir = com.example.llamadroid.util.AssetPackManagerUtil.getBinariesDir(context)
+        val assetBinDir = com.blackbox.ai.util.AssetPackManagerUtil.getBinariesDir(context)
         if (assetBinDir.exists()) {
             paths.add(assetBinDir.absolutePath)
         }
@@ -833,10 +833,10 @@ class BinaryRepository(private val context: Context) {
          
          val currentTier = getTier()
          val featurePackages = listOf(
-            "com.example.llamadroid.feature.llm.$currentTier",
-            "com.example.llamadroid.feature.media.$currentTier",
-            "com.example.llamadroid.feature.kiwix.$currentTier",
-            "com.example.llamadroid.feature.upscaler"
+            "com.blackbox.ai.feature.llm.$currentTier",
+            "com.blackbox.ai.feature.media.$currentTier",
+            "com.blackbox.ai.feature.kiwix.$currentTier",
+            "com.blackbox.ai.feature.upscaler"
         )
         
         featurePackages.forEach { pkgName ->

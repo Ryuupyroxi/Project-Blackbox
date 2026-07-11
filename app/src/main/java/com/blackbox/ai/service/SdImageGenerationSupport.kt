@@ -1,7 +1,7 @@
 package com.blackbox.ai.service
 
 import android.content.Context
-import com.example.llamadroid.R
+import com.blackbox.ai.R
 import java.io.File
 
 internal enum class SdLaunchIssue {

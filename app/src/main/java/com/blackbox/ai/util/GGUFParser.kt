@@ -1,6 +1,6 @@
 package com.blackbox.ai.util
 
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.util.DebugLog
 import java.io.File
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer

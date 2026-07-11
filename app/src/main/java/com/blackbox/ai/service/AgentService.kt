@@ -4,27 +4,27 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
-import com.example.llamadroid.R
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.ModelType
-import com.example.llamadroid.data.repository.KnowledgeBaseRepository
-import com.example.llamadroid.onnx.OnnxBackgroundRemovalConfig
-import com.example.llamadroid.onnx.OnnxBackgroundRemovalPipeline
-import com.example.llamadroid.onnx.OnnxGraphOptimizationLevel
-import com.example.llamadroid.onnx.OnnxImageGenConfig
-import com.example.llamadroid.onnx.OnnxImageGenMode
-import com.example.llamadroid.onnx.OnnxRuntimeBackend
-import com.example.llamadroid.onnx.OnnxRuntimeOptions
-import com.example.llamadroid.onnx.OnnxTxt2ImgPipeline
-import com.example.llamadroid.onnx.isOnnxBackgroundRemovalModel
-import com.example.llamadroid.onnx.isOnnxTxt2ImgBundle
-import com.example.llamadroid.sd.isSdImageMainModel
-import com.example.llamadroid.sd.resolvedSdFamily
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.service.containsTraversalSegments
-import com.example.llamadroid.service.isSequentialBatchBlockedTool
-import com.example.llamadroid.service.stripHtmlTags
+import com.blackbox.ai.R
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.ModelType
+import com.blackbox.ai.data.repository.KnowledgeBaseRepository
+import com.blackbox.ai.onnx.OnnxBackgroundRemovalConfig
+import com.blackbox.ai.onnx.OnnxBackgroundRemovalPipeline
+import com.blackbox.ai.onnx.OnnxGraphOptimizationLevel
+import com.blackbox.ai.onnx.OnnxImageGenConfig
+import com.blackbox.ai.onnx.OnnxImageGenMode
+import com.blackbox.ai.onnx.OnnxRuntimeBackend
+import com.blackbox.ai.onnx.OnnxRuntimeOptions
+import com.blackbox.ai.onnx.OnnxTxt2ImgPipeline
+import com.blackbox.ai.onnx.isOnnxBackgroundRemovalModel
+import com.blackbox.ai.onnx.isOnnxTxt2ImgBundle
+import com.blackbox.ai.sd.isSdImageMainModel
+import com.blackbox.ai.sd.resolvedSdFamily
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.service.containsTraversalSegments
+import com.blackbox.ai.service.isSequentialBatchBlockedTool
+import com.blackbox.ai.service.stripHtmlTags
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -140,7 +140,7 @@ private data class HardCompactionState(
 )
 
 data class AgentLlamaServerRuntimeState(
-    val backend: String = com.example.llamadroid.data.SettingsRepository.PDF_BACKEND_LLAMA_SERVER,
+    val backend: String = com.blackbox.ai.data.SettingsRepository.PDF_BACKEND_LLAMA_SERVER,
     val baseUrl: String = "",
     val isConnected: Boolean = false,
     val hasChecked: Boolean = false,
@@ -367,7 +367,7 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
             runCatching {
                 AiRuntimeJobStore.upsert(
                     appContext,
-                    com.example.llamadroid.data.db.AiRuntimeJobEntity(
+                    com.blackbox.ai.data.db.AiRuntimeJobEntity(
                         jobId = jobId,
                         jobKey = jobKey,
                         type = AiRuntimeJobStore.TYPE_AGENT_CHAT,
@@ -444,7 +444,7 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
 
             AiRuntimeJobStore.upsert(
                 appContext,
-                com.example.llamadroid.data.db.AiRuntimeJobEntity(
+                com.blackbox.ai.data.db.AiRuntimeJobEntity(
                     jobId = jobId,
                     jobKey = jobKey,
                     type = AiRuntimeJobStore.TYPE_AGENT_CHAT,
@@ -481,7 +481,7 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
     }
 
     fun snapshotPersistentState(): String {
-        fun serializeToolCall(toolCall: com.example.llamadroid.service.OllamaService.ToolCall?): JSONObject? {
+        fun serializeToolCall(toolCall: com.blackbox.ai.service.OllamaService.ToolCall?): JSONObject? {
             return toolCall?.let {
                 JSONObject().apply {
                     put("name", it.name)
@@ -599,12 +599,12 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
     }
 
     fun restorePersistentState(payloadJson: String) {
-        fun deserializeToolCall(json: JSONObject?): com.example.llamadroid.service.OllamaService.ToolCall? {
+        fun deserializeToolCall(json: JSONObject?): com.blackbox.ai.service.OllamaService.ToolCall? {
             if (json == null) return null
             val argsJson = json.optJSONObject("arguments")
             val args = mutableMapOf<String, String>()
             argsJson?.keys()?.forEach { key -> args[key] = argsJson.optString(key) }
-            return com.example.llamadroid.service.OllamaService.ToolCall(
+            return com.blackbox.ai.service.OllamaService.ToolCall(
                 name = json.optString("name"),
                 arguments = args,
                 id = json.optString("id").takeIf { it.isNotBlank() }
@@ -717,11 +717,11 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
     }
 
     suspend fun refreshLlamaServerRuntimeState(
-        settingsRepo: com.example.llamadroid.data.SettingsRepository,
+        settingsRepo: com.blackbox.ai.data.SettingsRepository,
         force: Boolean = false
     ): Result<AgentLlamaServerRuntimeState> = withContext(Dispatchers.IO) {
-        val backend = com.example.llamadroid.data.SettingsRepository.normalizeOllamaOrLlamaBackend(settingsRepo.agentBackend.value)
-        val isLlamaSwap = com.example.llamadroid.data.SettingsRepository.isLlamaSwapBackend(backend)
+        val backend = com.blackbox.ai.data.SettingsRepository.normalizeOllamaOrLlamaBackend(settingsRepo.agentBackend.value)
+        val isLlamaSwap = com.blackbox.ai.data.SettingsRepository.isLlamaSwapBackend(backend)
         val backendLabel = if (isLlamaSwap) "llama-swap" else "llama-server"
         val baseUrl = if (isLlamaSwap) {
             settingsRepo.agentLlamaSwapUrl.value
@@ -952,7 +952,7 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
     suspend fun queueVisionAttachment(
         path: String,
         role: AgentRole,
-        activeCustom: com.example.llamadroid.data.db.CustomAgentEntity?
+        activeCustom: com.blackbox.ai.data.db.CustomAgentEntity?
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
             val safePath = sanitizePath(path)
@@ -986,7 +986,7 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
         prompt: String,
         negativePrompt: String,
         outputPath: String,
-        settingsRepo: com.example.llamadroid.data.SettingsRepository
+        settingsRepo: com.blackbox.ai.data.SettingsRepository
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
             if (!settingsRepo.agentImageGenerationToolEnabled.value) {
@@ -1069,7 +1069,7 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
         val model = mainModels.find { it.filename == selectedModelId || it.path == selectedModelId }
             ?: return Result.failure(Exception(context.getString(R.string.agent_generate_image_sd_model_missing)))
         val (family, variant) = model.resolvedSdFamily()
-        val spec = family?.let { com.example.llamadroid.sd.resolveSdFamilySpec(it, variant) }
+        val spec = family?.let { com.blackbox.ai.sd.resolveSdFamilySpec(it, variant) }
             ?: return Result.failure(Exception(context.getString(R.string.agent_generate_image_sd_model_missing)))
         val supportModels = db.modelDao().getModelsByTypesSync(
             listOf(
@@ -1193,7 +1193,7 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
     suspend fun removeImageBackground(
         imagePath: String,
         outputPath: String?,
-        settingsRepo: com.example.llamadroid.data.SettingsRepository
+        settingsRepo: com.blackbox.ai.data.SettingsRepository
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
             if (!settingsRepo.agentBackgroundRemovalToolEnabled.value) {
@@ -2108,7 +2108,7 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
         }
 
         fun setIsLoading(loading: Boolean, status: String? = null) {
-            val appContext = com.example.llamadroid.LlamaApplication.instance
+            val appContext = com.blackbox.ai.LlamaApplication.instance
 
             // Update reference counter
             val count = if (loading) {
@@ -2158,14 +2158,14 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
             _statusText.value = status
             // Also update notification if service is running
             if (loadingRefCount.get() > 0) {
-                val appContext = com.example.llamadroid.LlamaApplication.instance
+                val appContext = com.blackbox.ai.LlamaApplication.instance
                 AgentForegroundService.updateStatus(appContext, status)
             }
         }
 
         private fun refreshIdleStatusIfNeeded() {
             if (loadingRefCount.get() == 0) {
-                val appContext = com.example.llamadroid.LlamaApplication.instance
+                val appContext = com.blackbox.ai.LlamaApplication.instance
                 _statusText.value = idleStatusText(appContext)
             }
         }
@@ -2235,14 +2235,14 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
             val agentRole: String? = null,  // Which agent produced this message
             val customAgentName: String? = null,  // Name of custom agent (if applicable)
             val isSuspicious: Boolean = false, // Command triggers security pattern
-            val pendingToolCall: com.example.llamadroid.service.OllamaService.ToolCall? = null,
+            val pendingToolCall: com.blackbox.ai.service.OllamaService.ToolCall? = null,
             val isOutputExpanded: Boolean = false, // Individual toggle for tool output
             val timestamp: Long = System.currentTimeMillis(),
             val sequenceNumber: Int = _messageCounter.incrementAndGet()
         ) {
-            fun toOllamaMessage(includeThinking: Boolean = true): com.example.llamadroid.service.OllamaService.ChatMessage {
+            fun toOllamaMessage(includeThinking: Boolean = true): com.blackbox.ai.service.OllamaService.ChatMessage {
                 val safeImagePath = imagePath?.takeIf { java.io.File(it).exists() }
-                return com.example.llamadroid.service.OllamaService.ChatMessage(
+                return com.blackbox.ai.service.OllamaService.ChatMessage(
                     role = this.role,
                     content = this.content,
                     toolCallId = this.toolCallId,
@@ -2271,7 +2271,7 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
             }
         }
 
-        fun serializeToolCall(toolCall: com.example.llamadroid.service.OllamaService.ToolCall?): String? {
+        fun serializeToolCall(toolCall: com.blackbox.ai.service.OllamaService.ToolCall?): String? {
             if (toolCall == null) return null
             return JSONObject().apply {
                 put("name", toolCall.name)
@@ -2280,14 +2280,14 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
             }.toString()
         }
 
-        fun deserializeToolCall(jsonStr: String?): com.example.llamadroid.service.OllamaService.ToolCall? {
+        fun deserializeToolCall(jsonStr: String?): com.blackbox.ai.service.OllamaService.ToolCall? {
             if (jsonStr.isNullOrBlank()) return null
             return try {
                 val json = JSONObject(jsonStr)
                 val argsJson = json.optJSONObject("arguments")
                 val args = mutableMapOf<String, String>()
                 argsJson?.keys()?.forEach { key -> args[key] = argsJson.optString(key) }
-                com.example.llamadroid.service.OllamaService.ToolCall(
+                com.blackbox.ai.service.OllamaService.ToolCall(
                     name = json.optString("name"),
                     arguments = args,
                     id = json.optString("id").takeIf { it.isNotBlank() }
@@ -2367,8 +2367,8 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
             message: ChatMessage,
             conversationId: Long,
             originalIdOverride: String? = null
-        ): com.example.llamadroid.data.db.AgentMessageEntity {
-            return com.example.llamadroid.data.db.AgentMessageEntity(
+        ): com.blackbox.ai.data.db.AgentMessageEntity {
+            return com.blackbox.ai.data.db.AgentMessageEntity(
                 originalId = originalIdOverride ?: message.id,
                 conversationId = conversationId,
                 role = message.role,
@@ -2398,7 +2398,7 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
             )
         }
 
-        fun chatMessageFromEntity(entity: com.example.llamadroid.data.db.AgentMessageEntity): ChatMessage {
+        fun chatMessageFromEntity(entity: com.blackbox.ai.data.db.AgentMessageEntity): ChatMessage {
             return ChatMessage(
                 id = entity.originalId,
                 role = entity.role,
@@ -2547,12 +2547,12 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
             if (enabled) current.remove(agentName.uppercase()) else current.add(agentName.uppercase())
             _disabledBuiltInAgents.value = current
             // Persist
-            val prefs = com.example.llamadroid.LlamaApplication.instance.getSharedPreferences("settings", 0)
+            val prefs = com.blackbox.ai.LlamaApplication.instance.getSharedPreferences("settings", 0)
             prefs.edit().putStringSet("disabled_built_in_agents", _disabledBuiltInAgents.value).apply()
         }
 
         fun loadDisabledAgents() {
-            val prefs = com.example.llamadroid.LlamaApplication.instance.getSharedPreferences("settings", 0)
+            val prefs = com.blackbox.ai.LlamaApplication.instance.getSharedPreferences("settings", 0)
             _disabledBuiltInAgents.value = prefs.getStringSet("disabled_built_in_agents", emptySet()) ?: emptySet()
         }
 
@@ -3052,17 +3052,17 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
         private fun rememberRuntimeRefs(
             context: Context,
             ollamaService: OllamaService,
-            settingsRepo: com.example.llamadroid.data.SettingsRepository,
+            settingsRepo: com.blackbox.ai.data.SettingsRepository,
             agentService: AgentService
         ) {
             lastRuntimeRefs = AgentRuntimeRefs(context.applicationContext, ollamaService, settingsRepo, agentService)
         }
 
         // Active custom agent (persistent)
-        private val _activeCustomAgent = MutableStateFlow<com.example.llamadroid.data.db.CustomAgentEntity?>(null)
-        val activeCustomAgent: StateFlow<com.example.llamadroid.data.db.CustomAgentEntity?> = _activeCustomAgent.asStateFlow()
+        private val _activeCustomAgent = MutableStateFlow<com.blackbox.ai.data.db.CustomAgentEntity?>(null)
+        val activeCustomAgent: StateFlow<com.blackbox.ai.data.db.CustomAgentEntity?> = _activeCustomAgent.asStateFlow()
 
-        fun setActiveCustomAgent(agent: com.example.llamadroid.data.db.CustomAgentEntity?) {
+        fun setActiveCustomAgent(agent: com.blackbox.ai.data.db.CustomAgentEntity?) {
             _activeCustomAgent.value = agent
         }
 
@@ -3141,7 +3141,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
 
         private fun buildFinishTaskSchemaPrompt(
             role: AgentRole,
-            activeCustom: com.example.llamadroid.data.db.CustomAgentEntity?
+            activeCustom: com.blackbox.ai.data.db.CustomAgentEntity?
         ): String? {
             if (role == AgentRole.ORCHESTRATOR && activeCustom == null) return null
             return when (role) {
@@ -3206,7 +3206,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
         private data class AgentRuntimeRefs(
             val context: Context,
             val ollamaService: OllamaService,
-            val settingsRepo: com.example.llamadroid.data.SettingsRepository,
+            val settingsRepo: com.blackbox.ai.data.SettingsRepository,
             val agentService: AgentService
         )
         private data class PackedPromptContext(
@@ -3470,12 +3470,12 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
                             _retryMessage.value = null
                             return@launch
                         }
-                        val appContext = com.example.llamadroid.LlamaApplication.instance
+                        val appContext = com.blackbox.ai.LlamaApplication.instance
                         _retryMessage.value = appContext.getString(R.string.agent_retry_message, i, index + 1, retryIntervals.size)
                         delay(1000)
                     }
 
-                    val appContext = com.example.llamadroid.LlamaApplication.instance
+                    val appContext = com.blackbox.ai.LlamaApplication.instance
                     _retryMessage.value = appContext.getString(R.string.agent_connecting)
                     agentService.connect().onSuccess {
                         _connectionStatus.value = ConnectionStatus.CONNECTED
@@ -3489,7 +3489,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
 
                 // All retries failed
                 _connectionStatus.value = ConnectionStatus.DISCONNECTED
-                val appContext = com.example.llamadroid.LlamaApplication.instance
+                val appContext = com.blackbox.ai.LlamaApplication.instance
                 _retryMessage.value = appContext.getString(R.string.agent_retry_failed)
                 delay(5000)
                 _retryMessage.value = null // Clear message but keep status DISCONNECTED
@@ -3501,7 +3501,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
     private fun acquireWakeLock() {
         try {
             if (wakeLock == null) {
-                val pm = com.example.llamadroid.LlamaApplication.instance.getSystemService(Context.POWER_SERVICE) as? PowerManager
+                val pm = com.blackbox.ai.LlamaApplication.instance.getSystemService(Context.POWER_SERVICE) as? PowerManager
                 wakeLock = pm?.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "AI-Doomsday:AgentTask")
             }
             if (wakeLock?.isHeld == false) {
@@ -3549,7 +3549,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
 
             // Ensure WakeLock is released (defensive call before setIsLoading)
             releaseWakeLock()
-            val appContext = com.example.llamadroid.LlamaApplication.instance
+            val appContext = com.blackbox.ai.LlamaApplication.instance
             setIsLoading(false, appContext.getString(R.string.agent_status_interrupted))
             addDebugLog("🛑 All jobs stopped by user. Reset to Orchestrator.")
             recordAgentEvent("agent_stop", "Stopped all running agent work", "User interrupted the active workflow.")
@@ -3610,7 +3610,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
             cancelCurrentChatJob()
             loadingRefCount.set(0)
             _isLoading.value = false
-            _statusText.value = idleStatusText(com.example.llamadroid.LlamaApplication.instance)
+            _statusText.value = idleStatusText(com.blackbox.ai.LlamaApplication.instance)
             _streamingContent.value = ""
             _streamingThinking.value = ""
             _streamingMessageId.value = null
@@ -3659,7 +3659,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
             updateMessage(id) { it.copy(isOutputExpanded = !it.isOutputExpanded) }
         }
 
-        fun handlePlanModified(context: Context, ollamaService: OllamaService, settingsRepo: com.example.llamadroid.data.SettingsRepository, agentService: AgentService, id: String, newContent: String) {
+        fun handlePlanModified(context: Context, ollamaService: OllamaService, settingsRepo: com.blackbox.ai.data.SettingsRepository, agentService: AgentService, id: String, newContent: String) {
             updateMessage(id) {
                 it.copy(
                     content = newContent,
@@ -3840,10 +3840,10 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
         }
 
         // ========== CUSTOM TOOLS (loaded from database) ==========
-        private val _loadedCustomTools = MutableStateFlow<List<com.example.llamadroid.data.db.CustomToolEntity>>(emptyList())
-        val loadedCustomTools: StateFlow<List<com.example.llamadroid.data.db.CustomToolEntity>> = _loadedCustomTools.asStateFlow()
+        private val _loadedCustomTools = MutableStateFlow<List<com.blackbox.ai.data.db.CustomToolEntity>>(emptyList())
+        val loadedCustomTools: StateFlow<List<com.blackbox.ai.data.db.CustomToolEntity>> = _loadedCustomTools.asStateFlow()
 
-        fun setLoadedCustomTools(tools: List<com.example.llamadroid.data.db.CustomToolEntity>) {
+        fun setLoadedCustomTools(tools: List<com.blackbox.ai.data.db.CustomToolEntity>) {
             _loadedCustomTools.value = tools
             addDebugLog("📦 Loaded ${tools.size} custom tools")
             // Regenerate tools_reference.md when custom tools change
@@ -4012,7 +4012,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
         fun sendMessage(
             context: Context,
             ollamaService: OllamaService,
-            settingsRepo: com.example.llamadroid.data.SettingsRepository,
+            settingsRepo: com.blackbox.ai.data.SettingsRepository,
             agentService: AgentService,
             isRedo: Boolean = false,
             recoveryInstruction: String? = null,
@@ -4705,7 +4705,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
         fun executeToolCall(
             context: Context,
             ollamaService: OllamaService,
-            settingsRepo: com.example.llamadroid.data.SettingsRepository,
+            settingsRepo: com.blackbox.ai.data.SettingsRepository,
             agentService: AgentService,
             toolCall: OllamaService.ToolCall,
             isForced: Boolean = false, // If true, ignore autoMode check
@@ -5374,7 +5374,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
 
                                         val args = mutableMapOf<String, String>()
                                         argsObj.keys().forEach { key -> args[key] = argsObj.opt(key)?.toString().orEmpty() }
-                                        val nestedToolCall = com.example.llamadroid.service.OllamaService.ToolCall(
+                                        val nestedToolCall = com.blackbox.ai.service.OllamaService.ToolCall(
                                             name = toolName,
                                             arguments = args
                                         )
@@ -5674,25 +5674,25 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
         fun continueAfterToolExecution(
             context: Context,
             ollamaService: OllamaService,
-            settingsRepo: com.example.llamadroid.data.SettingsRepository,
+            settingsRepo: com.blackbox.ai.data.SettingsRepository,
             agentService: AgentService
         ) {
             sendMessage(context, ollamaService, settingsRepo, agentService)
         }
 
         // ========== CUSTOM AGENTS (loaded from database) ==========
-        private val _loadedCustomAgents = MutableStateFlow<List<com.example.llamadroid.data.db.CustomAgentEntity>>(emptyList())
-        val loadedCustomAgents: StateFlow<List<com.example.llamadroid.data.db.CustomAgentEntity>> = _loadedCustomAgents.asStateFlow()
+        private val _loadedCustomAgents = MutableStateFlow<List<com.blackbox.ai.data.db.CustomAgentEntity>>(emptyList())
+        val loadedCustomAgents: StateFlow<List<com.blackbox.ai.data.db.CustomAgentEntity>> = _loadedCustomAgents.asStateFlow()
 
         // Currently active custom agent (during delegation)
 
-        fun setLoadedCustomAgents(agents: List<com.example.llamadroid.data.db.CustomAgentEntity>) {
+        fun setLoadedCustomAgents(agents: List<com.blackbox.ai.data.db.CustomAgentEntity>) {
             _loadedCustomAgents.value = agents
             addDebugLog("🤖 Loaded ${agents.size} custom agents")
         }
 
         // Check if an agent name refers to a custom agent
-        fun getCustomAgent(name: String): com.example.llamadroid.data.db.CustomAgentEntity? {
+        fun getCustomAgent(name: String): com.blackbox.ai.data.db.CustomAgentEntity? {
             return _loadedCustomAgents.value.find {
                 it.name.equals(name, ignoreCase = true) && it.isEnabled
             }
@@ -5722,7 +5722,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
 
         private fun resolveCapabilityPolicy(
             role: AgentRole = _currentAgent.value,
-            activeCustom: com.example.llamadroid.data.db.CustomAgentEntity? = _activeCustomAgent.value
+            activeCustom: com.blackbox.ai.data.db.CustomAgentEntity? = _activeCustomAgent.value
         ): ToolCapabilityPolicy {
             if (activeCustom == null) {
                 return ToolCapabilityPolicy(
@@ -5883,11 +5883,11 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
 
         private fun isVisionEnabledForAgent(
             role: AgentRole,
-            activeCustom: com.example.llamadroid.data.db.CustomAgentEntity?,
-            settingsRepo: com.example.llamadroid.data.SettingsRepository? = null
+            activeCustom: com.blackbox.ai.data.db.CustomAgentEntity?,
+            settingsRepo: com.blackbox.ai.data.SettingsRepository? = null
         ): Boolean {
             if (activeCustom != null) return activeCustom.visionEnabled
-            val repo = settingsRepo ?: AgentForegroundService.getSettingsRepository(com.example.llamadroid.LlamaApplication.instance)
+            val repo = settingsRepo ?: AgentForegroundService.getSettingsRepository(com.blackbox.ai.LlamaApplication.instance)
             return repo.getAgentVisionEnabledForRole(role.name)
         }
 
@@ -6837,7 +6837,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
             return fallbackToolRationale(toolCall)
         }
 
-        private fun fallbackToolRationale(toolCall: com.example.llamadroid.service.OllamaService.ToolCall): String {
+        private fun fallbackToolRationale(toolCall: com.blackbox.ai.service.OllamaService.ToolCall): String {
             return when (toolCall.name) {
                 "read_file" -> "Inspect ${toolCall.arguments["path"] ?: "the requested file"} before making changes."
                 "read_file_lines" -> "Inspect the requested line range before deciding how to proceed."
@@ -7093,7 +7093,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
         }
 
         private data class ToolCallRecoveryAttempt(
-            val toolCall: com.example.llamadroid.service.OllamaService.ToolCall? = null,
+            val toolCall: com.blackbox.ai.service.OllamaService.ToolCall? = null,
             val attempted: Boolean,
             val source: String,
             val error: String? = null,
@@ -7222,7 +7222,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
             return null
         }
 
-        private fun parseRecoveredToolCall(candidate: String): com.example.llamadroid.service.OllamaService.ToolCall? {
+        private fun parseRecoveredToolCall(candidate: String): com.blackbox.ai.service.OllamaService.ToolCall? {
             val root = JSONObject(candidate)
             val normalized = when {
                 root.has("name") || root.has("function") -> root
@@ -7247,7 +7247,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
             }
             val args = AgentRuntimeSupport.normalizeToolArguments(rawArgs)
 
-            return com.example.llamadroid.service.OllamaService.ToolCall(
+            return com.blackbox.ai.service.OllamaService.ToolCall(
                 name = name,
                 arguments = args,
                 id = id
@@ -7255,7 +7255,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
         }
 
         private fun syncAssistantToolProgress(
-            toolCall: com.example.llamadroid.service.OllamaService.ToolCall,
+            toolCall: com.blackbox.ai.service.OllamaService.ToolCall,
             toolOutput: String? = null
         ) {
             val targetId = _messages.value
@@ -7279,10 +7279,10 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
         }
 
         private fun validateToolCall(
-            toolCall: com.example.llamadroid.service.OllamaService.ToolCall,
+            toolCall: com.blackbox.ai.service.OllamaService.ToolCall,
             role: AgentRole = _currentAgent.value,
-            activeCustom: com.example.llamadroid.data.db.CustomAgentEntity? = _activeCustomAgent.value,
-            settingsRepo: com.example.llamadroid.data.SettingsRepository? = null
+            activeCustom: com.blackbox.ai.data.db.CustomAgentEntity? = _activeCustomAgent.value,
+            settingsRepo: com.blackbox.ai.data.SettingsRepository? = null
         ): Result<ValidatedToolCall> {
             val tool = getAgentTools(role, activeCustom, settingsRepo).find { it.name == toolCall.name }
                 ?: return Result.failure(IllegalArgumentException("Tool `${toolCall.name}` is not available to the current agent."))
@@ -7546,10 +7546,10 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
          */
         fun getAgentTools(
             role: AgentRole = _currentAgent.value,
-            activeCustom: com.example.llamadroid.data.db.CustomAgentEntity? = _activeCustomAgent.value,
-            settingsRepo: com.example.llamadroid.data.SettingsRepository? = null
+            activeCustom: com.blackbox.ai.data.db.CustomAgentEntity? = _activeCustomAgent.value,
+            settingsRepo: com.blackbox.ai.data.SettingsRepository? = null
         ): List<AgentTool> {
-            val repo = settingsRepo ?: AgentForegroundService.getSettingsRepository(com.example.llamadroid.LlamaApplication.instance)
+            val repo = settingsRepo ?: AgentForegroundService.getSettingsRepository(com.blackbox.ai.LlamaApplication.instance)
             val kiwixEnabled = repo.agentKiwixEnabled.value
             val imageGenerationToolEnabled = repo.agentImageGenerationToolEnabled.value
             val backgroundRemovalToolEnabled = repo.agentBackgroundRemovalToolEnabled.value
@@ -8414,13 +8414,13 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
         }
     }
 
-    private fun customToolLooksNetworkBound(customTool: com.example.llamadroid.data.db.CustomToolEntity): Boolean {
+    private fun customToolLooksNetworkBound(customTool: com.blackbox.ai.data.db.CustomToolEntity): Boolean {
         val template = customTool.commandTemplate.lowercase()
         return template.contains("curl ") || template.contains("wget ") || template.contains("http ")
     }
 
     suspend fun executeCustomTool(
-        customTool: com.example.llamadroid.data.db.CustomToolEntity,
+        customTool: com.blackbox.ai.data.db.CustomToolEntity,
         validatedToolCall: ValidatedToolCall
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
@@ -8456,7 +8456,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
     }
 
     private suspend fun executeCustomToolArgv(
-        customTool: com.example.llamadroid.data.db.CustomToolEntity,
+        customTool: com.blackbox.ai.data.db.CustomToolEntity,
         arguments: Map<String, String>,
         cwd: String
     ): Result<String> = withContext(Dispatchers.IO) {
@@ -8488,7 +8488,7 @@ sys.exit(proc.returncode)
     }
 
     private suspend fun executeCustomToolShell(
-        customTool: com.example.llamadroid.data.db.CustomToolEntity,
+        customTool: com.blackbox.ai.data.db.CustomToolEntity,
         arguments: Map<String, String>,
         cwd: String
     ): Result<String> = withContext(Dispatchers.IO) {
@@ -9861,7 +9861,7 @@ sys.exit(proc.returncode)
         systemPrompt: String,
         userPrompt: String,
         ollamaService: OllamaService,
-        settingsRepo: com.example.llamadroid.data.SettingsRepository,
+        settingsRepo: com.blackbox.ai.data.SettingsRepository,
         summarizerModel: String,
         summarizerCtx: Int
     ): Result<String> {
@@ -9950,7 +9950,7 @@ sys.exit(proc.returncode)
     /**
      * Search the web using DuckDuckGo HTML, fetch each result page, and summarize via LLM
      */
-    suspend fun webSearch(query: String, ollamaService: OllamaService, settingsRepo: com.example.llamadroid.data.SettingsRepository): Result<String> = withContext(Dispatchers.IO) {
+    suspend fun webSearch(query: String, ollamaService: OllamaService, settingsRepo: com.blackbox.ai.data.SettingsRepository): Result<String> = withContext(Dispatchers.IO) {
         try {
             val maxResults = settingsRepo.agentWebSearchMaxResults.value
             val maxChars = settingsRepo.agentWebSearchMaxChars.value
@@ -10081,7 +10081,7 @@ sys.exit(proc.returncode)
     /**
      * Search local Kiwix server, fetch result pages, and summarize via LLM
      */
-    suspend fun kiwixSearch(query: String, ollamaService: OllamaService, settingsRepo: com.example.llamadroid.data.SettingsRepository): Result<String> = withContext(Dispatchers.IO) {
+    suspend fun kiwixSearch(query: String, ollamaService: OllamaService, settingsRepo: com.blackbox.ai.data.SettingsRepository): Result<String> = withContext(Dispatchers.IO) {
         try {
             val kiwixUrl = settingsRepo.agentKiwixUrl.value.trimEnd('/')
             val maxResults = settingsRepo.agentKiwixMaxResults.value

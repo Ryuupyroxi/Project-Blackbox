@@ -83,7 +83,7 @@ fun KiwixViewerScreen(navController: NavController, zimPath: String? = null) {
             val matchingZim = installedZims.find { it.path == decodedPath }
             if (matchingZim != null) {
                 selectedZim = matchingZim
-                com.example.llamadroid.util.DebugLog.log("[KIWIX] Auto-selected ZIM: ${matchingZim.title}")
+                com.blackbox.ai.util.DebugLog.log("[KIWIX] Auto-selected ZIM: ${matchingZim.title}")
             }
         }
     }

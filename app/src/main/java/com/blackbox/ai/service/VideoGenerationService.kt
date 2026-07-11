@@ -9,11 +9,11 @@ import android.os.IBinder
 import android.os.PowerManager
 import android.os.SystemClock
 import androidx.documentfile.provider.DocumentFile
-import com.example.llamadroid.R
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.data.binary.BinaryRepository
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.getParcelableExtraCompat
+import com.blackbox.ai.R
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.data.binary.BinaryRepository
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.getParcelableExtraCompat
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -855,8 +855,8 @@ class VideoGenerationService : Service() {
         private const val STALL_THRESHOLD_MS_2 = 120_000L
         private const val STALL_THRESHOLD_MS_3 = 300_000L
 
-        private const val ACTION_START_GENERATION = "com.example.llamadroid.action.START_VIDEO_GENERATION"
-        private const val ACTION_CANCEL_MODE = "com.example.llamadroid.action.CANCEL_VIDEO_GENERATION"
+        private const val ACTION_START_GENERATION = "com.blackbox.ai.action.START_VIDEO_GENERATION"
+        private const val ACTION_CANCEL_MODE = "com.blackbox.ai.action.CANCEL_VIDEO_GENERATION"
         private const val EXTRA_CONFIG = "extra_video_generation_config"
         private const val EXTRA_MODE = "extra_video_generation_mode"
         private const val DIAGNOSTIC_SOURCE = "video_generation"

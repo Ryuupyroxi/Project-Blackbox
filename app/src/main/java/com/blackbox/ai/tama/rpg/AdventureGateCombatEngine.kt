@@ -1,6 +1,6 @@
 package com.blackbox.ai.tama.rpg
 
-import com.example.llamadroid.R
+import com.blackbox.ai.R
 
 import kotlin.math.max
 import kotlin.math.roundToInt

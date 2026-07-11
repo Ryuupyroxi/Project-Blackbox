@@ -1,8 +1,8 @@
 package com.blackbox.ai.service
 
 import android.content.Context
-import com.example.llamadroid.data.model.LiteRtModelEntity
-import com.example.llamadroid.data.model.currentLiteRtDeviceTargetInfo
+import com.blackbox.ai.data.model.LiteRtModelEntity
+import com.blackbox.ai.data.model.currentLiteRtDeviceTargetInfo
 import com.google.gson.Gson
 import java.io.File
 

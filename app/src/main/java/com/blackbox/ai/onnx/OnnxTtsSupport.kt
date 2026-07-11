@@ -5,9 +5,9 @@ import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
 import android.content.Context
 import android.net.Uri
-import com.example.llamadroid.data.binary.BinaryRepository
-import com.example.llamadroid.service.extractNativePdfTextFromBytes
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.data.binary.BinaryRepository
+import com.blackbox.ai.service.extractNativePdfTextFromBytes
+import com.blackbox.ai.util.DebugLog
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.Serializable

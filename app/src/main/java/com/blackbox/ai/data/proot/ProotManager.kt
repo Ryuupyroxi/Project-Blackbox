@@ -2,9 +2,9 @@ package com.blackbox.ai.data.proot
 
 import android.content.Context
 import android.os.Build
-import com.example.llamadroid.service.SDInstallState
-import com.example.llamadroid.service.SDStateHolder
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.service.SDInstallState
+import com.blackbox.ai.service.SDStateHolder
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File

@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.util.DebugLog
 
 /**
  * Type converters for Room database.
@@ -25,7 +25,7 @@ class Converters {
             enumValueOf<T>(value)
         } catch (e: IllegalArgumentException) {
             // Log for debugging, but don't crash
-            com.example.llamadroid.util.DebugLog.log(
+            com.blackbox.ai.util.DebugLog.log(
                 "[DB] Unknown ${T::class.simpleName} value: '$value', using default: $default"
             )
             default
@@ -80,7 +80,7 @@ class Converters {
         SystemPromptEntity::class, 
         NoteEntity::class, 
         ZimEntity::class, 
-        com.example.llamadroid.data.model.SavedWorker::class, 
+        com.blackbox.ai.data.model.SavedWorker::class, 
         WorkflowTemplateEntity::class, 
         BenchmarkResult::class,
         // Dataset entities
@@ -98,13 +98,13 @@ class Converters {
         OllamaServerEntity::class,
         AiRuntimeJobEntity::class,
         // Llama Native Client entities
-        com.example.llamadroid.data.model.LlamaServerEntity::class,
-        com.example.llamadroid.data.model.LlamaChatFolderEntity::class,
-        com.example.llamadroid.data.model.LlamaChatPromptProfileEntity::class,
-        com.example.llamadroid.data.model.LlamaChatEntity::class,
-        com.example.llamadroid.data.model.LlamaMessageEntity::class,
-        com.example.llamadroid.data.model.LlamaScheduledTaskEntity::class,
-        com.example.llamadroid.data.model.LlamaScheduledTaskLogEntity::class,
+        com.blackbox.ai.data.model.LlamaServerEntity::class,
+        com.blackbox.ai.data.model.LlamaChatFolderEntity::class,
+        com.blackbox.ai.data.model.LlamaChatPromptProfileEntity::class,
+        com.blackbox.ai.data.model.LlamaChatEntity::class,
+        com.blackbox.ai.data.model.LlamaMessageEntity::class,
+        com.blackbox.ai.data.model.LlamaScheduledTaskEntity::class,
+        com.blackbox.ai.data.model.LlamaScheduledTaskLogEntity::class,
         OrganizerEventEntity::class,
         OrganizerAlarmEntity::class,
         OrganizerLlmSettingsEntity::class,
@@ -115,7 +115,7 @@ class Converters {
         KnowledgeBaseEntity::class,
         KnowledgeSourceEntity::class,
         KnowledgeChunkEntity::class,
-        com.example.llamadroid.data.model.LiteRtModelEntity::class,
+        com.blackbox.ai.data.model.LiteRtModelEntity::class,
         LiveTranslatorTemplateEntity::class,
         LiveTranslatorSessionEntity::class,
         LiveTranslatorTurnEntity::class,
@@ -152,18 +152,18 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun aiRuntimeJobDao(): AiRuntimeJobDao
     
     // Llama Native Client DAOs
-    abstract fun llamaServerDao(): com.example.llamadroid.data.dao.LlamaServerDao
-    abstract fun llamaChatFolderDao(): com.example.llamadroid.data.dao.LlamaChatFolderDao
-    abstract fun llamaChatPromptProfileDao(): com.example.llamadroid.data.dao.LlamaChatPromptProfileDao
-    abstract fun llamaChatDao(): com.example.llamadroid.data.dao.LlamaChatDao
-    abstract fun llamaMessageDao(): com.example.llamadroid.data.dao.LlamaMessageDao
-    abstract fun llamaScheduledTaskDao(): com.example.llamadroid.data.dao.LlamaScheduledTaskDao
+    abstract fun llamaServerDao(): com.blackbox.ai.data.dao.LlamaServerDao
+    abstract fun llamaChatFolderDao(): com.blackbox.ai.data.dao.LlamaChatFolderDao
+    abstract fun llamaChatPromptProfileDao(): com.blackbox.ai.data.dao.LlamaChatPromptProfileDao
+    abstract fun llamaChatDao(): com.blackbox.ai.data.dao.LlamaChatDao
+    abstract fun llamaMessageDao(): com.blackbox.ai.data.dao.LlamaMessageDao
+    abstract fun llamaScheduledTaskDao(): com.blackbox.ai.data.dao.LlamaScheduledTaskDao
     abstract fun organizerDao(): OrganizerDao
     abstract fun quadtrixProfileDao(): QuadtrixProfileDao
     abstract fun quadtrixRunDao(): QuadtrixRunDao
     abstract fun quadtrixMetricDao(): QuadtrixMetricDao
     abstract fun knowledgeBaseDao(): KnowledgeBaseDao
-    abstract fun liteRtModelDao(): com.example.llamadroid.data.dao.LiteRtModelDao
+    abstract fun liteRtModelDao(): com.blackbox.ai.data.dao.LiteRtModelDao
     abstract fun liveTranslatorTemplateDao(): LiveTranslatorTemplateDao
     abstract fun liveTranslatorSessionDao(): LiveTranslatorSessionDao
     abstract fun liveTranslatorTurnDao(): LiveTranslatorTurnDao

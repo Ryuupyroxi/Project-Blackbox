@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
-import com.example.llamadroid.util.FilePathResolver
+import com.blackbox.ai.util.FilePathResolver
 import java.io.File
 
 data class QuadtrixWorkspaceSelection(

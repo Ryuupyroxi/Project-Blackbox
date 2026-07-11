@@ -2,8 +2,8 @@ package com.blackbox.ai.service
 
 import java.io.File
 import java.util.Base64
-import com.example.llamadroid.data.model.LlamaMessageEntity
-import com.example.llamadroid.data.model.shouldEmbedAudioAttachment
+import com.blackbox.ai.data.model.LlamaMessageEntity
+import com.blackbox.ai.data.model.shouldEmbedAudioAttachment
 
 internal fun buildNativeLlamaUserContent(
     userMessage: String,

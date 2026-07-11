@@ -1316,8 +1316,8 @@ private fun FolderActionsCard(
 
 @Composable
 private fun NoteImportCard(
-    notes: List<com.example.llamadroid.data.db.NoteEntity>,
-    onImport: (com.example.llamadroid.data.db.NoteEntity) -> Unit
+    notes: List<com.blackbox.ai.data.db.NoteEntity>,
+    onImport: (com.blackbox.ai.data.db.NoteEntity) -> Unit
 ) {
     Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -25,12 +25,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
-import com.example.llamadroid.R
-import com.example.llamadroid.tama.adventure.DungeonType
-import com.example.llamadroid.tama.adventure.localizedName
-import com.example.llamadroid.tama.db.TamaDatabase
-import com.example.llamadroid.ui.navigation.Screen
-import com.example.llamadroid.data.SettingsRepository
+import com.blackbox.ai.R
+import com.blackbox.ai.tama.adventure.DungeonType
+import com.blackbox.ai.tama.adventure.localizedName
+import com.blackbox.ai.tama.db.TamaDatabase
+import com.blackbox.ai.ui.navigation.Screen
+import com.blackbox.ai.data.SettingsRepository
 import kotlinx.coroutines.launch
 
 // Dark fantasy color scheme

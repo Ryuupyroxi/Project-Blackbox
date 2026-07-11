@@ -576,15 +576,15 @@ fun PDFToolboxScreen(navController: NavController) {
                                             result.fold(
                                                 onSuccess = { text ->
                                                     // Save to notes
-                                                    val db = com.example.llamadroid.data.db.AppDatabase.getDatabase(context)
+                                                    val db = com.blackbox.ai.data.db.AppDatabase.getDatabase(context)
                                                     db.noteDao().insert(
-                                                        com.example.llamadroid.data.db.NoteEntity(
+                                                        com.blackbox.ai.data.db.NoteEntity(
                                                             title = context.getString(
                                                                 R.string.pdf_extract_note_title,
                                                                 selectedPdfs.first().lastPathSegment ?: context.getString(R.string.pdf_extract_default_source_name)
                                                             ),
                                                             content = text,
-                                                            type = com.example.llamadroid.data.db.NoteType.PDF_SUMMARY,
+                                                            type = com.blackbox.ai.data.db.NoteType.PDF_SUMMARY,
                                                             sourceFile = selectedPdfs.first().toString()
                                                         )
                                                     )
@@ -837,15 +837,15 @@ fun PDFToolboxScreen(navController: NavController) {
                                     onClick = {
                                         scope.launch {
                                             val sourceUri = selectedOcrPdf ?: selectedOcrImage
-                                            val db = com.example.llamadroid.data.db.AppDatabase.getDatabase(context)
+                                            val db = com.blackbox.ai.data.db.AppDatabase.getDatabase(context)
                                             db.noteDao().insert(
-                                                com.example.llamadroid.data.db.NoteEntity(
+                                                com.blackbox.ai.data.db.NoteEntity(
                                                     title = context.getString(
                                                         R.string.pdf_ocr_note_title,
                                                         sourceLabel.ifBlank { context.getString(R.string.pdf_ocr_default_source_name) }
                                                     ),
                                                     content = ocrResult,
-                                                    type = com.example.llamadroid.data.db.NoteType.PDF_SUMMARY,
+                                                    type = com.blackbox.ai.data.db.NoteType.PDF_SUMMARY,
                                                     sourceFile = sourceUri?.toString()
                                                 )
                                             )

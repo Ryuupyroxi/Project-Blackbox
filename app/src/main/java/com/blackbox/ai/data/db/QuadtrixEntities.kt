@@ -8,7 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
-import com.example.llamadroid.quadtrix.QuadtrixOptionKeys
+import com.blackbox.ai.quadtrix.QuadtrixOptionKeys
 import kotlinx.coroutines.flow.Flow
 
 @Entity(

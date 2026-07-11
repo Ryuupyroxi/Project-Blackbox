@@ -3,9 +3,9 @@ package com.blackbox.ai.service
 import android.content.Context
 import android.net.Uri
 import androidx.room.withTransaction
-import com.example.llamadroid.data.api.LlamaServerApi
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.data.db.*
+import com.blackbox.ai.data.api.LlamaServerApi
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.data.db.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +13,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-import com.example.llamadroid.R
+import com.blackbox.ai.R
 
 /**
  * Processes dataset chunks through LLM pipeline:
@@ -717,24 +717,24 @@ class DatasetProcessor(
             setProcessing(true)
             var outcome = JobOutcome.CANCELLED
             var errorMessage: String? = null
-            com.example.llamadroid.util.DebugLog.log("[Dataset] Starting cleaning stage for project ${project.id}")
+            com.blackbox.ai.util.DebugLog.log("[Dataset] Starting cleaning stage for project ${project.id}")
             
             try {
                 val backend = createBackend(project)
                 val pendingChunks = dao.getChunksByStatus(project.id, ChunkStatus.PENDING)
                 val total = pendingChunks.size
-                com.example.llamadroid.util.DebugLog.log("[Dataset] Found $total pending chunks to clean")
+                com.blackbox.ai.util.DebugLog.log("[Dataset] Found $total pending chunks to clean")
                 
                 if (total == 0) {
                     updateProgress(Progress(context.getString(R.string.dataset_stage_done), 0, 0, context.getString(R.string.dataset_no_chunks_clean), project.id))
-                    com.example.llamadroid.util.DebugLog.log("[Dataset] No chunks to clean, done")
+                    com.blackbox.ai.util.DebugLog.log("[Dataset] No chunks to clean, done")
                     outcome = JobOutcome.SUCCESS
                     return@launch
                 }
                 
                 pendingChunks.forEachIndexed { index, chunk ->
                     ensureActive()
-                    com.example.llamadroid.util.DebugLog.log("[Dataset] Cleaning chunk ${index + 1}/$total (id=${chunk.id})")
+                    com.blackbox.ai.util.DebugLog.log("[Dataset] Cleaning chunk ${index + 1}/$total (id=${chunk.id})")
                     
                     updateProgress(Progress(context.getString(R.string.dataset_stage_cleaning), index + 1, total, context.getString(R.string.dataset_chunk_param, chunk.chunkIndex), project.id))
                     
@@ -746,7 +746,7 @@ class DatasetProcessor(
                         val chunkTexts = sortedChunks.map { it.cleanedText ?: it.originalText }
                         val currentIndex = sortedChunks.indexOfFirst { it.id == chunk.id }
                         if (currentIndex < 0) {
-                            com.example.llamadroid.util.DebugLog.log(
+                            com.blackbox.ai.util.DebugLog.log(
                                 "[Dataset] Skipping deleted chunk ${chunk.id} during cleaning"
                             )
                             return@forEachIndexed
@@ -754,37 +754,37 @@ class DatasetProcessor(
                         
                         val (prev, _, next) = buildContext(chunkTexts, currentIndex)
                         
-                        com.example.llamadroid.util.DebugLog.log("[Dataset] Calling LLM for chunk ${chunk.id}...")
+                        com.blackbox.ai.util.DebugLog.log("[Dataset] Calling LLM for chunk ${chunk.id}...")
                         val cleanedText = cleanChunk(
                             backend, chunk.originalText, prev, next,
                             cleanPrompt, project.maxTokens, project.temperature
                         )
-                        com.example.llamadroid.util.DebugLog.log("[Dataset] LLM response received, length=${cleanedText.length}")
+                        com.blackbox.ai.util.DebugLog.log("[Dataset] LLM response received, length=${cleanedText.length}")
                         
                         // Update chunk with cleaned text
                         dao.updateChunk(chunk.copy(
                             cleanedText = cleanedText,
                             status = ChunkStatus.CLEANED
                         ))
-                        com.example.llamadroid.util.DebugLog.log("[Dataset] Chunk ${chunk.id} updated to CLEANED")
+                        com.blackbox.ai.util.DebugLog.log("[Dataset] Chunk ${chunk.id} updated to CLEANED")
                     } catch (e: Exception) {
-                        com.example.llamadroid.util.DebugLog.log("[Dataset] ERROR cleaning chunk ${chunk.id}: ${e.message}")
+                        com.blackbox.ai.util.DebugLog.log("[Dataset] ERROR cleaning chunk ${chunk.id}: ${e.message}")
                         updateProgress(Progress(context.getString(R.string.dataset_stage_error), index + 1, total, context.getString(R.string.dataset_error_param, e.message), project.id))
                         throw e
                     }
                 }
-                com.example.llamadroid.util.DebugLog.log("[Dataset] Cleaning stage COMPLETED for all $total chunks")
+                com.blackbox.ai.util.DebugLog.log("[Dataset] Cleaning stage COMPLETED for all $total chunks")
                 outcome = JobOutcome.SUCCESS
             } catch (cancelled: CancellationException) {
                 errorMessage = cancelled.message
-                com.example.llamadroid.util.DebugLog.log("[Dataset] Cleaning stage CANCELLED")
+                com.blackbox.ai.util.DebugLog.log("[Dataset] Cleaning stage CANCELLED")
             } catch (e: Exception) {
-                com.example.llamadroid.util.DebugLog.log("[Dataset] Cleaning stage ERROR: ${e.message}")
+                com.blackbox.ai.util.DebugLog.log("[Dataset] Cleaning stage ERROR: ${e.message}")
                 outcome = JobOutcome.FAILED
                 errorMessage = e.message
                 showProcessingError(project.id, e)
             } finally {
-                com.example.llamadroid.util.DebugLog.log("[Dataset] Cleaning stage FINISHED, resetting state")
+                com.blackbox.ai.util.DebugLog.log("[Dataset] Cleaning stage FINISHED, resetting state")
                 setProcessing(false)
                 updateProgress(null)
                 finishCurrentJob(
@@ -822,7 +822,7 @@ class DatasetProcessor(
                     val chunkTexts = sortedChunks.map { it.cleanedText ?: it.originalText }
                     val currentIndex = sortedChunks.indexOfFirst { it.id == chunk.id }
                     if (currentIndex < 0) {
-                        com.example.llamadroid.util.DebugLog.log(
+                        com.blackbox.ai.util.DebugLog.log(
                             "[Dataset] Skipping deleted chunk ${chunk.id} during question generation"
                         )
                         return@forEach
@@ -984,7 +984,7 @@ class DatasetProcessor(
             setProcessing(true)
             var outcome = JobOutcome.CANCELLED
             var errorMessage: String? = null
-            com.example.llamadroid.util.DebugLog.log("[Regen] Starting regenerate answers for ${qaIds.size} items")
+            com.blackbox.ai.util.DebugLog.log("[Regen] Starting regenerate answers for ${qaIds.size} items")
             
             try {
                 val backend = createBackend(project)
@@ -994,7 +994,7 @@ class DatasetProcessor(
                 qaList.forEachIndexed { index, qa ->
                     ensureActive()
                     updateProgress(Progress(context.getString(R.string.dataset_job_regen_answers_param, total), index + 1, total, qa.question.take(30) + "...", project.id))
-                    com.example.llamadroid.util.DebugLog.log("[Regen] Regenerating answer ${index + 1}/$total")
+                    com.blackbox.ai.util.DebugLog.log("[Regen] Regenerating answer ${index + 1}/$total")
                     
                     val chunk = dao.getChunk(qa.chunkId) ?: return@forEachIndexed
                     val context = chunk.cleanedText ?: chunk.originalText
@@ -1011,7 +1011,7 @@ class DatasetProcessor(
                         status = QAStatus.ANSWERED
                     ))
                 }
-                com.example.llamadroid.util.DebugLog.log("[Regen] Completed regenerate answers")
+                com.blackbox.ai.util.DebugLog.log("[Regen] Completed regenerate answers")
                 outcome = JobOutcome.SUCCESS
             } catch (cancelled: CancellationException) {
                 errorMessage = cancelled.message
@@ -1040,7 +1040,7 @@ class DatasetProcessor(
             setProcessing(true)
             var outcome = JobOutcome.CANCELLED
             var errorMessage: String? = null
-            com.example.llamadroid.util.DebugLog.log("[Regen] Starting regenerate ratings for ${qaIds.size} items")
+            com.blackbox.ai.util.DebugLog.log("[Regen] Starting regenerate ratings for ${qaIds.size} items")
             
             try {
                 val backend = createBackend(project)
@@ -1050,7 +1050,7 @@ class DatasetProcessor(
                 qaList.forEachIndexed { index, qa ->
                     ensureActive()
                     updateProgress(Progress(context.getString(R.string.dataset_job_regen_ratings_param, total), index + 1, total, qa.question.take(30) + "...", project.id))
-                    com.example.llamadroid.util.DebugLog.log("[Regen] Regenerating rating ${index + 1}/$total")
+                    com.blackbox.ai.util.DebugLog.log("[Regen] Regenerating rating ${index + 1}/$total")
                     
                     val chunk = dao.getChunk(qa.chunkId) ?: return@forEachIndexed
                     val context = chunk.cleanedText ?: chunk.originalText
@@ -1066,7 +1066,7 @@ class DatasetProcessor(
                         status = QAStatus.REVIEWED
                     ))
                 }
-                com.example.llamadroid.util.DebugLog.log("[Regen] Completed regenerate ratings")
+                com.blackbox.ai.util.DebugLog.log("[Regen] Completed regenerate ratings")
                 outcome = JobOutcome.SUCCESS
             } catch (cancelled: CancellationException) {
                 errorMessage = cancelled.message
@@ -1095,7 +1095,7 @@ class DatasetProcessor(
             setProcessing(true)
             var outcome = JobOutcome.CANCELLED
             var errorMessage: String? = null
-            com.example.llamadroid.util.DebugLog.log("[Regen] Starting regenerate questions for ${chunkIds.size} chunks")
+            com.blackbox.ai.util.DebugLog.log("[Regen] Starting regenerate questions for ${chunkIds.size} chunks")
             
             try {
                 val backend = createBackend(project)
@@ -1105,7 +1105,7 @@ class DatasetProcessor(
                 chunks.forEachIndexed { index, chunk ->
                     ensureActive()
                     updateProgress(Progress(context.getString(R.string.dataset_job_regen_questions_param, total), index + 1, total, chunk.originalText.take(30) + "...", project.id))
-                    com.example.llamadroid.util.DebugLog.log("[Regen] Regenerating questions for chunk ${index + 1}/$total")
+                    com.blackbox.ai.util.DebugLog.log("[Regen] Regenerating questions for chunk ${index + 1}/$total")
                     
                     // Delete existing QAs for this chunk
                     dao.deleteQAForChunk(chunk.id)
@@ -1114,7 +1114,7 @@ class DatasetProcessor(
                     val allChunks = dao.getChunksByStatus(project.id, ChunkStatus.CLEANED)
                     val chunkIdx = allChunks.indexOfFirst { c -> c.id == chunk.id }
                     if (chunkIdx < 0) {
-                        com.example.llamadroid.util.DebugLog.log(
+                        com.blackbox.ai.util.DebugLog.log(
                             "[Regen] Skipping deleted chunk ${chunk.id} during question regeneration"
                         )
                         return@forEachIndexed
@@ -1140,7 +1140,7 @@ class DatasetProcessor(
                         }
                     }
                 }
-                com.example.llamadroid.util.DebugLog.log("[Regen] Completed regenerate questions")
+                com.blackbox.ai.util.DebugLog.log("[Regen] Completed regenerate questions")
                 outcome = JobOutcome.SUCCESS
             } catch (cancelled: CancellationException) {
                 errorMessage = cancelled.message
@@ -1167,18 +1167,18 @@ class DatasetProcessor(
             setProcessing(true)
             var outcome = JobOutcome.CANCELLED
             var errorMessage: String? = null
-            com.example.llamadroid.util.DebugLog.log("[Regen] Starting single answer regen for QA $qaId")
+            com.blackbox.ai.util.DebugLog.log("[Regen] Starting single answer regen for QA $qaId")
             
             try {
                 val project = dao.getProject(projectId) ?: run {
-                    com.example.llamadroid.util.DebugLog.log(
+                    com.blackbox.ai.util.DebugLog.log(
                         "[Regen] Skipping single answer regen: project $projectId no longer exists"
                     )
                     outcome = JobOutcome.SUCCESS
                     return@launch
                 }
                 val qa = dao.getQA(qaId) ?: run {
-                    com.example.llamadroid.util.DebugLog.log(
+                    com.blackbox.ai.util.DebugLog.log(
                         "[Regen] Skipping single answer regen: QA $qaId no longer exists"
                     )
                     outcome = JobOutcome.SUCCESS
@@ -1189,7 +1189,7 @@ class DatasetProcessor(
                 updateProgress(Progress(context.getString(R.string.dataset_job_regen_answer), 1, 1, qa.question.take(30) + "...", projectId))
                 
                 val chunk = dao.getChunk(qa.chunkId) ?: run {
-                    com.example.llamadroid.util.DebugLog.log(
+                    com.blackbox.ai.util.DebugLog.log(
                         "[Regen] Skipping single answer regen: chunk ${qa.chunkId} no longer exists"
                     )
                     outcome = JobOutcome.SUCCESS
@@ -1208,7 +1208,7 @@ class DatasetProcessor(
                     scoreJustification = null,
                     status = QAStatus.ANSWERED
                 ))
-                com.example.llamadroid.util.DebugLog.log("[Regen] Completed single answer regen")
+                com.blackbox.ai.util.DebugLog.log("[Regen] Completed single answer regen")
                 outcome = JobOutcome.SUCCESS
             } catch (cancelled: CancellationException) {
                 errorMessage = cancelled.message
@@ -1233,25 +1233,25 @@ class DatasetProcessor(
             setProcessing(true)
             var outcome = JobOutcome.CANCELLED
             var errorMessage: String? = null
-            com.example.llamadroid.util.DebugLog.log("[Regen] Starting single rating regen for QA $qaId")
+            com.blackbox.ai.util.DebugLog.log("[Regen] Starting single rating regen for QA $qaId")
             
             try {
                 val project = dao.getProject(projectId) ?: run {
-                    com.example.llamadroid.util.DebugLog.log(
+                    com.blackbox.ai.util.DebugLog.log(
                         "[Regen] Skipping single rating regen: project $projectId no longer exists"
                     )
                     outcome = JobOutcome.SUCCESS
                     return@launch
                 }
                 val qa = dao.getQA(qaId) ?: run {
-                    com.example.llamadroid.util.DebugLog.log(
+                    com.blackbox.ai.util.DebugLog.log(
                         "[Regen] Skipping single rating regen: QA $qaId no longer exists"
                     )
                     outcome = JobOutcome.SUCCESS
                     return@launch
                 }
                 if (qa.answer == null) {
-                    com.example.llamadroid.util.DebugLog.log(
+                    com.blackbox.ai.util.DebugLog.log(
                         "[Regen] Skipping single rating regen: QA $qaId has no answer"
                     )
                     outcome = JobOutcome.SUCCESS
@@ -1262,7 +1262,7 @@ class DatasetProcessor(
                 updateProgress(Progress(context.getString(R.string.dataset_job_regen_rating), 1, 1, qa.question.take(30) + "...", projectId))
                 
                 val chunk = dao.getChunk(qa.chunkId) ?: run {
-                    com.example.llamadroid.util.DebugLog.log(
+                    com.blackbox.ai.util.DebugLog.log(
                         "[Regen] Skipping single rating regen: chunk ${qa.chunkId} no longer exists"
                     )
                     outcome = JobOutcome.SUCCESS
@@ -1280,7 +1280,7 @@ class DatasetProcessor(
                     scoreJustification = justification,
                     status = QAStatus.REVIEWED
                 ))
-                com.example.llamadroid.util.DebugLog.log("[Regen] Completed single rating regen")
+                com.blackbox.ai.util.DebugLog.log("[Regen] Completed single rating regen")
                 outcome = JobOutcome.SUCCESS
             } catch (cancelled: CancellationException) {
                 errorMessage = cancelled.message
@@ -1305,7 +1305,7 @@ class DatasetProcessor(
     fun executeJob(job: Job) {
         processingScope.launch {
             val project = dao.getProject(job.projectId) ?: run {
-                com.example.llamadroid.util.DebugLog.log(
+                com.blackbox.ai.util.DebugLog.log(
                     "[Dataset] Skipping job ${job.name}: project ${job.projectId} no longer exists"
                 )
                 finishCurrentJob(
@@ -1339,7 +1339,7 @@ class DatasetProcessor(
         try {
             _isProcessing.value = true
             val chunk = dao.getChunk(chunkId) ?: run {
-                com.example.llamadroid.util.DebugLog.log(
+                com.blackbox.ai.util.DebugLog.log(
                     "[Dataset] Skipping single clean regen: chunk $chunkId no longer exists"
                 )
                 outcome = JobOutcome.SUCCESS
@@ -1376,7 +1376,7 @@ Cleaned text:""" else cleanPrompt
         } catch (cancelled: CancellationException) {
             errorMessage = cancelled.message
         } catch (e: Exception) {
-            com.example.llamadroid.util.DebugLog.log("[Dataset] ERROR in runRegenSingleClean: ${e.message}")
+            com.blackbox.ai.util.DebugLog.log("[Dataset] ERROR in runRegenSingleClean: ${e.message}")
             outcome = JobOutcome.FAILED
             errorMessage = e.message
             showProcessingError(project.id, e)

@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
 
         // Start binary deployment lazily so the app can render immediately after updates.
         lifecycle.coroutineScope.launch(Dispatchers.IO) {
-            val repo = com.example.llamadroid.data.binary.BinaryRepository(this@MainActivity)
+            val repo = com.blackbox.ai.data.binary.BinaryRepository(this@MainActivity)
             val shouldDeferProvisioning = postUpdateLaunch
             val delayMs = if (shouldDeferProvisioning) 10_000L else 0L
 
@@ -138,10 +138,10 @@ class MainActivity : ComponentActivity() {
                         event = "startup_feature_install_requested",
                         details = "reason=binaries_missing"
                     )
-                    com.example.llamadroid.util.DynamicFeatureManager.installAllFeatures(this@MainActivity)
+                    com.blackbox.ai.util.DynamicFeatureManager.installAllFeatures(this@MainActivity)
                 }
 
-                com.example.llamadroid.util.DynamicFeatureManager.installOptionalAccelerators(this@MainActivity)
+                com.blackbox.ai.util.DynamicFeatureManager.installOptionalAccelerators(this@MainActivity)
 
                 GenerationDiagnosticsStore.recordBreadcrumb(
                     source = "main_activity",

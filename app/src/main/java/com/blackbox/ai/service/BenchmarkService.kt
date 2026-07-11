@@ -1,12 +1,12 @@
 package com.blackbox.ai.service
 
 import android.content.Context
-import com.example.llamadroid.R
-import com.example.llamadroid.data.binary.BinaryRepository
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.BenchmarkResult
-import com.example.llamadroid.util.DebugLog
-import com.example.llamadroid.util.WakeLockManager
+import com.blackbox.ai.R
+import com.blackbox.ai.data.binary.BinaryRepository
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.BenchmarkResult
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.WakeLockManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

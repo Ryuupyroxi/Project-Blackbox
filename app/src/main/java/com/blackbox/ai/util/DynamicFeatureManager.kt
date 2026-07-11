@@ -2,7 +2,7 @@ package com.blackbox.ai.util
 
 import android.content.Context
 import android.util.Log
-import com.example.llamadroid.BuildConfig
+import com.blackbox.ai.BuildConfig
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallRequest

@@ -8,10 +8,10 @@ import android.os.Build
 import android.os.IBinder
 import android.net.wifi.WifiManager
 import android.os.PowerManager
-import com.example.llamadroid.data.SettingsRepository
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.repository.OllamaRepository
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.data.SettingsRepository
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.repository.OllamaRepository
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
@@ -202,7 +202,7 @@ class AgentForegroundService : Service() {
             if (dispatch.useForegroundStart) {
                 start(
                     context = context,
-                    status = context.getString(com.example.llamadroid.R.string.agent_runtime_recovering_jobs),
+                    status = context.getString(com.blackbox.ai.R.string.agent_runtime_recovering_jobs),
                     recoveryOnly = dispatch.recoveryOnly,
                     startSource = dispatch.startSource
                 )

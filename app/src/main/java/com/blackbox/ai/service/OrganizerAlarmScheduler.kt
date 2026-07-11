@@ -6,11 +6,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.example.llamadroid.MainActivity
-import com.example.llamadroid.data.db.AppDatabase
-import com.example.llamadroid.data.db.OrganizerAlarmEntity
-import com.example.llamadroid.ui.navigation.Screen
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.MainActivity
+import com.blackbox.ai.data.db.AppDatabase
+import com.blackbox.ai.data.db.OrganizerAlarmEntity
+import com.blackbox.ai.ui.navigation.Screen
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,7 +19,7 @@ import kotlin.math.max
 
 object OrganizerAlarmScheduler {
     private const val TAG = "[OrganizerAlarm]"
-    private const val ACTION_FIRE = "com.example.llamadroid.organizer.ALARM_FIRE"
+    private const val ACTION_FIRE = "com.blackbox.ai.organizer.ALARM_FIRE"
     private const val EXTRA_ALARM_ID = "alarm_id"
     private const val REQUEST_CODE_BASE = 510_000
 

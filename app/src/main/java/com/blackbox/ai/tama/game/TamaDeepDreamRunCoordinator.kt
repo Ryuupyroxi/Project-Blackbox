@@ -3,12 +3,12 @@ package com.blackbox.ai.tama.game
 import android.content.Context
 import androidx.core.content.ContextCompat
 import androidx.room.withTransaction
-import com.example.llamadroid.R
-import com.example.llamadroid.service.TamaArtworkGenerationService
-import com.example.llamadroid.tama.data.TamaArtworkStatus
-import com.example.llamadroid.tama.db.TamaArtworkEntity
-import com.example.llamadroid.tama.db.TamaDatabase
-import com.example.llamadroid.tama.db.TamaDeepDreamRunEntity
+import com.blackbox.ai.R
+import com.blackbox.ai.service.TamaArtworkGenerationService
+import com.blackbox.ai.tama.data.TamaArtworkStatus
+import com.blackbox.ai.tama.db.TamaArtworkEntity
+import com.blackbox.ai.tama.db.TamaDatabase
+import com.blackbox.ai.tama.db.TamaDeepDreamRunEntity
 import java.util.UUID
 
 enum class TamaDeepDreamRunClaimAction {
@@ -478,7 +478,7 @@ object TamaDeepDreamRunCoordinator {
     }
 
     private suspend fun clearPendingAlbumIfNeeded(
-        dao: com.example.llamadroid.tama.db.TamaDao,
+        dao: com.blackbox.ai.tama.db.TamaDao,
         petId: String,
         albumId: String?
     ) {

@@ -7,8 +7,8 @@ import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
 import androidx.documentfile.provider.DocumentFile
-import com.example.llamadroid.data.binary.BinaryRepository
-import com.example.llamadroid.util.DebugLog
+import com.blackbox.ai.data.binary.BinaryRepository
+import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

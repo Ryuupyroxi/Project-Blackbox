@@ -539,7 +539,7 @@ fun LiveTranslatorScreen(navController: NavController) {
 
 @Composable
 private fun LiveTranslatorStatusCard(
-    state: com.example.llamadroid.service.LiveTranslatorUiState,
+    state: com.blackbox.ai.service.LiveTranslatorUiState,
     onStop: () -> Unit,
     onSpeakerOne: () -> Unit,
     onSpeakerTwo: () -> Unit
@@ -573,7 +573,7 @@ private fun LiveTranslatorStatusCard(
 
 @Composable
 private fun LiveTranslatorActiveDialog(
-    state: com.example.llamadroid.service.LiveTranslatorUiState,
+    state: com.blackbox.ai.service.LiveTranslatorUiState,
     turns: List<LiveTranslatorTurnEntity>,
     onStop: () -> Unit,
     onSpeakerOne: () -> Unit,
@@ -681,7 +681,7 @@ private fun LiveTranslatorLanguagesCard(
     onSpeaker1LanguageChange: (String) -> Unit,
     speaker2Language: String,
     onSpeaker2LanguageChange: (String) -> Unit,
-    sampleState: com.example.llamadroid.service.LiveTranslatorSampleState,
+    sampleState: com.blackbox.ai.service.LiveTranslatorSampleState,
     onSamplerClick: () -> Unit,
     samplerEnabled: Boolean,
     onUseSampleForSpeaker1: () -> Unit,
@@ -766,7 +766,7 @@ private fun LiveTranslatorWhisperCard(
 
 @Composable
 internal fun LiveTranslatorBackendCard(
-    liteRtModels: List<com.example.llamadroid.data.model.LiteRtModelEntity>,
+    liteRtModels: List<com.blackbox.ai.data.model.LiteRtModelEntity>,
     backendEngine: String,
     onBackendEngineChange: (String) -> Unit,
     llamaServerUrl: String,
@@ -1026,11 +1026,11 @@ private fun LiveTranslatorTimingCard(
 
 @Composable
 private fun LiveTranslatorSessionsCard(
-    sessions: List<com.example.llamadroid.data.db.LiveTranslatorSessionEntity>,
+    sessions: List<com.blackbox.ai.data.db.LiveTranslatorSessionEntity>,
     selectedSessionId: Long,
     onSelect: (Long) -> Unit,
-    onDelete: (com.example.llamadroid.data.db.LiveTranslatorSessionEntity) -> Unit,
-    onRename: (com.example.llamadroid.data.db.LiveTranslatorSessionEntity, String) -> Unit
+    onDelete: (com.blackbox.ai.data.db.LiveTranslatorSessionEntity) -> Unit,
+    onRename: (com.blackbox.ai.data.db.LiveTranslatorSessionEntity, String) -> Unit
 ) {
     SectionCard(title = stringResource(R.string.live_translator_saved_transcriptions)) {
         sessions.take(6).forEach { session ->

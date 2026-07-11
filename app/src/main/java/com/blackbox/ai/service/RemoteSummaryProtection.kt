@@ -1,6 +1,6 @@
 package com.blackbox.ai.service
 
-import com.example.llamadroid.util.WakeLockManager
+import com.blackbox.ai.util.WakeLockManager
 import java.util.concurrent.atomic.AtomicInteger
 
 internal object RemoteSummaryProtection {

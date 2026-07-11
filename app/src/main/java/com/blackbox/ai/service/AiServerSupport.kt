@@ -1,7 +1,7 @@
 package com.blackbox.ai.service
 
-import com.example.llamadroid.data.db.AiServerConfigEntity
-import com.example.llamadroid.util.LogEntry
+import com.blackbox.ai.data.db.AiServerConfigEntity
+import com.blackbox.ai.util.LogEntry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
