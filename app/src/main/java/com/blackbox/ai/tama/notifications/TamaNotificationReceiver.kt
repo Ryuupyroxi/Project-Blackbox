@@ -96,7 +96,7 @@ class TamaNotificationReceiver : BroadcastReceiver() {
             TamaNotificationScheduler.AlertKind.POOP_READY -> {
                 val dueAt = TamaNotificationScheduler.dueAtFromIntent(intent)
                 val currentPet = latestPet(database, petId) ?: return
-                if (currentPet.isPoopGenerationPaused() || currentPet.stage == com.example.llamadroid.tama.data.GrowthStage.EGG) {
+                if (currentPet.isPoopGenerationPaused() || currentPet.stage == com.blackbox.ai.tama.data.GrowthStage.EGG) {
                     TamaNotificationScheduler.scheduleForPet(context, petId)
                     return
                 }
@@ -320,7 +320,7 @@ class TamaNotificationReceiver : BroadcastReceiver() {
     ) {
         val now = System.currentTimeMillis()
         val dreamDate = signature.split(":").getOrNull(1)
-            ?: com.example.llamadroid.tama.game.TamaDailyDreamManager.formatDreamDate(now)
+            ?: com.blackbox.ai.tama.game.TamaDailyDreamManager.formatDreamDate(now)
         val existing = database.tamaDao().getDeepDreamRunBySignature(petId, signature)
         val shouldNotify = existing?.status != TamaDeepDreamRunCoordinator.STATUS_WAITING_APP_OPEN
         val claim = TamaDeepDreamRunCoordinator.claimPlanningRun(

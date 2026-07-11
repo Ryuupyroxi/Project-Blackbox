@@ -42,16 +42,16 @@ object TamaNotificationScheduler {
     private const val PREFS_NAME = "tama_notification_state"
     private const val KEY_PREFIX_DELIVERED = "delivered"
     private const val KEY_PREFIX_LAST_SIGNATURE = "last_signature"
-    private const val ACTION_PET_NEED = "com.example.llamadroid.tama.notifications.PET_NEED"
-    private const val ACTION_CROP_READY = "com.example.llamadroid.tama.notifications.CROP_READY"
-    private const val ACTION_POOP_READY = "com.example.llamadroid.tama.notifications.POOP_READY"
-    private const val ACTION_POOP_NEGLECT = "com.example.llamadroid.tama.notifications.POOP_NEGLECT"
-    private const val ACTION_DEEP_DREAM = "com.example.llamadroid.tama.notifications.DEEP_DREAM"
-    private const val ACTION_BARN_FULL = "com.example.llamadroid.tama.notifications.BARN_FULL"
-    private const val ACTION_COOP_FULL = "com.example.llamadroid.tama.notifications.COOP_FULL"
-    private const val ACTION_BARN_HUNGRY = "com.example.llamadroid.tama.notifications.BARN_HUNGRY"
-    private const val ACTION_COOP_HUNGRY = "com.example.llamadroid.tama.notifications.COOP_HUNGRY"
-    private const val ACTION_STUDY_PHASE = "com.example.llamadroid.tama.notifications.STUDY_PHASE"
+    private const val ACTION_PET_NEED = "com.blackbox.ai.tama.notifications.PET_NEED"
+    private const val ACTION_CROP_READY = "com.blackbox.ai.tama.notifications.CROP_READY"
+    private const val ACTION_POOP_READY = "com.blackbox.ai.tama.notifications.POOP_READY"
+    private const val ACTION_POOP_NEGLECT = "com.blackbox.ai.tama.notifications.POOP_NEGLECT"
+    private const val ACTION_DEEP_DREAM = "com.blackbox.ai.tama.notifications.DEEP_DREAM"
+    private const val ACTION_BARN_FULL = "com.blackbox.ai.tama.notifications.BARN_FULL"
+    private const val ACTION_COOP_FULL = "com.blackbox.ai.tama.notifications.COOP_FULL"
+    private const val ACTION_BARN_HUNGRY = "com.blackbox.ai.tama.notifications.BARN_HUNGRY"
+    private const val ACTION_COOP_HUNGRY = "com.blackbox.ai.tama.notifications.COOP_HUNGRY"
+    private const val ACTION_STUDY_PHASE = "com.blackbox.ai.tama.notifications.STUDY_PHASE"
     private const val EXTRA_KIND = "kind"
     private const val EXTRA_PET_ID = "pet_id"
     private const val EXTRA_DUE_AT = "due_at"
@@ -382,7 +382,7 @@ object TamaNotificationScheduler {
 
     internal fun computeLivestockFullAlert(
         petId: String,
-        livestock: List<com.example.llamadroid.tama.db.FarmLivestockEntity>,
+        livestock: List<com.blackbox.ai.tama.db.FarmLivestockEntity>,
         type: FarmLivestockType,
         farmRepository: FarmRepository,
         now: Long = System.currentTimeMillis()
@@ -422,7 +422,7 @@ object TamaNotificationScheduler {
 
     internal fun computeLivestockHungryAlert(
         petId: String,
-        livestock: List<com.example.llamadroid.tama.db.FarmLivestockEntity>,
+        livestock: List<com.blackbox.ai.tama.db.FarmLivestockEntity>,
         type: FarmLivestockType,
         farmRepository: FarmRepository,
         now: Long = System.currentTimeMillis()
@@ -515,7 +515,7 @@ object TamaNotificationScheduler {
 
     internal fun computePetNeedForecast(pet: TamaPet, now: Long = System.currentTimeMillis()): PetNeedForecast? {
         if (pet.stage == GrowthStage.EGG || pet.isSleeping) return null
-        val decayPerHour = com.example.llamadroid.tama.game.TamaGameEngine.STAT_DECAY_PER_HOUR.toFloat()
+        val decayPerHour = com.blackbox.ai.tama.game.TamaGameEngine.STAT_DECAY_PER_HOUR.toFloat()
         val decayMultiplier = if (pet.stage == GrowthStage.BABY) 5f else 1f
         val decayPerMs = (decayPerHour * decayMultiplier) / 3_600_000f
         if (decayPerMs <= 0f) return null
@@ -540,7 +540,7 @@ object TamaNotificationScheduler {
 
     internal fun projectPetStats(pet: TamaPet, now: Long): PetStats {
         val secondsPassed = ((now - pet.lastDecayTime).coerceAtLeast(0L)) / 1000f
-        val decayPerHour = com.example.llamadroid.tama.game.TamaGameEngine.STAT_DECAY_PER_HOUR.toFloat()
+        val decayPerHour = com.blackbox.ai.tama.game.TamaGameEngine.STAT_DECAY_PER_HOUR.toFloat()
         val decayMultiplier = if (pet.stage == GrowthStage.BABY) 5f else 1f
         val decayAmount = (secondsPassed / 3600f) * decayPerHour * decayMultiplier
         if (decayAmount <= 0.001f) return pet.stats
@@ -569,7 +569,7 @@ object TamaNotificationScheduler {
     private fun cropReadyTime(crop: PlantedCrop, now: Long): Long? {
         if (crop.isDecayed) return null
         if (crop.stage >= 3) return if (now >= crop.lastStageUpdateTime) crop.lastStageUpdateTime else crop.lastStageUpdateTime
-        val info = com.example.llamadroid.tama.data.CropDefinitions.CROPS[crop.type] ?: return null
+        val info = com.blackbox.ai.tama.data.CropDefinitions.CROPS[crop.type] ?: return null
         var stage = crop.stage
         var lastUpdate = crop.lastStageUpdateTime
         while (stage < 3) {

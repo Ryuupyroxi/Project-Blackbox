@@ -332,7 +332,7 @@ data class TamaTransferDeepDreamRun(
     val lastHeartbeatAt: Long,
     val errorMessage: String? = null
 ) {
-    fun toEntity() = com.example.llamadroid.tama.db.TamaDeepDreamRunEntity(
+    fun toEntity() = com.blackbox.ai.tama.db.TamaDeepDreamRunEntity(
         id = id,
         petId = petId,
         signature = signature,
@@ -348,7 +348,7 @@ data class TamaTransferDeepDreamRun(
     )
 
     companion object {
-        fun fromEntity(entity: com.example.llamadroid.tama.db.TamaDeepDreamRunEntity) = TamaTransferDeepDreamRun(
+        fun fromEntity(entity: com.blackbox.ai.tama.db.TamaDeepDreamRunEntity) = TamaTransferDeepDreamRun(
             id = entity.id,
             petId = entity.petId,
             signature = entity.signature,

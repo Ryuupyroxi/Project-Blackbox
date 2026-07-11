@@ -87,7 +87,7 @@ class TamaFarmWidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
-        private const val ACTION_REFRESH = "com.example.llamadroid.widget.action.REFRESH_TAMA_FARM"
+        private const val ACTION_REFRESH = "com.blackbox.ai.widget.action.REFRESH_TAMA_FARM"
         private const val REQUEST_OPEN_BASE = 621_000
         private const val REQUEST_REFRESH = 621_901
         private const val GROWING_REFRESH_MS = 60_000L

@@ -34,7 +34,7 @@ import java.util.Locale
 
 private const val CALENDAR_WIDGET_PREFS_NAME = "organizer_calendar_widgets"
 private const val PREF_MONTH_PREFIX = "month_"
-private const val ACTION_CALENDAR_MONTH_DELTA = "com.example.llamadroid.widget.CALENDAR_MONTH_DELTA"
+private const val ACTION_CALENDAR_MONTH_DELTA = "com.blackbox.ai.widget.CALENDAR_MONTH_DELTA"
 private const val EXTRA_CALENDAR_MONTH_DELTA = "extra_calendar_month_delta"
 private val WIDGET_EVENT_BUBBLE_BACKGROUNDS = intArrayOf(
     R.drawable.widget_upcoming_bubble_blue,
