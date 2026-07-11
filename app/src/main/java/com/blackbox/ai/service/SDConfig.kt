@@ -1,0 +1,99 @@
+package com.blackbox.ai.service
+
+import android.os.Parcelable
+import com.example.llamadroid.sd.SdLoraApplyMode
+import kotlinx.parcelize.Parcelize
+
+/**
+ * Configuration for stable-diffusion.cpp image generation
+ */
+@Parcelize
+data class SDConfig(
+    val modelPath: String,
+    val prompt: String,
+    val negativePrompt: String = "",
+    val width: Int = 512,
+    val height: Int = 512,
+    val steps: Int = 20,
+    val cfgScale: Float = 7.0f,
+    val seed: Long = -1, // -1 for random
+    val samplingMethod: SamplingMethod = SamplingMethod.EULER_A,
+    val outputPath: String,
+    // img2img specific
+    val initImage: String? = null,
+    val strength: Float = 0.75f,
+    // Upscale specific
+    val upscaleModel: String? = null,
+    val upscaleRepeats: Int = 1,
+    // Mode
+    val mode: SDMode = SDMode.TXT2IMG,
+    // Performance
+    val threads: Int = -1, // -1 for auto
+    val vaeTiling: Boolean = false, // For low memory
+    val vaeTileOverlap: Float = 0.5f,
+    val vaeTileSize: String = "32x32",
+    val vaeRelativeTileSize: String = "",
+    val tensorTypeRules: String = "",
+    val cacheMode: SdCacheMode? = null,
+    val cacheOption: String = "",
+    val scmMask: String = "",
+    val scmPolicy: SdCacheScmPolicy? = null,
+    // Backward-compatible hint kept while older UI paths are migrated.
+    val isFluxModel: Boolean = false,
+    // Family metadata and components
+    val modelFamily: String? = null,
+    val modelVariant: String? = null,
+    val vaePath: String? = null,
+    val taePath: String? = null,
+    val clipLPath: String? = null,
+    val clipGPath: String? = null,
+    val t5xxlPath: String? = null,
+    val llmPath: String? = null,
+    val llmVisionPath: String? = null,
+    // ControlNet (optional)
+    val controlNetPath: String? = null,
+    val controlImagePath: String? = null,
+    val controlStrength: Float = 0.9f,
+    // LoRA (optional)
+    val loraPath: String? = null,
+    val loraStrength: Float = 1.0f,
+    val loraApplyMode: SdLoraApplyMode? = null,
+    // PhotoMaker (optional)
+    val photoMakerPath: String? = null,
+    // Family-specific runtime flags
+    val flowShift: Float? = null,
+    val diffusionFa: Boolean = false,
+    val mmap: Boolean = false,
+    val vaeConvDirect: Boolean = false,
+    val qwenImageZeroCondT: Boolean = false,
+    val chromaDisableDitMask: Boolean = false,
+    // Quantization type for stable-diffusion.cpp (--type)
+    val quantizationType: String = ""
+) : Parcelable
+
+@Parcelize
+data class SDWorkflowConfig(
+    val txt2imgConfig: SDConfig,
+    val upscaleConfig: SDConfig
+) : Parcelable
+
+@Parcelize
+data class SDUpscaleConfig(
+    val modelPath: String,
+    val inputImagePath: String,
+    val outputPath: String,
+    val upscaleRepeats: Int = 1,
+    val threads: Int = -1
+) : Parcelable
+
+enum class SamplingMethod(val cliName: String) {
+    EULER("euler"),
+    EULER_A("euler_a"),
+    HEUN("heun"),
+    DPM2("dpm2"),
+    DPM_PP_2S_A("dpm++2s_a"),
+    DPM_PP_2M("dpm++2m"),
+    DPM_PP_2M_V2("dpm++2mv2"),
+    LCM("lcm"),
+    DDIM_TRAILING("ddim_trailing")
+}

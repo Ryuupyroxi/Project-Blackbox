@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Blackbox" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/blackbox_accent</item>
+        <item name="colorPrimaryContainer">@color/blackbox_secondary</item>
+        <item name="colorOnPrimary">@color/blackbox_on_primary</item>
+        <item name="colorSecondary">@color/blackbox_accent_secondary</item>
+        <item name="colorSurface">@color/blackbox_surface</item>
+        <item name="colorSurfaceVariant">@color/blackbox_surface_variant</item>
+        <item name="android:colorBackground">@color/blackbox_background</item>
+        <item name="colorOnSurface">@color/blackbox_on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/blackbox_on_surface_variant</item>
+        <item name="android:statusBarColor">@color/blackbox_primary</item>
+        <item name="android:navigationBarColor">@color/blackbox_primary</item>
+    </style>
+</resources>

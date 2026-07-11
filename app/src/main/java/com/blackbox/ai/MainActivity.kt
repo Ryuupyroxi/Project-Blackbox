@@ -1,0 +1,234 @@
+package com.blackbox.ai
+
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import com.blackbox.ai.ui.theme.LlamaDroidTheme
+import com.blackbox.ai.ui.LlamaApp
+import com.blackbox.ai.service.GenerationDiagnosticsStore
+import com.blackbox.ai.service.DatasetForegroundService
+import com.blackbox.ai.tama.notifications.TamaNotificationScheduler
+import com.blackbox.ai.util.UpscalerAssetPackSupport
+import com.blackbox.ai.util.getParcelableExtraCompat
+
+/**
+ * Shared file data from intent
+ */
+data class SharedFileData(
+    val uri: Uri,
+    val mimeType: String
+)
+
+class MainActivity : ComponentActivity() {
+    companion object {
+        const val EXTRA_OPEN_ROUTE = "extra_open_route"
+        private const val KEY_LAST_SEEN_VERSION_CODE = "last_seen_version_code"
+    }
+    
+    // Share intent data
+    private val sharedFileData = mutableStateOf<SharedFileData?>(null)
+    private val pendingNavigationRoute = mutableStateOf<String?>(null)
+    private val isDeployingBinaries = mutableStateOf(true)
+    private val deploymentStatusId = mutableStateOf(R.string.deployment_adjusting)
+    
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { _ ->
+        // Permission result - notifications will work if granted
+    }
+    
+    /**
+     * Override to apply locale setting to the Activity context
+     */
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LlamaApplication.updateLocale(newBase))
+    }
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        enableEdgeToEdge()
+
+        val preferences = getSharedPreferences("llamadroid_settings", Context.MODE_PRIVATE)
+        val currentVersionCode = appVersionCode()
+        val previousVersionCode = preferences.getLong(KEY_LAST_SEEN_VERSION_CODE, 0L)
+        val postUpdateLaunch = AppStartupDeploymentPolicy.shouldSkipDeploymentAfterUpdate(
+            previousVersionCode = previousVersionCode,
+            currentVersionCode = currentVersionCode
+        )
+
+        isDeployingBinaries.value = false
+
+        // Request notification permission for Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) 
+                != PackageManager.PERMISSION_GRANTED) {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+
+        // Start binary deployment lazily so the app can render immediately after updates.
+        lifecycle.coroutineScope.launch(Dispatchers.IO) {
+            val repo = com.example.llamadroid.data.binary.BinaryRepository(this@MainActivity)
+            val shouldDeferProvisioning = postUpdateLaunch
+            val delayMs = if (shouldDeferProvisioning) 10_000L else 0L
+
+            GenerationDiagnosticsStore.recordBreadcrumb(
+                source = "main_activity",
+                event = "startup_provisioning_scheduled",
+                details = "defer=$shouldDeferProvisioning delayMs=$delayMs previousVersionCode=$previousVersionCode currentVersionCode=$currentVersionCode"
+            )
+
+            if (delayMs > 0L) {
+                delay(delayMs)
+            }
+
+            runCatching {
+                UpscalerAssetPackSupport.cleanupRetainedPackIfPresent(this@MainActivity)
+                    .onFailure { error ->
+                        GenerationDiagnosticsStore.recordBreadcrumb(
+                            source = "main_activity",
+                            event = "startup_upscaler_pack_cleanup_failed",
+                            details = "${error.javaClass.simpleName}: ${error.message}"
+                        )
+                    }
+
+                val binariesReady = repo.deployAllBinaries()
+                GenerationDiagnosticsStore.recordBreadcrumb(
+                    source = "main_activity",
+                    event = "startup_provisioning_checked",
+                    details = "binariesReady=$binariesReady assetPacksDeferred=true"
+                )
+
+                if (BuildConfig.IS_FAT_APK_BUILD && !binariesReady) {
+                    android.util.Log.e(
+                        "MainActivity",
+                        "Fat APK build is missing bundled components. binariesReady=$binariesReady"
+                    )
+                    GenerationDiagnosticsStore.recordBreadcrumb(
+                        source = "main_activity",
+                        event = "startup_provisioning_missing_components",
+                        details = "binariesReady=$binariesReady"
+                    )
+                    return@runCatching
+                }
+
+                if (!binariesReady) {
+                    GenerationDiagnosticsStore.recordBreadcrumb(
+                        source = "main_activity",
+                        event = "startup_feature_install_requested",
+                        details = "reason=binaries_missing"
+                    )
+                    com.example.llamadroid.util.DynamicFeatureManager.installAllFeatures(this@MainActivity)
+                }
+
+                com.example.llamadroid.util.DynamicFeatureManager.installOptionalAccelerators(this@MainActivity)
+
+                GenerationDiagnosticsStore.recordBreadcrumb(
+                    source = "main_activity",
+                    event = "startup_provisioning_finished",
+                    details = "defer=$shouldDeferProvisioning"
+                )
+            }.onFailure { error ->
+                GenerationDiagnosticsStore.recordBreadcrumb(
+                    source = "main_activity",
+                    event = "startup_provisioning_failed",
+                    details = "${error.javaClass.simpleName}: ${error.message}"
+                )
+                android.util.Log.e("MainActivity", "Deferred startup provisioning failed", error)
+            }
+
+            preferences.edit().putLong(KEY_LAST_SEEN_VERSION_CODE, currentVersionCode).apply()
+        }
+        
+        // Handle share intent
+        handleShareIntent(intent)
+        pendingNavigationRoute.value = extractNavigationRoute(intent)
+
+        GenerationDiagnosticsStore.consumePendingRelaunchWarning()?.let {
+            Toast.makeText(
+                this,
+                getString(R.string.generation_diag_relaunch_warning),
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        
+        setContent {
+            LlamaDroidTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    LlamaApp(
+                        sharedFileData = sharedFileData.value,
+                        onSharedFileHandled = { sharedFileData.value = null },
+                        pendingNavigationRoute = pendingNavigationRoute.value,
+                        onNavigationHandled = { pendingNavigationRoute.value = null }
+                    )
+                }
+            }
+        }
+    }
+    
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleShareIntent(intent)
+        pendingNavigationRoute.value = extractNavigationRoute(intent)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        DatasetForegroundService.requestResume(this)
+        lifecycle.coroutineScope.launch(Dispatchers.IO) {
+            runCatching {
+                TamaNotificationScheduler.retryPendingDeepDreamForActivePet(this@MainActivity)
+            }.onFailure { error ->
+                GenerationDiagnosticsStore.recordBreadcrumb(
+                    source = "main_activity",
+                    event = "deep_dream_pending_retry_failed",
+                    details = "${error.javaClass.simpleName}: ${error.message}"
+                )
+            }
+        }
+    }
+    
+    private fun handleShareIntent(intent: Intent?) {
+        if (intent?.action == Intent.ACTION_SEND) {
+            val uri = intent.getParcelableExtraCompat<Uri>(Intent.EXTRA_STREAM)
+            val mimeType = intent.type ?: ""
+            
+            if (uri != null && mimeType.isNotEmpty()) {
+                sharedFileData.value = SharedFileData(uri, mimeType)
+            }
+        }
+    }
+
+    private fun extractNavigationRoute(intent: Intent?): String? {
+        return intent?.getStringExtra(EXTRA_OPEN_ROUTE)
+    }
+
+    @Suppress("DEPRECATION")
+    private fun appVersionCode(): Long {
+        return packageManager.getPackageInfo(packageName, 0).longVersionCode
+    }
+
+}

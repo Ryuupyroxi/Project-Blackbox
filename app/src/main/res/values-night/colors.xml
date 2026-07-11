@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Blackbox Primary Colors -->
+    <color name="blackbox_primary">#FF0A0A0A</color>
+    <color name="blackbox_secondary">#FF1A1A2E</color>
+    <color name="blackbox_accent">#FF00D4FF</color>
+    <color name="blackbox_accent_secondary">#FF7B2FFF</color>
+    
+    <!-- Surface Colors -->
+    <color name="blackbox_surface">#FF121212</color>
+    <color name="blackbox_surface_variant">#FF1E1E1E</color>
+    <color name="blackbox_background">#FF0A0A0A</color>
+    
+    <!-- Text Colors -->
+    <color name="blackbox_on_surface">#FFE0E0E0</color>
+    <color name="blackbox_on_surface_variant">#FFB0B0B0</color>
+    <color name="blackbox_on_primary">#FF000000</color>
+    
+    <!-- Status Colors -->
+    <color name="blackbox_success">#FF00E676</color>
+    <color name="blackbox_warning">#FFFFD600</color>
+    <color name="blackbox_error">#FFFF1744</color>
+    
+    <!-- Seed color for Material You dynamic theming -->
+    <color name="blackbox_seed">#FF00D4FF</color>
+</resources>

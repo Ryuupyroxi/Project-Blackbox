@@ -1,0 +1,592 @@
+package com.blackbox.ai.ui.logs
+
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.blackbox.ai.util.DebugLog
+import com.blackbox.ai.util.LogEntry
+import com.blackbox.ai.service.DistributedService
+import com.blackbox.ai.service.GenerationBreadcrumb
+import com.blackbox.ai.service.GenerationDiagnosticsStore
+import com.blackbox.ai.service.GenerationExitSnapshot
+import androidx.compose.ui.res.stringResource
+import com.blackbox.ai.R
+import com.blackbox.ai.ui.components.AppContentColumn
+import com.blackbox.ai.ui.components.AppPageBackground
+import com.blackbox.ai.ui.components.AppPageHeader
+import kotlinx.coroutines.delay
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
+private enum class LogTab { APP, GENERATION_DIAGNOSTICS, RPC }
+
+@Composable
+fun LogsScreen(navController: NavController) {
+    val appLogs by DebugLog.logs.collectAsState()
+    val rpcLogs by DistributedService.rpcLogs.collectAsState()
+    val generationBreadcrumbs by GenerationDiagnosticsStore.recentBreadcrumbs.collectAsState()
+    val latestExitSnapshot by GenerationDiagnosticsStore.latestExitSnapshot.collectAsState()
+    val dateFormat = remember { SimpleDateFormat("HH:mm:ss", Locale.getDefault()) }
+    val context = LocalContext.current
+    val appListState = rememberLazyListState()
+    val rpcListState = rememberLazyListState()
+    val generationDiagnosticsAvailable = latestExitSnapshot != null || generationBreadcrumbs.isNotEmpty()
+    
+    var selectedTab by remember { mutableStateOf(LogTab.APP) }
+    var autoOpenedDiagnostics by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            DebugLog.refreshFromDisk()
+            delay(1000)
+        }
+    }
+
+    LaunchedEffect(generationDiagnosticsAvailable, appLogs.isEmpty()) {
+        if (!autoOpenedDiagnostics && generationDiagnosticsAvailable && appLogs.isEmpty()) {
+            selectedTab = LogTab.GENERATION_DIAGNOSTICS
+            autoOpenedDiagnostics = true
+        }
+    }
+
+    AppPageBackground {
+        Column(modifier = Modifier.fillMaxSize()) {
+            AppContentColumn(
+                modifier = Modifier.fillMaxWidth(),
+                bottomPadding = 0.dp,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                AppPageHeader(
+                    eyebrow = "DEBUG",
+                    title = stringResource(R.string.logs_title),
+                    subtitle = stringResource(R.string.settings_debug_desc)
+                )
+            }
+        
+        // Tab Row
+        TabRow(
+            selectedTabIndex = selectedTab.ordinal,
+            modifier = Modifier.padding(horizontal = 20.dp),
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            indicator = { _ -> }
+        ) {
+            Tab(
+                selected = selectedTab == LogTab.APP,
+                onClick = { selectedTab = LogTab.APP },
+                text = { 
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("📱 " + stringResource(R.string.logs_tab_app))
+                        if (appLogs.isNotEmpty()) {
+                            Spacer(Modifier.width(4.dp))
+                            Badge { Text("${appLogs.size}") }
+                        }
+                    }
+                }
+            )
+            Tab(
+                selected = selectedTab == LogTab.GENERATION_DIAGNOSTICS,
+                onClick = { selectedTab = LogTab.GENERATION_DIAGNOSTICS },
+                text = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("🧪 " + stringResource(R.string.logs_tab_generation_diag))
+                        if (generationDiagnosticsAvailable) {
+                            Spacer(Modifier.width(4.dp))
+                            Badge(
+                                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                            ) {
+                                Text("${generationBreadcrumbs.size + if (latestExitSnapshot != null) 1 else 0}")
+                            }
+                        }
+                    }
+                }
+            )
+            Tab(
+                selected = selectedTab == LogTab.RPC,
+                onClick = { selectedTab = LogTab.RPC },
+                text = { 
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("🌐 " + stringResource(R.string.logs_tab_rpc))
+                        if (rpcLogs.isNotEmpty()) {
+                            Spacer(Modifier.width(4.dp))
+                            Badge(
+                                containerColor = Color(0xFF00FF41),
+                                contentColor = Color.Black
+                            ) { Text("${rpcLogs.size}") }
+                        }
+                    }
+                }
+            )
+        }
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        // Action buttons
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            val canCopyOrClear = when (selectedTab) {
+                LogTab.APP -> appLogs.isNotEmpty()
+                LogTab.GENERATION_DIAGNOSTICS -> generationDiagnosticsAvailable
+                LogTab.RPC -> rpcLogs.isNotEmpty()
+            }
+            val logText = when (selectedTab) {
+                LogTab.APP -> buildAppLogExport(appLogs, dateFormat)
+                LogTab.GENERATION_DIAGNOSTICS -> buildDiagnosticsExport(
+                    context = context,
+                    exitSnapshot = latestExitSnapshot,
+                    breadcrumbs = GenerationDiagnosticsStore.loadAllStoredBreadcrumbs(),
+                    dateFormat = dateFormat
+                )
+                LogTab.RPC -> rpcLogs.joinToString("\n")
+            }
+            
+            FilledTonalButton(
+                onClick = {
+                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    clipboard.setPrimaryClip(ClipData.newPlainText(context.getString(R.string.logs_clip_label), logText))
+                    Toast.makeText(context, context.getString(R.string.logs_copied), Toast.LENGTH_SHORT).show()
+                },
+                enabled = canCopyOrClear,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.logs_copy))
+            }
+            
+            FilledTonalButton(
+                onClick = {
+                    when (selectedTab) {
+                        LogTab.APP -> DebugLog.clear()
+                        LogTab.GENERATION_DIAGNOSTICS -> GenerationDiagnosticsStore.clearPersistedDiagnostics()
+                        LogTab.RPC -> DistributedService.clearRpcLogs()
+                    }
+                },
+                enabled = canCopyOrClear,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                )
+            ) {
+                Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.logs_clear))
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        // Log content based on selected tab
+        Box(
+            modifier = Modifier
+                .weight(1f, fill = true)
+                .fillMaxWidth()
+        ) {
+            when (selectedTab) {
+                LogTab.APP -> AppLogsContent(
+                    logs = appLogs,
+                    listState = appListState,
+                    dateFormat = dateFormat
+                )
+                LogTab.GENERATION_DIAGNOSTICS -> GenerationDiagnosticsContent(
+                    exitSnapshot = latestExitSnapshot,
+                    breadcrumbs = generationBreadcrumbs,
+                    dateFormat = dateFormat
+                )
+                LogTab.RPC -> RpcLogsContent(rpcLogs, rpcListState)
+            }
+        }
+        }
+    }
+}
+
+@Composable
+private fun AppLogsContent(
+    logs: List<LogEntry>,
+    listState: androidx.compose.foundation.lazy.LazyListState,
+    dateFormat: SimpleDateFormat
+) {
+    if (logs.isEmpty()) {
+        EmptyLogsPlaceholder(stringResource(R.string.logs_no_app), stringResource(R.string.logs_no_app_desc))
+    } else {
+        Card(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp, vertical = 8.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        ) {
+            LazyColumn(
+                state = listState,
+                contentPadding = PaddingValues(12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                reverseLayout = true
+            ) {
+                items(logs.reversed()) { entry ->
+                    val isError = entry.message.contains("ERROR", ignoreCase = true) ||
+                        entry.message.contains("FAILED", ignoreCase = true) ||
+                        entry.message.contains("CRASH", ignoreCase = true)
+                    val isServer = entry.message.startsWith("Server:")
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(if (isError) Color(0xFF3D2020) else Color.Transparent)
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Text(
+                            text = dateFormat.format(Date(entry.timestamp)),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 10.sp
+                            ),
+                            color = Color(0xFF6A9955),
+                            modifier = Modifier.width(50.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = entry.message,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 11.sp
+                            ),
+                            color = when {
+                                isError -> Color(0xFFF48771)
+                                isServer -> Color(0xFF9CDCFE)
+                                else -> Color(0xFFD4D4D4)
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun GenerationDiagnosticsContent(
+    exitSnapshot: GenerationExitSnapshot?,
+    breadcrumbs: List<GenerationBreadcrumb>,
+    dateFormat: SimpleDateFormat
+) {
+    if (exitSnapshot == null && breadcrumbs.isEmpty()) {
+        EmptyLogsPlaceholder(
+            stringResource(R.string.logs_generation_diag_title),
+            stringResource(R.string.logs_no_generation_diag_desc)
+        )
+    } else {
+        Card(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp, vertical = 8.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.35f)
+            )
+        ) {
+            LazyColumn(
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                item {
+                    Text(
+                        text = stringResource(R.string.logs_generation_diag_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                if (exitSnapshot?.hadActiveGeneration == true) {
+                    item {
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer
+                            )
+                        ) {
+                            Text(
+                                text = stringResource(R.string.generation_diag_relaunch_warning),
+                                modifier = Modifier.padding(12.dp),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
+                    }
+                }
+
+                if (exitSnapshot != null) {
+                    item {
+                        Text(
+                            text = stringResource(
+                                R.string.logs_generation_diag_reason,
+                                exitSnapshot.reasonLabel,
+                                exitSnapshot.reasonCode
+                            ),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    item {
+                        Text(
+                            text = stringResource(
+                                R.string.logs_generation_diag_time,
+                                dateFormat.format(Date(exitSnapshot.timestamp))
+                            ),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    exitSnapshot.sessionSummary?.let { sessionSummary ->
+                        item {
+                            Text(
+                                text = stringResource(R.string.logs_generation_diag_session, sessionSummary),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+                    exitSnapshot.description?.let { description ->
+                        item {
+                            Text(
+                                text = stringResource(R.string.logs_generation_diag_description, description),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+                    exitSnapshot.traceSnippet?.takeIf { it.isNotBlank() }?.let { traceSnippet ->
+                        item {
+                            Text(
+                                text = stringResource(
+                                    R.string.logs_generation_diag_trace,
+                                    traceSnippet.take(600)
+                                ),
+                                style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace)
+                            )
+                        }
+                    }
+                }
+
+                if (breadcrumbs.isNotEmpty()) {
+                    item {
+                        HorizontalDivider()
+                    }
+                    item {
+                        Text(
+                            text = stringResource(R.string.logs_generation_diag_recent),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                    items(breadcrumbs.reversed()) { breadcrumb ->
+                        Text(
+                            text = buildBreadcrumbLine(breadcrumb, dateFormat),
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 11.sp
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RpcLogsContent(
+    logs: List<String>,
+    listState: androidx.compose.foundation.lazy.LazyListState
+) {
+    if (logs.isEmpty()) {
+        EmptyLogsPlaceholder(
+            stringResource(R.string.logs_no_rpc),
+            stringResource(R.string.logs_no_rpc_desc)
+        )
+    } else {
+        // Hacker-style terminal card
+        Card(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp, vertical = 8.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF0D0D0D)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column {
+                // Terminal header
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFF1A1A1A))
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Fake window buttons
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Box(Modifier.size(10.dp).clip(RoundedCornerShape(50)).background(Color(0xFFFF5F56)))
+                        Box(Modifier.size(10.dp).clip(RoundedCornerShape(50)).background(Color(0xFFFFBD2E)))
+                        Box(Modifier.size(10.dp).clip(RoundedCornerShape(50)).background(Color(0xFF27CA40)))
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Text(
+                        stringResource(R.string.logs_terminal_header),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontFamily = FontFamily.Monospace
+                        ),
+                        color = Color(0xFF888888)
+                    )
+                }
+                
+                LazyColumn(
+                    state = listState,
+                    contentPadding = PaddingValues(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                    reverseLayout = true
+                ) {
+                    items(logs.reversed()) { line ->
+                        val isTimestamp = line.startsWith("[")
+                        val isError = line.contains("error", ignoreCase = true) || 
+                                      line.contains("failed", ignoreCase = true)
+                        val isConnection = line.contains("connection", ignoreCase = true) ||
+                                           line.contains("accepted", ignoreCase = true)
+                        val isHeader = line.startsWith("===")
+                        
+                        Text(
+                            text = line,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 11.sp,
+                                lineHeight = 14.sp
+                            ),
+                            color = when {
+                                isHeader -> Color(0xFF00FFFF) // Cyan for headers
+                                isError -> Color(0xFFFF4444)  // Red for errors
+                                isConnection -> Color(0xFF00FF41) // Matrix green
+                                isTimestamp && line.contains("]") -> Color(0xFF00FF41).copy(alpha = 0.8f)
+                                else -> Color(0xFF00FF41).copy(alpha = 0.7f)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmptyLogsPlaceholder(title: String, subtitle: String) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                Icons.Default.Info,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+            )
+        }
+    }
+}
+
+private fun buildAppLogExport(
+    logs: List<LogEntry>,
+    dateFormat: SimpleDateFormat
+): String = logs.joinToString("\n") { "[${dateFormat.format(Date(it.timestamp))}] ${it.message}" }
+
+private fun buildDiagnosticsExport(
+    context: Context,
+    exitSnapshot: GenerationExitSnapshot?,
+    breadcrumbs: List<GenerationBreadcrumb>,
+    dateFormat: SimpleDateFormat
+): String {
+    if (exitSnapshot == null && breadcrumbs.isEmpty()) return ""
+
+    val lines = mutableListOf<String>()
+    lines += context.getString(R.string.logs_generation_diag_title)
+    exitSnapshot?.let { snapshot ->
+        lines += context.getString(
+            R.string.logs_generation_diag_reason,
+            snapshot.reasonLabel,
+            snapshot.reasonCode
+        )
+        lines += context.getString(
+            R.string.logs_generation_diag_time,
+            dateFormat.format(Date(snapshot.timestamp))
+        )
+        snapshot.sessionSummary?.let {
+            lines += context.getString(R.string.logs_generation_diag_session, it)
+        }
+        snapshot.description?.let {
+            lines += context.getString(R.string.logs_generation_diag_description, it)
+        }
+        snapshot.traceSnippet?.takeIf { it.isNotBlank() }?.let {
+            lines += context.getString(R.string.logs_generation_diag_trace, it)
+        }
+    }
+    if (breadcrumbs.isNotEmpty()) {
+        lines += context.getString(R.string.logs_generation_diag_recent)
+        lines += breadcrumbs.map { buildBreadcrumbLine(it, dateFormat) }
+    }
+    return lines.joinToString("\n")
+}
+
+private fun buildBreadcrumbLine(
+    breadcrumb: GenerationBreadcrumb,
+    dateFormat: SimpleDateFormat
+): String {
+    return buildString {
+        append("[${dateFormat.format(Date(breadcrumb.timestamp))}] ")
+        append(breadcrumb.source)
+        breadcrumb.mode?.let { append(" $it") }
+        append(" ${breadcrumb.event}")
+        breadcrumb.phase?.let { append(" phase=$it") }
+        breadcrumb.details?.let { append(" $it") }
+    }
+}
