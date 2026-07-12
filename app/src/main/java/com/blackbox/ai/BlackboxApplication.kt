@@ -29,7 +29,7 @@ private const val REMOVED_LLM_TRAINING_CLEANUP_DONE = "trainer_cleanup_done_v54"
 private const val REMOVED_LLM_TRAINING_WORKER_CLASS = "com.blackbox.ai.service.TrainerRunWorker"
 private const val WORK_MANAGER_DB_NAME = "androidx.work.workdb"
 
-class LlamaApplication : Application() {
+class BlackboxApplication : Application() {
     lateinit var container: AppContainer
 
     override fun onCreate() {
@@ -42,7 +42,7 @@ class LlamaApplication : Application() {
         installCrashBreadcrumbHandler()
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             runRemovedLlmTrainingCleanupOnce()
-            val staleJobs = AiRuntimeJobStore.markStaleActiveJobsTerminal(this@LlamaApplication)
+            val staleJobs = AiRuntimeJobStore.markStaleActiveJobsTerminal(this@BlackboxApplication)
             runCatching {
                 GenerationDiagnosticsStore.recordBreadcrumb(
                     source = "llama_application",
@@ -50,8 +50,8 @@ class LlamaApplication : Application() {
                     details = "stalePruned=${staleJobs.size}"
                 )
             }
-            runCatching { OrganizerAlarmScheduler.rescheduleAll(this@LlamaApplication) }
-            runCatching { LlamaScheduledTaskScheduler.rescheduleAll(this@LlamaApplication) }
+            runCatching { OrganizerAlarmScheduler.rescheduleAll(this@BlackboxApplication) }
+            runCatching { LlamaScheduledTaskScheduler.rescheduleAll(this@BlackboxApplication) }
         }
         
         // Request native libs installation immediately (Simulate Fast-Follow)
@@ -70,11 +70,11 @@ class LlamaApplication : Application() {
          * Safe because Application lives for entire app lifecycle.
          * Use this instead of storing Activity references.
          */
-        lateinit var instance: LlamaApplication
+        lateinit var instance: BlackboxApplication
             private set
         
         fun updateLocale(context: Context): Context {
-            val prefs = context.getSharedPreferences("blackbox_settings", Context.MODE_PRIVATE)
+            val prefs = context.getSharedPreferences("llamadroid_settings", Context.MODE_PRIVATE)
             val languageCode = prefs.getString("selected_language", "system") ?: "system"
             
             val locale = when (languageCode) {

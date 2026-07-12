@@ -120,7 +120,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LlamaApp(
+fun BlackboxApp(
     sharedFileData: SharedFileData? = null,
     onSharedFileHandled: () -> Unit = {},
     pendingNavigationRoute: String? = null,

@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import com.blackbox.ai.ui.theme.BlackboxTheme
-import com.blackbox.ai.ui.LlamaApp
+import com.blackbox.ai.ui.BlackboxApp
 import com.blackbox.ai.service.GenerationDiagnosticsStore
 import com.blackbox.ai.service.DatasetForegroundService
 import com.blackbox.ai.tama.notifications.TamaNotificationScheduler
@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
      * Override to apply locale setting to the Activity context
      */
     override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LlamaApplication.updateLocale(newBase))
+        super.attachBaseContext(BlackboxApplication.updateLocale(newBase))
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -178,7 +178,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    LlamaApp(
+                    BlackboxApp(
                         sharedFileData = sharedFileData.value,
                         onSharedFileHandled = { sharedFileData.value = null },
                         pendingNavigationRoute = pendingNavigationRoute.value,
