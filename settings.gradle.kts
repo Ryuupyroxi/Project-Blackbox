@@ -20,7 +20,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LlamaDroid"
+rootProject.name = "Blackbox"
 include(":app")
 
 // Asset Packs for native binary delivery
