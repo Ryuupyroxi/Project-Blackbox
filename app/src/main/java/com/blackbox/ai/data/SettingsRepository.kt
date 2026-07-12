@@ -50,7 +50,7 @@ data class PdfTranslationOptionsSnapshot(
 )
 
 class SettingsRepository(private val context: Context) {
-    private val prefs: SharedPreferences = context.getSharedPreferences("llamadroid_settings", Context.MODE_PRIVATE)
+    private val prefs: SharedPreferences = context.getSharedPreferences("blackbox_settings", Context.MODE_PRIVATE)
 
     private inline fun <reified T : Enum<T>> enumPref(key: String, defaultValue: T): T {
         val stored = prefs.getString(key, defaultValue.name)

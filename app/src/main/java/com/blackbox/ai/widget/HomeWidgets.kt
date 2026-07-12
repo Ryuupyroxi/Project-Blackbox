@@ -219,7 +219,7 @@ class OrganizerCalendarWidgetProvider : AppWidgetProvider() {
                 fillMonthGrid(context, views, month, events, zone)
                 val adapterIntent = Intent(context, OrganizerCalendarUpcomingEventsService::class.java).apply {
                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                    data = Uri.parse("llamadroid://calendar-upcoming/$appWidgetId")
+                    data = Uri.parse("blackbox://calendar-upcoming/$appWidgetId")
                 }
                 views.setRemoteAdapter(R.id.widget_calendar_upcoming_list, adapterIntent)
                 views.setEmptyView(R.id.widget_calendar_upcoming_list, R.id.widget_calendar_upcoming_empty)

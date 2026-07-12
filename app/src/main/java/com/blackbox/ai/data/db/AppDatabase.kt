@@ -178,7 +178,7 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "llama_droid_db"
+                    "blackbox_db"
                 )
                     // Apply any defined migrations
                     .addMigrations(*Migrations.ALL_MIGRATIONS)

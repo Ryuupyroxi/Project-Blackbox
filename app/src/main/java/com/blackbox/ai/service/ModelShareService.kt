@@ -230,7 +230,7 @@ class ModelShareService : Service() {
                 appendLine("<!DOCTYPE html><html><head>")
                 appendLine("<meta charset='UTF-8'>")
                 appendLine("<meta name='viewport' content='width=device-width, initial-scale=1'>")
-                appendLine("<title>LlamaDroid Models</title>")
+                appendLine("<title>Blackbox Models</title>")
                 appendLine("<style>")
                 appendLine("body { font-family: -apple-system, sans-serif; padding: 20px; background: #1a1a1a; color: #fff; }")
                 appendLine("h1 { color: #4CAF50; }")
@@ -239,7 +239,7 @@ class ModelShareService : Service() {
                 appendLine(".model .size { color: #888; font-size: 14px; }")
                 appendLine(".model .type { color: #FFA726; font-size: 12px; margin-top: 5px; }")
                 appendLine("</style></head><body>")
-                appendLine("<h1>📲 LlamaDroid Models</h1>")
+                appendLine("<h1>📲 Blackbox Models</h1>")
                 appendLine("<p>Available for download:</p>")
                 
                 if (models.isEmpty()) {

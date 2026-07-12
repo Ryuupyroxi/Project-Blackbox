@@ -153,7 +153,7 @@ object VideoSumupService {
         // Acquire wake lock
         try {
             val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "LlamaDroid:VideoSumup")
+            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Blackbox:VideoSumup")
             wakeLock?.acquire(60 * 60 * 1000L)
             DebugLog.log("[VIDEO-SUMUP] Wake lock acquired")
         } catch (e: Exception) {

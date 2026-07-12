@@ -270,7 +270,7 @@ class ProjectExportService(
     companion object {
         fun getExportFileName(projectName: String): String {
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-            return "llamadroid_${projectName}_$timestamp.zip"
+            return "blackbox_${projectName}_$timestamp.zip"
         }
     }
 }

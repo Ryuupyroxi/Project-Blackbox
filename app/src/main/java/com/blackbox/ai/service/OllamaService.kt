@@ -221,7 +221,7 @@ class OllamaService(private val context: Context) {
     
     // Load saved settings from SharedPreferences
     fun initFromSettings(prefix: String = "") {
-        val prefs = context.getSharedPreferences("llamadroid_settings", Context.MODE_PRIVATE)
+        val prefs = context.getSharedPreferences("blackbox_settings", Context.MODE_PRIVATE)
         val keyUrl = if (prefix.isEmpty()) "ollama_url" else "${prefix}ollama_url"
         val keyMmap = if (prefix.isEmpty()) "ollama_mmap" else "${prefix}ollama_mmap"
         val keyThreads = if (prefix.isEmpty()) "ollama_threads" else "${prefix}ollama_threads"

@@ -873,7 +873,7 @@
     <string name="logs_no_rpc">No RPC logs yet</string>
     <string name="logs_no_rpc_desc">Start a worker to see RPC server output</string>
     <string name="logs_terminal_header">rpc-server -- /dev/tty</string>
-    <string name="logs_clip_label">LlamaDroid Logs</string>
+    <string name="logs_clip_label">Blackbox Logs</string>
     <string name="logs_generation_diag_title">Generation Diagnostics</string>
     <string name="logs_generation_diag_reason">Last exit reason: %1$s (%2$d)</string>
     <string name="logs_generation_diag_time">Exit time: %1$s</string>
@@ -5432,8 +5432,8 @@
     <string name="adventure_gate_skill_cooldown_info">Cooldown: %1$d turn(s)</string>
     <string name="adventure_gate_skill_cooldown_line">CD %1$d turn(s)</string>
     <string name="adventure_gate_skill_cooldown_short">%1$s CD %2$d</string>
-    <string name="adventure_gate_skill_doomsday_bonk">Doomsday Bonk</string>
-    <string name="adventure_gate_skill_doomsday_bonk_desc">A final arcane attack with very high power.</string>
+    <string name="adventure_gate_skill_blackbox_bonk">Doomsday Bonk</string>
+    <string name="adventure_gate_skill_blackbox_bonk_desc">A final arcane attack with very high power.</string>
     <string name="adventure_gate_skill_dream_mend">Dream Mend</string>
     <string name="adventure_gate_skill_dream_mend_desc">Healing magic that adds a gentle regen effect.</string>
     <string name="adventure_gate_skill_ember_lullaby">Ember Lullaby</string>

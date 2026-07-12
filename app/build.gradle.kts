@@ -75,7 +75,7 @@ android {
         }
         create("release") {
             // Keystore path - set via environment or use default location
-            storeFile = file(System.getenv("KEYSTORE_PATH") ?: System.getProperty("user.home") + "/.android/aidoomsdaytoolbox-release.jks")
+            storeFile = file(System.getenv("KEYSTORE_PATH") ?: System.getProperty("user.home") + "/.android/blackbox-release.jks")
             storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
             keyAlias = System.getenv("KEY_ALIAS") ?: "release"
             keyPassword = System.getenv("KEY_PASSWORD") ?: ""

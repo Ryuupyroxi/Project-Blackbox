@@ -47,7 +47,7 @@ import com.blackbox.ai.LlamaApplication
 import com.blackbox.ai.R
 import com.blackbox.ai.data.db.AppDatabase
 import com.blackbox.ai.data.db.OrganizerAlarmEntity
-import com.blackbox.ai.ui.theme.LlamaDroidTheme
+import com.blackbox.ai.ui.theme.BlackboxTheme
 import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -65,7 +65,7 @@ class OrganizerAlarmRingActivity : ComponentActivity() {
         prepareAlarmWindow()
 
         setContent {
-            LlamaDroidTheme {
+            BlackboxTheme {
                 var alarm by remember { mutableStateOf<OrganizerAlarmEntity?>(null) }
                 LaunchedEffect(alarmId) {
                     alarm = withContext(Dispatchers.IO) {

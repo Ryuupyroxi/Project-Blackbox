@@ -38,7 +38,7 @@ object Downloader {
         // Acquire WakeLock to prevent CPU sleep during download
         val wakeLock = context?.let {
             val powerManager = it.getSystemService(Context.POWER_SERVICE) as PowerManager
-            powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "LlamaDroid:DownloadWakeLock")
+            powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Blackbox:DownloadWakeLock")
         }
         
         val downloadId = destFile.name
@@ -115,7 +115,7 @@ object Downloader {
     ): Flow<Float> = flow {
         val wakeLock = context?.let {
             val powerManager = it.getSystemService(Context.POWER_SERVICE) as PowerManager
-            powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "LlamaDroid:DownloadWakeLock")
+            powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Blackbox:DownloadWakeLock")
         }
         
         try {

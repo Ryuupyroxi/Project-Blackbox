@@ -22,7 +22,7 @@ import androidx.lifecycle.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import com.blackbox.ai.ui.theme.LlamaDroidTheme
+import com.blackbox.ai.ui.theme.BlackboxTheme
 import com.blackbox.ai.ui.LlamaApp
 import com.blackbox.ai.service.GenerationDiagnosticsStore
 import com.blackbox.ai.service.DatasetForegroundService
@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
 
-        val preferences = getSharedPreferences("llamadroid_settings", Context.MODE_PRIVATE)
+        val preferences = getSharedPreferences("blackbox_settings", Context.MODE_PRIVATE)
         val currentVersionCode = appVersionCode()
         val previousVersionCode = preferences.getLong(KEY_LAST_SEEN_VERSION_CODE, 0L)
         val postUpdateLaunch = AppStartupDeploymentPolicy.shouldSkipDeploymentAfterUpdate(
@@ -173,7 +173,7 @@ class MainActivity : ComponentActivity() {
         }
         
         setContent {
-            LlamaDroidTheme {
+            BlackboxTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

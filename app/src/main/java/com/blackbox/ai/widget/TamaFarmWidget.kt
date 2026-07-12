@@ -54,7 +54,7 @@ import com.blackbox.ai.tama.game.PetMapper
 import com.blackbox.ai.ui.components.AppScreenScaffold
 import com.blackbox.ai.ui.components.AppSectionCard
 import com.blackbox.ai.ui.navigation.Screen
-import com.blackbox.ai.ui.theme.LlamaDroidTheme
+import com.blackbox.ai.ui.theme.BlackboxTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -261,7 +261,7 @@ class TamaFarmWidgetConfigActivity : ComponentActivity() {
         }
 
         setContent {
-            LlamaDroidTheme {
+            BlackboxTheme {
                 TamaFarmWidgetConfigScreen(
                     onCancel = { finish() },
                     onSelectPage = { pageIndex ->

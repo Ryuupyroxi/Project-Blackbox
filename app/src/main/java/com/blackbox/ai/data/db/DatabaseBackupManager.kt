@@ -29,7 +29,7 @@ object DatabaseBackupManager {
     private const val TAG = "[DB-Backup]"
     
     // Database file names (must match the names in AppDatabase/TamaDatabase builders)
-    private const val APP_DB_NAME = "llama_droid_db"
+    private const val APP_DB_NAME = "blackbox_db"
     private const val TAMA_DB_NAME = "tama_database"
     
     // Journal file suffixes
@@ -61,7 +61,7 @@ object DatabaseBackupManager {
      */
     fun generateBackupFilename(): String {
         val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
-        return "aidoomsday_backup_${dateFormat.format(Date())}.zip"
+        return "blackbox_backup_${dateFormat.format(Date())}.zip"
     }
     
     /**

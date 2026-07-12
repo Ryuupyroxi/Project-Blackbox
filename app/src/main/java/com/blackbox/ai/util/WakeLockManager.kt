@@ -27,7 +27,7 @@ object WakeLockManager {
                 val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
                 wakeLock = powerManager.newWakeLock(
                     PowerManager.PARTIAL_WAKE_LOCK,
-                    "LlamaDroid:AppWakeLock"
+                    "Blackbox:AppWakeLock"
                 )
             }
             
@@ -101,7 +101,7 @@ object WakeLockManager {
                 @Suppress("DEPRECATION")
                 wifiLock = wifiManager.createWifiLock(
                     android.net.wifi.WifiManager.WIFI_MODE_FULL_HIGH_PERF,
-                    "LlamaDroid:AppWifiLock"
+                    "Blackbox:AppWifiLock"
                 )
                 wifiLock?.setReferenceCounted(false)
             }

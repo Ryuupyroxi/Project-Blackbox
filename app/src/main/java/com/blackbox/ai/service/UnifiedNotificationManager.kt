@@ -33,10 +33,10 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 object UnifiedNotificationManager {
     
-    private const val CHANNEL_ID = "doomsday_ai_tasks"
+    private const val CHANNEL_ID = "blackbox_ai_tasks"
     private const val CHANNEL_NAME = "AI Tasks"
-    private const val AGENT_ATTENTION_CHANNEL_ID = "doomsday_agent_attention"
-    private const val COMPLETION_CHANNEL_ID = "doomsday_completion"
+    private const val AGENT_ATTENTION_CHANNEL_ID = "blackbox_agent_attention"
+    private const val COMPLETION_CHANNEL_ID = "blackbox_completion"
     private const val COMPLETION_CHANNEL_NAME = "Task Completions"
     private const val AGENT_ATTENTION_ID = 98
     private const val AI_RUNTIME_RECOVERY_ID = 490_000

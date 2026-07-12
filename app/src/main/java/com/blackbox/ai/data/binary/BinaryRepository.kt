@@ -49,7 +49,7 @@ class BinaryRepository(private val context: Context) {
         )
         
         // Preference keys
-        private const val PREFS_NAME = "llamadroid_settings"
+        private const val PREFS_NAME = "blackbox_settings"
         private const val KEY_PREFERRED_TIER = "preferred_cpu_tier"
 
         // Required shared libraries (not tiered, always same version)

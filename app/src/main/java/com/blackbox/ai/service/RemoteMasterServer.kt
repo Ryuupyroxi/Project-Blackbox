@@ -989,7 +989,7 @@ object SelfSignedCertGenerator {
             setSerialNumber.invoke(builder, java.math.BigInteger.valueOf(System.currentTimeMillis()))
             
             val x500Class = Class.forName("com.android.org.bouncycastle.jce.X509Principal")
-            val x500Name = x500Class.getConstructor(String::class.java).newInstance("CN=RemoteMaster,O=LlamaDroid")
+            val x500Name = x500Class.getConstructor(String::class.java).newInstance("CN=RemoteMaster,O=Blackbox")
             
             val setIssuerDN = builderClass.getMethod("setIssuerDN", java.security.Principal::class.java)
             setIssuerDN.invoke(builder, x500Name)
