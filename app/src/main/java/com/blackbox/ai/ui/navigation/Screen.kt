@@ -102,4 +102,8 @@ sealed class Screen(val route: String) {
     object LlamaChat : Screen("llama_chat/{chatId}/{serverId}") { // Chat interface
         fun createRoute(chatId: Long, serverId: Long): String = "llama_chat/$chatId/$serverId"
     }
+
+    object OnlineHub : Screen("online_hub")           // Online AI service hub
+    object DeviceToolkit : Screen("device_toolkit")   // Device tool manager (56 tools)
+    object AgentImporter : Screen("agent_import")     // Import agents from SID-OS
 }

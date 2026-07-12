@@ -117,6 +117,9 @@ import com.blackbox.ai.service.OllamaService
 import com.blackbox.ai.ui.components.AssetDownloadDialog
 import com.blackbox.ai.util.AssetPackManagerUtil
 import kotlinx.coroutines.launch
+import com.blackbox.ai.ui.online.OnlineHubScreen
+import com.blackbox.ai.toolkit.DeviceToolkitScreen
+import com.blackbox.ai.agent.imports.AgentImporterScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -867,7 +870,20 @@ fun BlackboxApp(
                     database = tamaDatabase,
                     mode = com.blackbox.ai.tama.ui.AdventureGateScreenMode.NIGHT_ARENA
                 )
+  
+            // === Blackbox Custom Screens ===
+            composable(Screen.OnlineHub.route) {
+                OnlineHubScreen(
+                    onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
+                )
             }
+            composable(Screen.DeviceToolkit.route) {
+                DeviceToolkitScreen(navController)
+            }
+            composable(Screen.AgentImporter.route) {
+                AgentImporterScreen(navController)
+            }
+          }
         }
     }
 }
