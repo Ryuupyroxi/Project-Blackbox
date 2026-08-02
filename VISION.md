@@ -128,9 +128,13 @@ runtime so agent coding works with zero setup. This is the key differentiator vs
 
 ## Open Questions (need Kevin's call)
 - Q1: ~~Which AnyClaw?~~ RESOLVED → **B1** (5-in-1 AI Coding). See Reference B.
-- Q2: **Distribution** — personal tool vs ship to Play Store? Sets polish/permission bar
-  (app requests MANAGE_EXTERNAL_STORAGE + REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-- Q3: **Cloud/online hub** — keep optional; app must fully function offline?
+- Q2: ~~Distribution~~ RESOLVED → **GitHub-hosted, open-source** (keep ADT's Apache-2.0
+  license). Public project. Polish/permissions held to a shippable bar, but no Play-store
+  gatekeeping required. Note: app currently requests MANAGE_EXTERNAL_STORAGE +
+  REQUEST_IGNORE_BATTERY_OPTIMIZATIONS — acceptable for local-first power tool, revisit if
+  a stricter public store path is ever wanted.
+- Q3: ~~Cloud/online hub~~ RESOLVED → **local-first. Online AI API / HuggingFace / GitHub
+  download / remote LLM are OPTIONAL conveniences only. App must fully function offline.**
 - Q4: **Coding runtime choice** — RESOLVED → offer BOTH: keep ADT's Termux+proot path for
   heavy toolchains AND add a B1-style self-contained Linux runtime (Node24/ARM64) so agent
   coding works zero-setup. This is the Blackbox differentiator vs stock ADT.
