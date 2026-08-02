@@ -137,43 +137,48 @@ android {
         }
     }
     
-    // Asset Packs for on-demand native binary delivery
-    assetPacks += setOf(
-        ":asset_upscaler"
-    )
-    
-    // Dynamic Features for native binaries execution (Install-Time/On-Demand)
-    dynamicFeatures += setOf(
-        ":feature_llm_baseline", ":feature_llm_dotprod", ":feature_llm_armv9",
-        ":feature_llm_snapdragon_opencl",
-        ":feature_kiwix_baseline", ":feature_kiwix_dotprod", ":feature_kiwix_armv9",
-        ":feature_media_baseline", ":feature_media_dotprod", ":feature_media_armv9",
-        ":feature_upscaler"
-    )
+    // Asset Packs / Dynamic Features disabled: the :asset_upscaler and :feature_* modules
+    // are not present in the fork snapshot (settings.gradle.kts already marks them
+    // "TEMP: disabled - no source"). Leaving these in fails configuration resolution.
+    // assetPacks += setOf(
+    //     ":asset_upscaler"
+    // )
+    //
+    // dynamicFeatures += setOf(
+    //     ":feature_llm_baseline", ":feature_llm_dotprod", ":feature_llm_armv9",
+    //     ":feature_llm_snapdragon_opencl",
+    //     ":feature_kiwix_baseline", ":feature_kiwix_dotprod", ":feature_kiwix_armv9",
+    //     ":feature_media_baseline", ":feature_media_dotprod", ":feature_media_armv9",
+    //     ":feature_upscaler"
+    // )
 }
 
-val tamaDialogWorkbook = layout.projectDirectory.file("src/main/tama-dialogs/pet_dialogs.xlsx")
-val tamaDialogGeneratedAssets = layout.buildDirectory.dir("generated/assets/tamaDialogs")
-val tamaDialogGeneratedJson = tamaDialogGeneratedAssets.map { it.file("tama/dialogs/pet_dialogs.json") }
-
-val generateTamaDialogCatalog by tasks.registering(Exec::class) {
-    inputs.file(tamaDialogWorkbook)
-    outputs.file(tamaDialogGeneratedJson)
-    commandLine(
-        "python3",
-        rootProject.file("tools/tama_dialog_excel.py").absolutePath,
-        "--workbook",
-        tamaDialogWorkbook.asFile.absolutePath,
-        "--output",
-        tamaDialogGeneratedJson.get().asFile.absolutePath
-    )
-}
-
-android.sourceSets["main"].assets.srcDir(tamaDialogGeneratedAssets)
-
-tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }.configureEach {
-    dependsOn(generateTamaDialogCatalog)
-}
+// Tama dialog catalog generation disabled: upstream tools/tama_dialog_excel.py is not
+// present in the fork snapshot. The pet_dialogs.xlsx asset is still bundled; the generated
+// assets/tama/dialogs/pet_dialogs.json will be missing until the generator script is restored.
+// Safe for first build; Tama dialogs may be empty until then.
+// val tamaDialogWorkbook = layout.projectDirectory.file("src/main/tama-dialogs/pet_dialogs.xlsx")
+// val tamaDialogGeneratedAssets = layout.buildDirectory.dir("generated/assets/tamaDialogs")
+// val tamaDialogGeneratedJson = tamaDialogGeneratedAssets.map { it.file("tama/dialogs/pet_dialogs.json") }
+//
+// val generateTamaDialogCatalog by tasks.registering(Exec::class) {
+//     inputs.file(tamaDialogWorkbook)
+//     outputs.file(tamaDialogGeneratedJson)
+//     commandLine(
+//         "python3",
+//         rootProject.file("tools/tama_dialog_excel.py").absolutePath,
+//         "--workbook",
+//         tamaDialogWorkbook.asFile.absolutePath,
+//         "--output",
+//         tamaDialogGeneratedJson.get().asFile.absolutePath
+//     )
+// }
+//
+// android.sourceSets["main"].assets.srcDir(tamaDialogGeneratedAssets)
+//
+// tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }.configureEach {
+//     dependsOn(generateTamaDialogCatalog)
+// }
 
 dependencies {
 
