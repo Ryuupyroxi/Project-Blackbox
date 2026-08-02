@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -22,7 +23,7 @@ fun BlackboxDashboard(
     onNavigateToSettings: () -> Unit
 ) {
     val processes by ProcessManager.processes.collectAsState()
-    val tools by DeviceToolkit(null).tools.collectAsState()
+    val tools by DeviceToolkit(LocalContext.current).tools.collectAsState()
     
     Scaffold(
         topBar = {

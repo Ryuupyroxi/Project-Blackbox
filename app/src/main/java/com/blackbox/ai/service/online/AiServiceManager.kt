@@ -13,13 +13,7 @@ data class AiServiceDefinition(
 )
 
 object AiServiceManager {
-    
-    private val _availableServices = MutableStateFlow(defaultServices)
-    val availableServices: StateFlow<List<AiServiceDefinition>> = _availableServices.asStateFlow()
-    
-    private val _enabledServices = MutableStateFlow<List<String>>(emptyList())
-    val enabledServices: StateFlow<List<String>> = _enabledServices.asStateFlow()
-    
+
     private val defaultServices = listOf(
         AiServiceDefinition("chatgpt", "ChatGPT", "https://chat.openai.com", "chat"),
         AiServiceDefinition("claude", "Claude", "https://claude.ai", "chat"),
@@ -32,7 +26,13 @@ object AiServiceManager {
         AiServiceDefinition("deepseek", "DeepSeek", "https://chat.deepseek.com", "chat"),
         AiServiceDefinition("mistral", "Mistral AI", "https://chat.mistral.ai", "chat")
     )
-    
+
+    private val _availableServices = MutableStateFlow(defaultServices)
+    val availableServices: StateFlow<List<AiServiceDefinition>> = _availableServices.asStateFlow()
+
+    private val _enabledServices = MutableStateFlow<List<String>>(emptyList())
+    val enabledServices: StateFlow<List<String>> = _enabledServices.asStateFlow()
+
     fun addService(service: AiServiceDefinition) {
         val current = _availableServices.value.toMutableList()
         if (current.none { it.id == service.id }) {
