@@ -335,7 +335,7 @@ Chunk summaries to unify:"""
     private fun acquireWakeLock(context: Context) {
         try {
             val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "LlamaDroid:PDFSummary")
+            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Blackbox:PDFSummary")
             wakeLock?.acquire(60 * 60 * 1000L)
         } catch (_: Exception) {
         }

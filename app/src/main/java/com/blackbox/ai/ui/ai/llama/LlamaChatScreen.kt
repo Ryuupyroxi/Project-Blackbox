@@ -3568,7 +3568,7 @@ private fun saveLlamaChatImageToGallery(context: Context, imageFile: File) {
             put(MediaStore.Images.Media.DISPLAY_NAME, displayName)
             put(MediaStore.Images.Media.MIME_TYPE, mimeType)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/AI-Doomsday-Toolbox")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Blackbox")
                 put(MediaStore.Images.Media.IS_PENDING, 1)
             }
         }

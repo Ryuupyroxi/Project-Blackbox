@@ -49,7 +49,7 @@ import java.net.NetworkInterface
 import java.util.Collections
 
 /**
- * Termux Doomsday Tools Screen
+ * Termux Blackbox Tools Screen
  * Install, uninstall, and run AI tools through a direct Ubuntu SSH server
  */
 @OptIn(ExperimentalMaterial3Api::class)

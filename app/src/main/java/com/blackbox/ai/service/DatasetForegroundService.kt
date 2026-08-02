@@ -652,7 +652,7 @@ class DatasetForegroundService : Service(), DatasetProcessor.RuntimeHooks {
                 val pm = getSystemService(Context.POWER_SERVICE) as? PowerManager
                 wakeLock = pm?.newWakeLock(
                     PowerManager.PARTIAL_WAKE_LOCK,
-                    "AI-Doomsday:DatasetForegroundService"
+                    "Blackbox:DatasetForegroundService"
                 )
             }
             if (wakeLock?.isHeld == false) {
@@ -663,7 +663,7 @@ class DatasetForegroundService : Service(), DatasetProcessor.RuntimeHooks {
                 @Suppress("DEPRECATION")
                 wifiLock = wifiManager?.createWifiLock(
                     WifiManager.WIFI_MODE_FULL_HIGH_PERF,
-                    "AI-Doomsday:DatasetForegroundServiceWifi"
+                    "Blackbox:DatasetForegroundServiceWifi"
                 )
             }
             if (wifiLock?.isHeld == false) {

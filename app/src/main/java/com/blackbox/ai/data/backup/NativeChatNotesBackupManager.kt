@@ -1317,7 +1317,7 @@ data class NativeChatNotesBackupImportResult(
 @Keep
 data class NativeChatNotesBackupManifest(
     val schemaVersion: Int = 1,
-    val app: String = "AI-Doomsday-Toolbox",
+    val app: String = "Blackbox",
     val exportedAt: Long = System.currentTimeMillis(),
     val servers: List<LlamaServerBackup> = emptyList(),
     val folders: List<LlamaChatFolderBackup> = emptyList(),

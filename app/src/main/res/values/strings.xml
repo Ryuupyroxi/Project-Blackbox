@@ -1600,7 +1600,7 @@
     <string name="about_title">About</string>
     <string name="about_version">Version</string>
     <string name="about_developer">Developer</string>
-    <string name="about_developer_name">ManuXD32</string>
+    <string name="about_developer_name">Kevin (RyuuPyroXi)</string>
     <string name="about_github">GitHub</string>
     <string name="about_support">Support Development</string>
     <string name="about_kofi">Buy me a coffee on Ko-fi</string>
@@ -1614,7 +1614,7 @@
     <string name="about_quadtrix_cpp_desc">Quadtrix.cpp - Native training</string>
     <string name="about_ffmpeg">FFmpeg - Media processing</string>
     <string name="about_sdai_desc">SDAI team - Local diffusion Android reference and inspiration</string>
-    <string name="about_thanks">Thank you for using Doomsday AI Toolbox!</string>
+    <string name="about_thanks">Thank you for using Blackbox! Based on AI Doomsday Toolbox by ManuXD32 (Apache-2.0).</string>
     <string name="about_zim_desc">Offline Wikipedia and ZIM file server</string>
     <string name="about_compatible_tools">Compatible Frontends &amp; Tools</string>
     <string name="about_easy_dataset_desc">Dataset processing and preparation</string>
@@ -5432,7 +5432,7 @@
     <string name="adventure_gate_skill_cooldown_info">Cooldown: %1$d turn(s)</string>
     <string name="adventure_gate_skill_cooldown_line">CD %1$d turn(s)</string>
     <string name="adventure_gate_skill_cooldown_short">%1$s CD %2$d</string>
-    <string name="adventure_gate_skill_blackbox_bonk">Doomsday Bonk</string>
+    <string name="adventure_gate_skill_blackbox_bonk">Blackbox Bonk</string>
     <string name="adventure_gate_skill_blackbox_bonk_desc">A final arcane attack with very high power.</string>
     <string name="adventure_gate_skill_dream_mend">Dream Mend</string>
     <string name="adventure_gate_skill_dream_mend_desc">Healing magic that adds a gentle regen effect.</string>

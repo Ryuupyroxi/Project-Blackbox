@@ -1,0 +1,17 @@
+Blackbox
+Copyright (c) 2026 Kevin (RyuuPyroxi)
+
+This product is a fork of AI Doomsday Toolbox.
+  AI Doomsday Toolbox — Copyright (c) 2025-2026 ManuXD32
+  https://github.com/ManuXD32/AI-Doomsday-Toolbox
+  Licensed under the Apache License, Version 2.0.
+
+This product includes software developed by ManuXD32 and the
+respective upstream projects (llama.cpp, whisper.cpp,
+stable-diffusion.cpp, Kiwix, Real-ESRGAN, ONNX Runtime, LiteRT,
+Ollama, Quadtrix, Termux, and others), each under its own license.
+
+The Blackbox SID-OS agent bridge is original work under this project.
+
+Licensed under the Apache License, Version 2.0. You may obtain a copy of
+the License at http://www.apache.org/licenses/LICENSE-2.0

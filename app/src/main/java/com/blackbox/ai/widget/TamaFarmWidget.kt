@@ -36,7 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.blackbox.ai.LlamaApplication
+import com.blackbox.ai.BlackboxApplication
 import com.blackbox.ai.MainActivity
 import com.blackbox.ai.R
 import com.blackbox.ai.tama.data.CropDefinitions
@@ -244,7 +244,7 @@ class TamaFarmWidgetConfigActivity : ComponentActivity() {
     private var appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID
 
     override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LlamaApplication.updateLocale(newBase))
+        super.attachBaseContext(BlackboxApplication.updateLocale(newBase))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

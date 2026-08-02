@@ -534,7 +534,7 @@ class AgentForegroundService : Service() {
                 val pm = getSystemService(Context.POWER_SERVICE) as? PowerManager
                 wakeLock = pm?.newWakeLock(
                     PowerManager.PARTIAL_WAKE_LOCK,
-                    "AI-Doomsday:AgentForegroundService"
+                    "Blackbox:AgentForegroundService"
                 )
             }
             if (wakeLock?.isHeld == false) {
@@ -546,7 +546,7 @@ class AgentForegroundService : Service() {
             if (wifiLock == null) {
                 val wm = applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
                 @Suppress("DEPRECATION")
-                wifiLock = wm?.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "AI-Doomsday:AgentWifiLock")
+                wifiLock = wm?.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Blackbox:AgentWifiLock")
             }
             if (wifiLock?.isHeld == false) {
                 wifiLock?.acquire()

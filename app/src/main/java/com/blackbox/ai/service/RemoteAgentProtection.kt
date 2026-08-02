@@ -1,6 +1,6 @@
 package com.blackbox.ai.service
 
-import com.blackbox.ai.LlamaApplication
+import com.blackbox.ai.BlackboxApplication
 import com.blackbox.ai.util.DebugLog
 import com.blackbox.ai.util.WakeLockManager
 import java.net.URI
@@ -49,7 +49,7 @@ internal object RemoteAgentProtection {
     }
 
     private fun acquire(status: String) {
-        val context = LlamaApplication.instance
+        val context = BlackboxApplication.instance
         if (refCount.incrementAndGet() == 1) {
             if (externalForegroundCount.get() > 0) {
                 DebugLog.log("[RemoteAgentProtection] using existing foreground for remote call")
@@ -67,7 +67,7 @@ internal object RemoteAgentProtection {
     }
 
     private fun release() {
-        val context = LlamaApplication.instance
+        val context = BlackboxApplication.instance
         val remaining = refCount.decrementAndGet().coerceAtLeast(0)
         if (remaining == 0) {
             refCount.set(0)

@@ -45,7 +45,7 @@ import com.blackbox.ai.data.db.NoteEntity
 import com.blackbox.ai.ui.components.AppScreenScaffold
 import com.blackbox.ai.ui.components.AppSectionCard
 import com.blackbox.ai.ui.navigation.Screen
-import com.blackbox.ai.ui.theme.LlamaDroidTheme
+import com.blackbox.ai.ui.theme.BlackboxTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -193,7 +193,7 @@ class NoteDisplayWidgetProvider : AppWidgetProvider() {
                 )
                 val adapterIntent = Intent(context, NoteDisplayWidgetService::class.java).apply {
                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                    data = Uri.parse("llamadroid://note-widget/$appWidgetId/${noteId ?: 0}")
+                    data = Uri.parse("blackbox://note-widget/$appWidgetId/${noteId ?: 0}")
                 }
                 views.setRemoteAdapter(R.id.widget_note_list, adapterIntent)
                 views.setEmptyView(R.id.widget_note_list, R.id.widget_note_empty)
@@ -368,7 +368,7 @@ class NoteDisplayWidgetConfigActivity : ComponentActivity() {
 
         val database = AppDatabase.getDatabase(applicationContext)
         setContent {
-            LlamaDroidTheme {
+            BlackboxTheme {
                 val notes by database.noteDao().getAllNotes().collectAsState(initial = emptyList())
                 NoteDisplayWidgetConfigScreen(
                     notes = notes,

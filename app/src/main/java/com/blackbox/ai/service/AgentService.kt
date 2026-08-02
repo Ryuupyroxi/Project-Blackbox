@@ -2108,7 +2108,7 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
         }
 
         fun setIsLoading(loading: Boolean, status: String? = null) {
-            val appContext = com.blackbox.ai.LlamaApplication.instance
+            val appContext = com.blackbox.ai.BlackboxApplication.instance
 
             // Update reference counter
             val count = if (loading) {
@@ -2158,14 +2158,14 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
             _statusText.value = status
             // Also update notification if service is running
             if (loadingRefCount.get() > 0) {
-                val appContext = com.blackbox.ai.LlamaApplication.instance
+                val appContext = com.blackbox.ai.BlackboxApplication.instance
                 AgentForegroundService.updateStatus(appContext, status)
             }
         }
 
         private fun refreshIdleStatusIfNeeded() {
             if (loadingRefCount.get() == 0) {
-                val appContext = com.blackbox.ai.LlamaApplication.instance
+                val appContext = com.blackbox.ai.BlackboxApplication.instance
                 _statusText.value = idleStatusText(appContext)
             }
         }
@@ -2547,12 +2547,12 @@ class AgentService(private val context: Context, private val isRuntimeOwner: Boo
             if (enabled) current.remove(agentName.uppercase()) else current.add(agentName.uppercase())
             _disabledBuiltInAgents.value = current
             // Persist
-            val prefs = com.blackbox.ai.LlamaApplication.instance.getSharedPreferences("settings", 0)
+            val prefs = com.blackbox.ai.BlackboxApplication.instance.getSharedPreferences("settings", 0)
             prefs.edit().putStringSet("disabled_built_in_agents", _disabledBuiltInAgents.value).apply()
         }
 
         fun loadDisabledAgents() {
-            val prefs = com.blackbox.ai.LlamaApplication.instance.getSharedPreferences("settings", 0)
+            val prefs = com.blackbox.ai.BlackboxApplication.instance.getSharedPreferences("settings", 0)
             _disabledBuiltInAgents.value = prefs.getStringSet("disabled_built_in_agents", emptySet()) ?: emptySet()
         }
 
@@ -3470,12 +3470,12 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
                             _retryMessage.value = null
                             return@launch
                         }
-                        val appContext = com.blackbox.ai.LlamaApplication.instance
+                        val appContext = com.blackbox.ai.BlackboxApplication.instance
                         _retryMessage.value = appContext.getString(R.string.agent_retry_message, i, index + 1, retryIntervals.size)
                         delay(1000)
                     }
 
-                    val appContext = com.blackbox.ai.LlamaApplication.instance
+                    val appContext = com.blackbox.ai.BlackboxApplication.instance
                     _retryMessage.value = appContext.getString(R.string.agent_connecting)
                     agentService.connect().onSuccess {
                         _connectionStatus.value = ConnectionStatus.CONNECTED
@@ -3489,7 +3489,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
 
                 // All retries failed
                 _connectionStatus.value = ConnectionStatus.DISCONNECTED
-                val appContext = com.blackbox.ai.LlamaApplication.instance
+                val appContext = com.blackbox.ai.BlackboxApplication.instance
                 _retryMessage.value = appContext.getString(R.string.agent_retry_failed)
                 delay(5000)
                 _retryMessage.value = null // Clear message but keep status DISCONNECTED
@@ -3501,8 +3501,8 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
     private fun acquireWakeLock() {
         try {
             if (wakeLock == null) {
-                val pm = com.blackbox.ai.LlamaApplication.instance.getSystemService(Context.POWER_SERVICE) as? PowerManager
-                wakeLock = pm?.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "AI-Doomsday:AgentTask")
+                val pm = com.blackbox.ai.BlackboxApplication.instance.getSystemService(Context.POWER_SERVICE) as? PowerManager
+                wakeLock = pm?.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Blackbox:AgentTask")
             }
             if (wakeLock?.isHeld == false) {
                 wakeLock?.acquire(30 * 60 * 1000L) // 30 min max
@@ -3549,7 +3549,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
 
             // Ensure WakeLock is released (defensive call before setIsLoading)
             releaseWakeLock()
-            val appContext = com.blackbox.ai.LlamaApplication.instance
+            val appContext = com.blackbox.ai.BlackboxApplication.instance
             setIsLoading(false, appContext.getString(R.string.agent_status_interrupted))
             addDebugLog("🛑 All jobs stopped by user. Reset to Orchestrator.")
             recordAgentEvent("agent_stop", "Stopped all running agent work", "User interrupted the active workflow.")
@@ -3610,7 +3610,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
             cancelCurrentChatJob()
             loadingRefCount.set(0)
             _isLoading.value = false
-            _statusText.value = idleStatusText(com.blackbox.ai.LlamaApplication.instance)
+            _statusText.value = idleStatusText(com.blackbox.ai.BlackboxApplication.instance)
             _streamingContent.value = ""
             _streamingThinking.value = ""
             _streamingMessageId.value = null
@@ -5887,7 +5887,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
             settingsRepo: com.blackbox.ai.data.SettingsRepository? = null
         ): Boolean {
             if (activeCustom != null) return activeCustom.visionEnabled
-            val repo = settingsRepo ?: AgentForegroundService.getSettingsRepository(com.blackbox.ai.LlamaApplication.instance)
+            val repo = settingsRepo ?: AgentForegroundService.getSettingsRepository(com.blackbox.ai.BlackboxApplication.instance)
             return repo.getAgentVisionEnabledForRole(role.name)
         }
 
@@ -7549,7 +7549,7 @@ THIS IS CRITICAL — without your updates, all progress context is lost between 
             activeCustom: com.blackbox.ai.data.db.CustomAgentEntity? = _activeCustomAgent.value,
             settingsRepo: com.blackbox.ai.data.SettingsRepository? = null
         ): List<AgentTool> {
-            val repo = settingsRepo ?: AgentForegroundService.getSettingsRepository(com.blackbox.ai.LlamaApplication.instance)
+            val repo = settingsRepo ?: AgentForegroundService.getSettingsRepository(com.blackbox.ai.BlackboxApplication.instance)
             val kiwixEnabled = repo.agentKiwixEnabled.value
             val imageGenerationToolEnabled = repo.agentImageGenerationToolEnabled.value
             val backgroundRemovalToolEnabled = repo.agentBackgroundRemovalToolEnabled.value

@@ -60,7 +60,7 @@ class VideoGenerationService : Service() {
         powerManager = getSystemService(POWER_SERVICE) as PowerManager
         wakeLock = powerManager.newWakeLock(
             PowerManager.PARTIAL_WAKE_LOCK,
-            "AI-Doomsday:VideoGeneration"
+            "Blackbox:VideoGeneration"
         ).apply {
             setReferenceCounted(false)
         }

@@ -1,6 +1,6 @@
 package com.blackbox.ai.ui.ai.ollama
 
-import com.blackbox.ai.LlamaApplication
+import com.blackbox.ai.BlackboxApplication
 import com.blackbox.ai.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -32,7 +32,7 @@ class OllamaViewModel(
     private val repository: OllamaRepository
 ) : ViewModel() {
     private val appContext
-        get() = LlamaApplication.instance
+        get() = BlackboxApplication.instance
     private val runtimeManager by lazy { AgentForegroundService.getOllamaRuntimeManager(appContext) }
     private var lastCompletedModels: Set<String> = emptySet()
 

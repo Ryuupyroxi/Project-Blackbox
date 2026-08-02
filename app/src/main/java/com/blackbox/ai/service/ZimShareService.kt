@@ -214,7 +214,7 @@ class ZimShareService : Service() {
                 appendLine("<!DOCTYPE html><html><head>")
                 appendLine("<meta charset='UTF-8'>")
                 appendLine("<meta name='viewport' content='width=device-width, initial-scale=1'>")
-                appendLine("<title>Doomsday AI Toolbox - ZIM Files</title>")
+                appendLine("<title>Blackbox - ZIM Files</title>")
                 appendLine("<style>")
                 appendLine("body { font-family: -apple-system, sans-serif; padding: 20px; background: #1a1a1a; color: #fff; }")
                 appendLine("h1 { color: #4CAF50; }")
@@ -251,7 +251,7 @@ class ZimShareService : Service() {
                 }
                 
                 appendLine("<hr style='border-color: #333; margin-top: 30px;'>")
-                appendLine("<p style='color: #666; font-size: 12px;'>Doomsday AI Toolbox - ZIM File Server</p>")
+                appendLine("<p style='color: #666; font-size: 12px;'>Blackbox - ZIM File Server</p>")
                 appendLine("</body></html>")
             }
             

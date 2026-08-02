@@ -1,7 +1,7 @@
 package com.blackbox.ai.service
 
 import android.util.Log
-import com.blackbox.ai.LlamaApplication
+import com.blackbox.ai.BlackboxApplication
 import com.blackbox.ai.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -471,7 +471,7 @@ class ProcessController {
             val exitCode = process?.waitFor() ?: -1
             DebugLog.log("ProcessController: Process exited with code $exitCode")
             process = null
-            val appContext = LlamaApplication.instance
+            val appContext = BlackboxApplication.instance
             val exitMessage = appContext.getString(R.string.llama_server_process_exited_unexpectedly, exitCode)
             onState?.invoke(resolveExitState(exitCode, exitMessage))
             return@withContext ProcessRunResult(

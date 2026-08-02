@@ -74,7 +74,7 @@ class BlackboxApplication : Application() {
             private set
         
         fun updateLocale(context: Context): Context {
-            val prefs = context.getSharedPreferences("llamadroid_settings", Context.MODE_PRIVATE)
+            val prefs = context.getSharedPreferences("blackbox_settings", Context.MODE_PRIVATE)
             val languageCode = prefs.getString("selected_language", "system") ?: "system"
             
             val locale = when (languageCode) {

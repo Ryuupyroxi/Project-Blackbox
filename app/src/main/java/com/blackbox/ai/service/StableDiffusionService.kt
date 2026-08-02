@@ -118,7 +118,7 @@ class StableDiffusionService : Service() {
         powerManager = getSystemService(POWER_SERVICE) as PowerManager
         wakeLock = powerManager.newWakeLock(
             PowerManager.PARTIAL_WAKE_LOCK,
-            "AI-Doomsday:StableDiffusion"
+            "Blackbox:StableDiffusion"
         ).apply {
             setReferenceCounted(false)
         }

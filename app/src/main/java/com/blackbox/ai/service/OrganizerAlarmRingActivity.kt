@@ -43,7 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
-import com.blackbox.ai.LlamaApplication
+import com.blackbox.ai.BlackboxApplication
 import com.blackbox.ai.R
 import com.blackbox.ai.data.db.AppDatabase
 import com.blackbox.ai.data.db.OrganizerAlarmEntity
@@ -56,7 +56,7 @@ class OrganizerAlarmRingActivity : ComponentActivity() {
     private var alarmId: Long = -1L
 
     override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LlamaApplication.updateLocale(newBase))
+        super.attachBaseContext(BlackboxApplication.updateLocale(newBase))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

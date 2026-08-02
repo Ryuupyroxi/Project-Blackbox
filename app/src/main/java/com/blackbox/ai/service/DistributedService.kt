@@ -21,7 +21,7 @@ import java.net.Socket
 import java.net.NetworkInterface
 import com.blackbox.ai.util.SystemMonitor
 import com.blackbox.ai.service.UnifiedNotificationManager.TaskType
-import com.blackbox.ai.LlamaApplication
+import com.blackbox.ai.BlackboxApplication
 
 /**
  * Distributed inference modes
@@ -580,8 +580,8 @@ class DistributedService : Service() {
             DebugLog.log("[$TAG] Master mode set with ${workerAddresses.size} workers: $workerAddresses")
             
             // Acquire locks for Master as well (needs to keep connection open)
-            WakeLockManager.acquire(LlamaApplication.instance, "DistributedServiceMaster")
-            WakeLockManager.acquireWifiLock(LlamaApplication.instance, "DistributedServiceMaster")
+            WakeLockManager.acquire(BlackboxApplication.instance, "DistributedServiceMaster")
+            WakeLockManager.acquireWifiLock(BlackboxApplication.instance, "DistributedServiceMaster")
             
             startMasterConnectionMonitor()
         }
