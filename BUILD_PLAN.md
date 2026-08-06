@@ -40,6 +40,33 @@ private, local-first Android application:
 - [x] `AgentRuntimeScreen` — install/start/stop/health/logs/web-UI for runtime agents
 - [x] `AssistantDaemonService` (Kai-style foreground daemon) + `ACTION_ASSIST` manifest filter + MainActivity hook → opens agent chat
 - [x] ProGuard rules renamed to `com.blackbox.ai.*` (was stale `com.example.llamadroid`)
+- [x] CI compile check — Phase 1 build `7c64456` green; Phase 2 build `0c7faa4` green; Phase 3+4 build `6d14325` green
+- [x] Fix any compile errors reported by the debugger/tester agent or CI — FIXES.md P0/P1/P2/P3 batch implemented
+- [x] Deep integration: route existing `AgentService` tool calls through the unified channels
+- [x] Assistant feature dispatch: `FeatureDispatch` enforces `FeatureAccessStore` grants
+- [x] Workspace-aware agent sessions: `WorkspaceAgentSession` (per-workspace channel/context)
+- [x] Task scheduler loop under `AssistantDaemonService` (Kai `TaskScheduler` pattern, 60s poll)
+- [x] Port OpenClaw `BootstrapInstaller` (zero-Termux embedded runtime) + `download-bootstrap.sh`
+- [x] Port OpenClaw `CodexServerManager` (Node.js, Codex CLI, platform binary, CONNECT proxy, OpenClaw gateway)
+- [x] `EmbeddedRuntimeManager` — LOCAL channel wraps bootstrap + Codex runtime; Agent Hub card added
+- [x] CI downloads Termux bootstrap into assets before `assembleDebug` (`.gitignore`d, not committed)
+- [x] TTS/STT voice round-trip in agent chat (`BlackboxVoice` + mic / speak-replies in Quick Agent Chat)
+- [x] Heartbeat + scheduled tasks: daemon tick refreshes ADT `LlamaScheduledTaskScheduler` alarms + records heartbeat
+- [x] Calendar integration: `CalendarAccess` (create events, ISO parsing, reminders) gated by `FeatureAccessStore.FEATURE_CALENDAR`
+
+
+- [x] Debug APK builds on GitHub Actions (94 MB, arm64-v8a) — heap settings fixed in `gradle.properties`
+- [x] Agents bottom tab added (route `Screen.Agents`, label `nav_agents`)
+- [x] New routes: `Screen.AgentRuntime`, `Screen.Agents`
+- [x] `EngineKeysStore` — API keys (OpenAI / OpenRouter / Anthropic) + local server + Termux SSH settings
+- [x] `ChatChannel` + `ChatChannelClient` — unified chat engine: local llama/Ollama OR any API key
+- [x] `WorkspaceStore` — multi-workspace support (add/switch/delete, per-workspace channel Local/SSH/Kai)
+- [x] `FeatureAccessStore` — assistant feature authorization grants (Organizer, Notes, Calendar, Kiwix, PDF, Tama, Models, Chat)
+- [x] `RuntimeAgent` catalog + `AgentRuntimeManager` — Hermes / Codex CLI / OpenClaw over the local Termux/Ubuntu SSH channel (commands from termux-agents-hub)
+- [x] `AgentHubScreen` — channel status, API keys, workspace manager, quick agent chat, daemon toggle
+- [x] `AgentRuntimeScreen` — install/start/stop/health/logs/web-UI for runtime agents
+- [x] `AssistantDaemonService` (Kai-style foreground daemon) + `ACTION_ASSIST` manifest filter + MainActivity hook → opens agent chat
+- [x] ProGuard rules renamed to `com.blackbox.ai.*` (was stale `com.example.llamadroid`)
 - [x] CI compile check of the new merge code — Phase 1 build `7c64456` green; Phase 2 build `0c7faa4` green (31127686809)
 - [x] Fix any compile errors reported by the debugger/tester agent or CI — FIXES.md P0/P1/P2/P3 batch implemented
 - [x] Deep integration: route existing `AgentService` tool calls through the unified channels

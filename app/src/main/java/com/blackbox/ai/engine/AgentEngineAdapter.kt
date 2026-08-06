@@ -1,8 +1,12 @@
 package com.blackbox.ai.engine
 
 import android.content.Context
-import com.blackbox.ai.service.AgentService
 import com.blackbox.ai.service.OllamaService
+import com.blackbox.ai.service.OllamaService.AgentTool
+import com.blackbox.ai.service.OllamaService.ChatMessage
+import com.blackbox.ai.service.OllamaService.ChatResponse
+import com.blackbox.ai.service.OllamaService.ChatUsage
+import com.blackbox.ai.service.OllamaService.ToolCall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -76,13 +80,13 @@ class AgentEngineAdapter(
      * Returns a Result containing the final ChatResponse.
      */
     suspend fun chatWithToolsStreaming(
-        messages: List<OllamaService.ChatMessage>,
-        tools: List<OllamaService.AgentTool>,
+        messages: List<ChatMessage>,
+        tools: List<AgentTool>,
         modelLabel: String,
         thinkingEnabled: Boolean,
         numCtx: Int,
         onChunk: (String?, String?) -> Unit,
-    ): Result<OllamaService.ChatResponse> = withContext(Dispatchers.IO) {
+    ): Result<ChatResponse> = withContext(Dispatchers.IO) {
         val channel = selectChannel() ?: return@withContext Result.failure(Exception("No configured channel available"))
 
         // Convert messages + tools to OpenAI-compatible format
@@ -137,8 +141,8 @@ class AgentEngineAdapter(
 
     private fun buildAnthropicBody(
         model: String,
-        messages: List<OllamaService.ChatMessage>,
-        tools: List<OllamaService.AgentTool>,
+        messages: List<ChatMessage>,
+        tools: List<AgentTool>,
         thinkingEnabled: Boolean,
     ): JSONObject {
         val body = JSONObject()
@@ -178,7 +182,7 @@ class AgentEngineAdapter(
         return body
     }
 
-    private fun parseAnthropicResponse(jsonText: String, onChunk: (String?, String?) -> Unit): OllamaService.ChatResponse {
+    private fun parseAnthropicResponse(jsonText: String, onChunk: (String?, String?) -> Unit): ChatResponse {
         val json = JSONObject(jsonText)
         val content = json.getJSONArray("content")
         var fullText = ""
@@ -207,7 +211,7 @@ class AgentEngineAdapter(
                         val k = keys.next()
                         args[k] = argsJson.optString(k)
                     }
-                    toolCall = OllamaService.ToolCall(
+                    toolCall = ToolCall(
                         id = block.getString("id"),
                         name = block.getString("name"),
                         arguments = args
@@ -225,7 +229,7 @@ class AgentEngineAdapter(
                 toolCalls = if (toolCall != null) listOf(toolCall) else null
             ),
             done = true,
-            usage = OllamaService.ChatUsage(
+            usage = ChatUsage(
                 promptTokens = usage?.optInt("input_tokens"),
                 completionTokens = usage?.optInt("output_tokens"),
                 totalTokens = (usage?.optInt("input_tokens") ?: 0) + (usage?.optInt("output_tokens") ?: 0),
@@ -238,8 +242,8 @@ class AgentEngineAdapter(
 
     private fun buildOpenAiBody(
         channel: ChatChannel,
-        messages: List<OllamaService.ChatMessage>,
-        tools: List<OllamaService.AgentTool>,
+        messages: List<ChatMessage>,
+        tools: List<AgentTool>,
         thinkingEnabled: Boolean,
         numCtx: Int,
     ): JSONObject {
@@ -300,7 +304,7 @@ class AgentEngineAdapter(
         return body
     }
 
-    private fun parseOpenAiStreamingResponse(jsonText: String, onChunk: (String?, String?) -> Unit): OllamaService.ChatResponse {
+    private fun parseOpenAiStreamingResponse(jsonText: String, onChunk: (String?, String?) -> Unit): ChatResponse {
         val json = JSONObject(jsonText)
         val choice = json.getJSONArray("choices").getJSONObject(0)
         val message = choice.getJSONObject("message")
@@ -323,7 +327,7 @@ class AgentEngineAdapter(
                 val k = keys.next()
                 args[k] = argsJson.optString(k)
             }
-            toolCall = OllamaService.ToolCall(
+            toolCall = ToolCall(
                 id = tc.getString("id"),
                 name = func.getString("name"),
                 arguments = args
@@ -338,7 +342,7 @@ class AgentEngineAdapter(
                 toolCalls = if (toolCall != null) listOf(toolCall) else null
             ),
             done = true,
-            usage = OllamaService.ChatUsage(
+            usage = ChatUsage(
                 promptTokens = usageJson?.optInt("prompt_tokens"),
                 completionTokens = usageJson?.optInt("completion_tokens"),
                 totalTokens = usageJson?.optInt("total_tokens"),

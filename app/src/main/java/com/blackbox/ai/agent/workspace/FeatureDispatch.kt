@@ -24,7 +24,7 @@ class FeatureDispatch(
     /**
      * Executes the block if the feature is granted; otherwise returns failure.
      */
-    inline fun <T> execute(feature: String, block: () -> T): Result<T> {
+    fun <T> execute(feature: String, block: () -> T): Result<T> {
         if (!featureAccess.isGranted(feature)) {
             val label = FeatureAccessStore.allFeatures().firstOrNull { it.first == feature }?.second ?: feature
             return Result.failure(SecurityException("Assistant not authorized to use $label. Grant access in Agent Hub."))

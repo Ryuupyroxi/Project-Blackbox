@@ -2,9 +2,11 @@ package com.blackbox.ai.service
 
 import android.app.assist.AssistContent
 import android.app.assist.AssistStructure
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.service.assist.AssistService
+import android.util.Log
 import com.blackbox.ai.MainActivity
 import com.blackbox.ai.ui.navigation.Screen
 
@@ -27,5 +29,9 @@ class BlackboxAssistService : AssistService() {
         }
         runCatching { startActivity(intent) }
         onHandleAssistFinished()
+    }
+
+    companion object {
+        fun isSupported(): Boolean = android.os.Build.VERSION.SDK_INT >= 18
     }
 }
