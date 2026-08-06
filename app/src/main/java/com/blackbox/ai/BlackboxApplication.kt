@@ -6,9 +6,15 @@ import android.content.res.Configuration
 import android.database.sqlite.SQLiteDatabase
 import androidx.work.WorkManager
 import com.blackbox.ai.R
+import com.blackbox.ai.agent.workspace.FeatureAccessStore
+import com.blackbox.ai.agent.workspace.WorkspaceAgentSession
+import com.blackbox.ai.agent.workspace.WorkspaceStore
 import com.blackbox.ai.data.AppContainer
 import com.blackbox.ai.data.DefaultAppContainer
+import com.blackbox.ai.engine.AgentEngineAdapter
+import com.blackbox.ai.engine.EngineKeysStore
 import com.blackbox.ai.service.AiRuntimeJobStore
+import com.blackbox.ai.service.AssistantDaemonService
 import com.blackbox.ai.service.GenerationDiagnosticsStore
 import com.blackbox.ai.service.OrganizerAlarmScheduler
 import com.blackbox.ai.service.LlamaScheduledTaskScheduler
@@ -32,6 +38,13 @@ private const val WORK_MANAGER_DB_NAME = "androidx.work.workdb"
 class BlackboxApplication : Application() {
     lateinit var container: AppContainer
 
+    // New merge components
+    private var _engineKeysStore: EngineKeysStore? = null
+    private var _workspaceStore: WorkspaceStore? = null
+    private var _featureAccessStore: FeatureAccessStore? = null
+    private var _workspaceSession: WorkspaceAgentSession? = null
+    private var _engineAdapter: AgentEngineAdapter? = null
+
     override fun onCreate() {
         super.onCreate()
         instance = this  // Safe: Application lives for entire app lifecycle
@@ -40,6 +53,14 @@ class BlackboxApplication : Application() {
         DebugLog.init(this)
         GenerationDiagnosticsStore.init(this)
         installCrashBreadcrumbHandler()
+
+        // Initialize new merge components
+        _engineKeysStore = EngineKeysStore(this)
+        _workspaceStore = WorkspaceStore(this)
+        _featureAccessStore = FeatureAccessStore(this)
+        _workspaceSession = WorkspaceAgentSession(this, _engineKeysStore!!, _workspaceStore!!)
+        _engineAdapter = AgentEngineAdapter(this, _engineKeysStore!!)
+
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             runRemovedLlmTrainingCleanupOnce()
             val staleJobs = AiRuntimeJobStore.markStaleActiveJobsTerminal(this@BlackboxApplication)
@@ -52,6 +73,8 @@ class BlackboxApplication : Application() {
             }
             runCatching { OrganizerAlarmScheduler.rescheduleAll(this@BlackboxApplication) }
             runCatching { LlamaScheduledTaskScheduler.rescheduleAll(this@BlackboxApplication) }
+            // Auto-start assistant daemon if enabled
+            runCatching { AssistantDaemonService.start(this@BlackboxApplication) }
         }
         
         // Request native libs installation immediately (Simulate Fast-Follow)
@@ -91,6 +114,13 @@ class BlackboxApplication : Application() {
             return context.createConfigurationContext(config)
         }
     }
+
+    // Getters for new components
+    fun getEngineKeysStore(): EngineKeysStore = _engineKeysStore!!
+    fun getWorkspaceStore(): WorkspaceStore = _workspaceStore!!
+    fun getFeatureAccessStore(): FeatureAccessStore = _featureAccessStore!!
+    fun getWorkspaceSession(): WorkspaceAgentSession = _workspaceSession!!
+    fun getEngineAdapter(): AgentEngineAdapter = _engineAdapter!!
 
     private fun installCrashBreadcrumbHandler() {
         val previousHandler = Thread.getDefaultUncaughtExceptionHandler()

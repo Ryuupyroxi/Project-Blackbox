@@ -116,3 +116,12 @@ class EngineKeysStore(context: Context) {
         private const val KEY_SESSION_LOG = "session_log"
     }
 }
+
+/** SSH config for Termux/Ubuntu channel — mirrors ADT's SSHConfig. */
+data class SSHConfig(
+    val host: String = "127.0.0.1",
+    val port: Int = 8025,
+    val user: String = "root",
+    val password: String = "",
+    val privateKeyPath: String? = null
+)

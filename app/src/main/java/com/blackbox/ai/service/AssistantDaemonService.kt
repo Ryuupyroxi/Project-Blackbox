@@ -10,24 +10,37 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
-import android.os.Handler
 import android.os.IBinder
-import android.os.Looper
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.blackbox.ai.MainActivity
+import com.blackbox.ai.agent.workspace.WorkspaceAgentSession
+import com.blackbox.ai.agent.workspace.WorkspaceStore
+import com.blackbox.ai.engine.AgentEngineAdapter
+import com.blackbox.ai.engine.EngineKeysStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlin.math.min
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.ExperimentalTime
 
-/**
- * Kai-style assistant daemon. A low-importance foreground service that keeps the
- * app process alive so the assistant stays responsive, with a lightweight
- * heartbeat loop. The system assist gesture (long-press home / power) opens the
- * agent chat via ACTION_ASSIST once Blackbox is set as the default assistant.
- */
-class AssistantDaemonService : Service() {
+@OptIn(ExperimentalTime::class)
+class AssistantDaemonService : Service(), LifecycleEventObserver {
 
     companion object {
         private const val CHANNEL_ID = "blackbox_assistant"
         private const val NOTIFICATION_ID = 9001
         private const val ACTION_STOP = "blackbox.assistant.STOP"
-        private const val HEARTBEAT_INTERVAL_MS = 15 * 60 * 1000L
+        private const val POLL_INTERVAL_MS = 60_000L
+        private const val MAX_BACKOFF_MS = 3_600_000L // 1 hour
+        private const val HEARTBEAT_PREVIEW_CHARS = 240
 
         /**
          * Derived from the real system service list so the UI never lies about
@@ -56,16 +69,18 @@ class AssistantDaemonService : Service() {
         }
     }
 
-    private val mainHandler = Handler(Looper.getMainLooper())
-    private var heartbeatStarted = false
+    // Long-lived scheduler scope — decoupled from callers so scheduled tasks
+    // and heartbeats keep firing as long as the OS keeps the process alive.
+    private val schedulerScope = CoroutineScope(
+        SupervisorJob() + Dispatchers.IO + kotlinx.coroutines.CoroutineName("AssistantScheduler")
+    )
 
-    private val heartbeat = object : Runnable {
-        override fun run() {
-            // Keep the process alive and mark activity; no user-facing work yet.
-            // Phase 2: drive scheduled tasks / feature dispatch from here.
-            mainHandler.postDelayed(this, HEARTBEAT_INTERVAL_MS)
-        }
-    }
+    private var schedulerJob: Job? = null
+
+    // Injected dependencies (set via BlackboxApplication or lazy init)
+    private var workspaceSession: WorkspaceAgentSession? = null
+    private var engineAdapter: AgentEngineAdapter? = null
+    private var featureAccess: com.blackbox.ai.agent.workspace.FeatureAccessStore? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -73,25 +88,36 @@ class AssistantDaemonService : Service() {
         super.onCreate()
         createNotificationChannel()
         val notification = buildNotification()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(
-                NOTIFICATION_ID,
-                notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-            )
-        } else {
-            startForeground(NOTIFICATION_ID, notification)
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(
+                    NOTIFICATION_ID,
+                    notification,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                )
+            } else {
+                startForeground(NOTIFICATION_ID, notification)
+            }
+        } catch (_: Exception) {
+            stopSelf()
+            return
         }
-        if (!heartbeatStarted) {
-            heartbeatStarted = true
-            mainHandler.postDelayed(heartbeat, HEARTBEAT_INTERVAL_MS)
+
+        // Initialize dependencies lazily
+        val app = applicationContext as? com.blackbox.ai.BlackboxApplication
+        if (app != null) {
+            workspaceSession = app.getWorkspaceSession()
+            engineAdapter = app.getEngineAdapter()
+            featureAccess = app.getFeatureAccessStore()
         }
+
+        // Start the scheduler loop
+        startScheduler()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP) {
-            mainHandler.removeCallbacks(heartbeat)
-            heartbeatStarted = false
+            stopScheduler()
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
             return START_NOT_STICKY
@@ -99,10 +125,50 @@ class AssistantDaemonService : Service() {
         return START_STICKY
     }
 
+    override fun onTimeout(startId: Int, fgsType: Int) {
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
+    }
+
     override fun onDestroy() {
-        mainHandler.removeCallbacks(heartbeat)
-        heartbeatStarted = false
+        stopScheduler()
+        schedulerScope.coroutineContext[Job]?.cancel()
         super.onDestroy()
+    }
+
+    private fun startScheduler() {
+        if (schedulerJob?.isActive == true) return
+        schedulerJob = schedulerScope.launch {
+            while (isActive) {
+                delay(POLL_INTERVAL_MS.milliseconds)
+                runSchedulerTick()
+            }
+        }
+    }
+
+    private fun stopScheduler() {
+        schedulerJob?.cancel()
+        schedulerJob = null
+    }
+
+    /**
+     * Main scheduler tick — runs periodic work (heartbeat, scheduled tasks, etc.)
+     * Mirrors Kai's TaskScheduler loop.
+     */
+    private fun runSchedulerTick() {
+        // Phase 2: drive scheduled tasks / feature dispatch from here.
+        // For now, just keep the process alive and optionally send a heartbeat.
+        
+        // TODO: Implement scheduled tasks (Kai pattern):
+        // - Poll TaskStore for due tasks
+        // - Execute with feature-access enforcement
+        // - Handle cron recurrence / exponential backoff
+        // - Send heartbeat notification if app not in foreground
+    }
+
+    // LifecycleEventObserver — track app foreground/background for heartbeat escalation
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        // Could track appInForeground here for heartbeat notification logic
     }
 
     private fun createNotificationChannel() {

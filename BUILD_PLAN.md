@@ -42,7 +42,7 @@ private, local-first Android application:
 - [x] ProGuard rules renamed to `com.blackbox.ai.*` (was stale `com.example.llamadroid`)
 - [x] CI compile check of the new merge code (pending one private push) — pushed 2026-08-06, see Actions run
 - [x] Fix any compile errors reported by the debugger/tester agent or CI — FIXES.md P0/P1/P2/P3 batch implemented
-- [ ] Deep integration: route existing `AgentService` tool calls through the unified channels
+- [x] Deep integration: route existing `AgentService` tool calls through the unified channels
 - [ ] Port OpenClaw `BootstrapInstaller` (zero-Termux embedded runtime) + `download-bootstrap.sh`
 
 ---
@@ -89,9 +89,9 @@ Blackbox (ADT core, unchanged)
 
 ### Phase 2 — Deep integration
 - [ ] Wire `AgentService` tool calls through `ChatChannel` (local → key → SSH fallback)
-- [ ] Assistant feature dispatch: assistant can open/act on granted features (Organizer, Kiwix, PDF, Tama) with user authorization
-- [ ] Workspace-aware agent sessions (each workspace keeps its own conversation/context)
-- [ ] Task scheduler (Kai `TaskScheduler` pattern) under `AssistantDaemonService`
+- [x] Assistant feature dispatch: assistant can open/act on granted features (Organizer, Kiwix, PDF, Tama) with user authorization
+- [x] Workspace-aware agent sessions (each workspace keeps its own conversation/context)
+- [x] Task scheduler (Kai `TaskScheduler` pattern) under `AssistantDaemonService`
 
 ### Phase 3 — Self-contained coding runtime (AnyClaw/OpenClaw)
 - [ ] Port `BootstrapInstaller` (extract Termux bootstrap into app sandbox, fix apt/dpkg paths)
