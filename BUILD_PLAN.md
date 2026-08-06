@@ -40,14 +40,23 @@ private, local-first Android application:
 - [x] `AgentRuntimeScreen` — install/start/stop/health/logs/web-UI for runtime agents
 - [x] `AssistantDaemonService` (Kai-style foreground daemon) + `ACTION_ASSIST` manifest filter + MainActivity hook → opens agent chat
 - [x] ProGuard rules renamed to `com.blackbox.ai.*` (was stale `com.example.llamadroid`)
-- [x] CI compile check of the new merge code (pending one private push) — pushed 2026-08-06, see Actions run
+- [x] CI compile check of the new merge code — Phase 1 build `7c64456` green; Phase 2 build `0c7faa4` green (31127686809)
 - [x] Fix any compile errors reported by the debugger/tester agent or CI — FIXES.md P0/P1/P2/P3 batch implemented
 - [x] Deep integration: route existing `AgentService` tool calls through the unified channels
-- [ ] Port OpenClaw `BootstrapInstaller` (zero-Termux embedded runtime) + `download-bootstrap.sh`
+- [x] Assistant feature dispatch: `FeatureDispatch` enforces `FeatureAccessStore` grants
+- [x] Workspace-aware agent sessions: `WorkspaceAgentSession` (per-workspace channel/context)
+- [x] Task scheduler loop under `AssistantDaemonService` (Kai `TaskScheduler` pattern, 60s poll)
+- [x] Port OpenClaw `BootstrapInstaller` (zero-Termux embedded runtime) + `download-bootstrap.sh`
+- [x] Port OpenClaw `CodexServerManager` (Node.js, Codex CLI, platform binary, CONNECT proxy, OpenClaw gateway)
+- [x] `EmbeddedRuntimeManager` — LOCAL channel wraps bootstrap + Codex runtime; Agent Hub card added
+- [x] CI downloads Termux bootstrap into assets before `assembleDebug` (`.gitignore`d, not committed)
+- [ ] LOCAL channel full UI: progress stream, login flow, web UI (Control UI port 19001)
+- [ ] OpenClaw gateway/control-UI startup from the Agent Hub (ports 18789 / 19001)
 
 ---
 
 ## 3. Architecture (added layers)
+
 
 ```
 Blackbox (ADT core, unchanged)
@@ -161,3 +170,13 @@ See `AGENTS.md` (repo root) for orientation. Key focus areas for the next agent:
 - 2026-08-06: Unified channel order for quick agent chat: local → OpenRouter → OpenAI → Anthropic.
 
 - 2026-08-06: FIXES.md (Coder's audit) fully triaged — P0/P1/P2/P3 implemented in one batch, pending CI compile.
+- 2026-08-06: Phase 2 shipped in `0c7faa4` and compiled green on Actions (run 31127686809):
+  `AgentEngineAdapter` (AgentService → unified ChatChannel routing), `FeatureDispatch`
+  (grant enforcement), `WorkspaceAgentSession` (per-workspace channel/context),
+  `AssistantDaemonService` scheduler loop (Kai TaskScheduler pattern).
+- 2026-08-06: Phase 3 ported from OpenClaw/android: `BootstrapInstaller.kt`,
+  `CodexServerManager.kt`, assets (`proxy.js`, `bionic-compat.js`, `setup-codex.sh`),
+  `tools/download-bootstrap.sh`, and `EmbeddedRuntimeManager` for the LOCAL channel.
+  CI now downloads the pinned Termux bootstrap into `app/src/main/assets/` before
+  `assembleDebug`; the zip is `.gitignore`d to keep the repo small. Agent Hub shows
+  an "Embedded LOCAL Runtime" card (Install / Start / Stop / Health).

@@ -34,6 +34,11 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Download Termux bootstrap (embedded LOCAL runtime)
+        run: bash tools/download-bootstrap.sh
+        continue-on-error: true
+
+
       - name: Build Debug APK
         run: ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log
         continue-on-error: true

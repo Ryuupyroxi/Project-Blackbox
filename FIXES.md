@@ -198,3 +198,19 @@ Implemented in one batch, ready for Coder to re-audit:
 - [x] **P3.12** Install console output no longer claims "Install complete" after every step; prints per-command tail and a single final result
 
 Status: awaiting CI compile after push. AGENTS.md now exists at repo root (orientation for Coder).
+
+---
+
+## Implementation status — updated by builder (2026-08-06, Phase 3)
+
+Phase 3 (self-contained LOCAL runtime) implemented, awaiting CI compile after push:
+
+- [x] **P3.13** Ported `BootstrapInstaller.kt` (Termux bootstrap extraction, symlinks, chmod, apt/dpkg path rewrite) → `app/src/main/java/com/blackbox/ai/runtime/`
+- [x] **P3.14** Ported `CodexServerManager.kt` (Node.js install, proot, Python, Codex CLI, platform binary via npm-tgz workaround, CONNECT proxy, `codex login --with-api-key`, OpenClaw gateway + control UI) → `app/src/main/java/com/blackbox/ai/runtime/`; remapped `com.codex.mobile` → `com.blackbox.ai`
+- [x] **P3.15** Assets copied: `proxy.js`, `bionic-compat.js`, `setup-codex.sh` → `app/src/main/assets/`
+- [x] **P3.16** `tools/download-bootstrap.sh` copied; CI runs it before `assembleDebug`; zip is `.gitignore`d
+- [x] **P3.17** `EmbeddedRuntimeManager` wraps bootstrap + Codex runtime for `WorkspaceChannel.LOCAL` (install/start/stop/login/health/runInPrefix)
+- [x] **P3.18** Agent Hub "Embedded LOCAL Runtime" card (Install / Start / Stop / Health)
+
+Next for Coder: re-audit the ported OpenClaw files for path remapping errors and verify the
+LOCAL channel works without Termux; review `EmbeddedRuntimeManager` timeouts and console stream.

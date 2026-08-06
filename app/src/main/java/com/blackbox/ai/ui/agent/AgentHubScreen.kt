@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.blackbox.ai.agent.runtime.AgentRuntimeManager
+import com.blackbox.ai.agent.runtime.EmbeddedRuntimeManager
 import com.blackbox.ai.agent.workspace.AgentWorkspace
 import com.blackbox.ai.agent.workspace.FeatureAccessStore
 import com.blackbox.ai.agent.workspace.WorkspaceChannel
@@ -76,6 +77,11 @@ fun AgentHubScreen(navController: NavController) {
     var termuxUser by remember { mutableStateOf(keys.getTermuxUser()) }
     var termuxPassword by remember { mutableStateOf(keys.getTermuxPassword()) }
     var termuxStatus by remember { mutableStateOf("Not connected") }
+
+    // Embedded LOCAL runtime state (zero-Termux channel)
+    var localRuntimeStatus by remember { mutableStateOf("Not installed") }
+    var localRuntimeOutput by remember { mutableStateOf("") }
+    var localRuntimeBusy by remember { mutableStateOf(false) }
 
     // Quick chat state
     var chatPrompt by remember { mutableStateOf("") }
@@ -266,7 +272,93 @@ fun AgentHubScreen(navController: NavController) {
                 }
             }
 
-            // ── API key channels ────────────────────────────────────────
+            // ── Embedded LOCAL runtime (zero-Termux channel) ───────────
+            item {
+                Card {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Embedded LOCAL Runtime", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            "Zero-setup coding runtime: Termux bootstrap, Node.js, and Codex CLI extracted into the app sandbox. No Termux or SSH server needed.",
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Status: $localRuntimeStatus", fontSize = 12.sp, color = Color.Gray)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Button(
+                                onClick = {
+                                    scope.launch {
+                                        localRuntimeBusy = true
+                                        localRuntimeOutput = ""
+                                        val result = EmbeddedRuntimeManager.install(context)
+                                        localRuntimeOutput = result.getOrElse { it.message ?: "Install failed" }
+                                        localRuntimeStatus = if (result.isSuccess) "Installed" else "Install failed"
+                                        localRuntimeBusy = false
+                                    }
+                                },
+                                enabled = !localRuntimeBusy,
+                                modifier = Modifier.weight(1f)
+                            ) { Text("Install") }
+                            Button(
+                                onClick = {
+                                    scope.launch {
+                                        localRuntimeBusy = true
+                                        localRuntimeOutput = ""
+                                        localRuntimeOutput = EmbeddedRuntimeManager.startServer(context)
+                                            .getOrElse { it.message ?: "Start failed" }
+                                        localRuntimeStatus = if (localRuntimeOutput.startsWith("Server running")) "Running" else localRuntimeOutput
+                                        localRuntimeBusy = false
+                                    }
+                                },
+                                enabled = !localRuntimeBusy,
+                                modifier = Modifier.weight(1f)
+                            ) { Text("Start") }
+                            Button(
+                                onClick = {
+                                    scope.launch {
+                                        localRuntimeBusy = true
+                                        localRuntimeOutput = EmbeddedRuntimeManager.stop(context)
+                                            .getOrElse { it.message ?: "Stop failed" }
+                                        localRuntimeStatus = "Stopped"
+                                        localRuntimeBusy = false
+                                    }
+                                },
+                                enabled = !localRuntimeBusy,
+                                modifier = Modifier.weight(1f)
+                            ) { Text("Stop") }
+                            Button(
+                                onClick = {
+                                    scope.launch {
+                                        localRuntimeBusy = true
+                                        localRuntimeOutput = ""
+                                        localRuntimeOutput = EmbeddedRuntimeManager.healthCheck(context)
+                                            .getOrElse { it.message ?: "Health failed" }
+                                        localRuntimeStatus = localRuntimeOutput
+                                        localRuntimeBusy = false
+                                    }
+                                },
+                                enabled = !localRuntimeBusy,
+                                modifier = Modifier.weight(1f)
+                            ) { Text("Health") }
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        if (localRuntimeOutput.isNotBlank()) {
+                            Text(
+                                localRuntimeOutput.takeLast(2400),
+                                fontSize = 11.sp,
+                                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            }
+
             item {
                 Card {
                     Column(modifier = Modifier.padding(16.dp)) {

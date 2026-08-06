@@ -33,3 +33,6 @@ Thumbs.db
 /captures
 .externalNativeBuild/
 .cxx/
+
+# Large runtime assets are downloaded at build time (see tools/download-bootstrap.sh)
+app/src/main/assets/bootstrap-*.zip
