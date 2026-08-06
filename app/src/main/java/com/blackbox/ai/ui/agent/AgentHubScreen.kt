@@ -19,9 +19,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import com.blackbox.ai.BlackboxApplication
 import com.blackbox.ai.agent.runtime.AgentRuntimeManager
 import com.blackbox.ai.agent.runtime.EmbeddedRuntimeManager
+import com.blackbox.ai.agent.voice.BlackboxVoice
 import com.blackbox.ai.agent.workspace.AgentWorkspace
 import com.blackbox.ai.agent.workspace.FeatureAccessStore
 import com.blackbox.ai.agent.workspace.WorkspaceChannel
@@ -88,6 +95,52 @@ fun AgentHubScreen(navController: NavController) {
     var chatResponse by remember { mutableStateOf("") }
     var chatLoading by remember { mutableStateOf(false) }
     var chatError by remember { mutableStateOf<String?>(null) }
+
+    // Voice round-trip state (Kai-style TTS/STT)
+    val voice = remember { (context.applicationContext as BlackboxApplication).getVoice() }
+    var voiceReady by remember { mutableStateOf(false) }
+    var listening by remember { mutableStateOf(false) }
+    var speakReplies by remember { mutableStateOf(false) }
+    DisposableEffect(Unit) {
+        voice.init { ready -> voiceReady = ready }
+        onDispose { voice.shutdown() }
+    }
+    val recordAudioPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            listening = true
+            voice.startListening(
+                onResult = { text ->
+                    chatPrompt = chatPrompt.trim().let { if (it.isBlank()) text else "$it $text" }
+                    listening = false
+                },
+                onError = { err ->
+                    chatError = err
+                    listening = false
+                }
+            )
+        } else {
+            chatError = "Microphone permission needed for voice input"
+        }
+    }
+    fun startListening() {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            listening = true
+            voice.startListening(
+                onResult = { text ->
+                    chatPrompt = chatPrompt.trim().let { if (it.isBlank()) text else "$it $text" }
+                    listening = false
+                },
+                onError = { err ->
+                    chatError = err
+                    listening = false
+                }
+            )
+        } else {
+            recordAudioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        }
+    }
 
     // Assistant daemon state
     var daemonEnabled by remember { mutableStateOf(AssistantDaemonService.isRunning(context)) }
@@ -467,9 +520,39 @@ fun AgentHubScreen(navController: NavController) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End,
+                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                IconButton(
+                                    onClick = {
+                                        if (listening) {
+                                            voice.stopListening()
+                                            listening = false
+                                        } else {
+                                            startListening()
+                                        }
+                                    },
+                                    enabled = voiceReady && !chatLoading
+                                ) {
+                                    Icon(
+                                        if (listening) Icons.Default.Stop else Icons.Default.Mic,
+                                        contentDescription = if (listening) "Stop listening" else "Voice input",
+                                        tint = if (listening) MaterialTheme.colorScheme.error else LocalContentColor.current
+                                    )
+                                }
+                                Text(
+                                    if (listening) "Listening…" else "Voice input",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Switch(checked = speakReplies, onCheckedChange = { speakReplies = it })
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Speak replies", fontSize = 12.sp)
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                             chatError?.let {
                                 Text(it, fontSize = 12.sp, color = MaterialTheme.colorScheme.error)
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -496,6 +579,7 @@ fun AgentHubScreen(navController: NavController) {
                                             result.fold(
                                                 onSuccess = {
                                                     chatResponse = "[via ${channel.label}]\n\n$it"
+                                                    if (speakReplies && voiceReady) voice.speak(it)
                                                     done = true
                                                 },
                                                 onFailure = { e ->
@@ -519,6 +603,7 @@ fun AgentHubScreen(navController: NavController) {
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text("Send")
                                 }
+                            }
                             }
                         }
                         if (chatResponse.isNotBlank()) {

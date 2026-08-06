@@ -52,6 +52,9 @@ private, local-first Android application:
 - [x] CI downloads Termux bootstrap into assets before `assembleDebug` (`.gitignore`d, not committed)
 - [ ] LOCAL channel full UI: progress stream, login flow, web UI (Control UI port 19001)
 - [ ] OpenClaw gateway/control-UI startup from the Agent Hub (ports 18789 / 19001)
+- [x] TTS/STT voice round-trip in agent chat (`BlackboxVoice` + mic / speak-replies in Quick Agent Chat)
+- [x] Heartbeat + scheduled tasks: daemon tick refreshes ADT `LlamaScheduledTaskScheduler` alarms + records heartbeat
+- [x] Calendar integration: `CalendarAccess` (create events, ISO parsing, reminders) gated by `FeatureAccessStore.FEATURE_CALENDAR`
 
 ---
 
@@ -180,3 +183,8 @@ See `AGENTS.md` (repo root) for orientation. Key focus areas for the next agent:
   CI now downloads the pinned Termux bootstrap into `app/src/main/assets/` before
   `assembleDebug`; the zip is `.gitignore`d to keep the repo small. Agent Hub shows
   an "Embedded LOCAL Runtime" card (Install / Start / Stop / Health).
+- 2026-08-06: Phase 4 core drafted (uncommitted at time of writing): `BlackboxVoice`
+  (TTS/STT round-trip), mic + speak-replies in Quick Agent Chat, `CalendarAccess`
+  (Kai CalendarRepository port, user-gated), and daemon heartbeat that re-asserts
+  ADT scheduled-task alarms every poll. Pushed together with Phase 3 to conserve
+  CI runs after the runner queue cancelled the Phase 3-only dispatch.

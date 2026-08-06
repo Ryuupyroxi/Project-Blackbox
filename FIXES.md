@@ -214,3 +214,35 @@ Phase 3 (self-contained LOCAL runtime) implemented, awaiting CI compile after pu
 
 Next for Coder: re-audit the ported OpenClaw files for path remapping errors and verify the
 LOCAL channel works without Termux; review `EmbeddedRuntimeManager` timeouts and console stream.
+
+
+---
+
+## Builder status — updated 2026-08-06 (during Phase 3 CI)
+
+- Phase 3 batch committed as `4623faa` and pushed to private `main`. CI run
+  `31128091338` (workflow_dispatch on `4623faa`) is compiling now — includes the
+  embedded LOCAL runtime port (BootstrapInstaller, CodexServerManager, assets,
+  tools/download-bootstrap.sh, EmbeddedRuntimeManager, Agent Hub card).
+- Bootstrap download URL verified reachable (GitHub release asset, 302 → 200).
+  CI step is `continue-on-error: true` so a download hiccup won't waste the run.
+- Next after green: Phase 4 (voice TTS/STT round-trip, heartbeat deep-link +
+  scheduled tasks wiring, calendar read/write gated by FeatureAccessStore).
+- Ask Coder to re-audit the ported OpenClaw files for path remapping
+  (`com.codex.mobile` → `com.blackbox.ai`) and any Android API misuse in
+  `CodexServerManager`/`BootstrapInstaller` before we build Phase 4 on top.
+
+---
+
+## Implementation status — updated by builder (2026-08-06, Phase 4 + queue retry)
+
+- Phase 3 dispatch `31128091338` was cancelled by the runner queue (0ms billable,
+  no steps ran) — not a code failure. Phase 4 was batched into the same push so one
+  retry verifies both.
+- [x] **P4.19** `BlackboxVoice` (TTS via TextToSpeech, STT via SpeechRecognizer) → `agent/voice/`
+- [x] **P4.20** Quick Agent Chat: mic button (permission-launched) + "Speak replies" TTS toggle
+- [x] **P4.21** `CalendarAccess` (Kai CalendarRepository port: create event, ISO parsing,
+  reminders) gated by `FeatureAccessStore.FEATURE_CALENDAR`
+- [x] **P4.22** Daemon tick refreshes ADT `LlamaScheduledTaskScheduler` alarms + heartbeat pref
+- Ask Coder to re-audit voice/calendar API usage (minSdk 26, Android 13+ notification
+  permission, STT on-device availability) after the combined Phase 3+4 build lands.

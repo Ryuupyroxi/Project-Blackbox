@@ -41,6 +41,8 @@ class AssistantDaemonService : Service(), LifecycleEventObserver {
         private const val POLL_INTERVAL_MS = 60_000L
         private const val MAX_BACKOFF_MS = 3_600_000L // 1 hour
         private const val HEARTBEAT_PREVIEW_CHARS = 240
+        private const val PREFS_NAME = "blackbox_assistant_prefs"
+        private const val KEY_LAST_HEARTBEAT = "last_heartbeat_at"
 
         /**
          * Derived from the real system service list so the UI never lies about
@@ -155,15 +157,18 @@ class AssistantDaemonService : Service(), LifecycleEventObserver {
      * Main scheduler tick — runs periodic work (heartbeat, scheduled tasks, etc.)
      * Mirrors Kai's TaskScheduler loop.
      */
-    private fun runSchedulerTick() {
-        // Phase 2: drive scheduled tasks / feature dispatch from here.
-        // For now, just keep the process alive and optionally send a heartbeat.
-        
-        // TODO: Implement scheduled tasks (Kai pattern):
-        // - Poll TaskStore for due tasks
-        // - Execute with feature-access enforcement
-        // - Handle cron recurrence / exponential backoff
-        // - Send heartbeat notification if app not in foreground
+    private suspend fun runSchedulerTick() {
+        // Real daemon work: keep ADT's scheduled tasks fresh and record a heartbeat.
+        // ADT owns the actual task store (LlamaScheduledTaskScheduler); the daemon
+        // re-asserts alarms so a killed process doesn't leave tasks stuck.
+        runCatching {
+            LlamaScheduledTaskScheduler.rescheduleAll(this)
+        }.onFailure { e ->
+            android.util.Log.w("AssistantDaemon", "rescheduleAll failed: ${e.message}")
+        }
+
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putLong(KEY_LAST_HEARTBEAT, System.currentTimeMillis()).apply()
     }
 
     // LifecycleEventObserver — track app foreground/background for heartbeat escalation

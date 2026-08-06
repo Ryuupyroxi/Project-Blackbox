@@ -6,11 +6,13 @@ import android.content.res.Configuration
 import android.database.sqlite.SQLiteDatabase
 import androidx.work.WorkManager
 import com.blackbox.ai.R
+import com.blackbox.ai.agent.workspace.CalendarAccess
 import com.blackbox.ai.agent.workspace.FeatureAccessStore
 import com.blackbox.ai.agent.workspace.WorkspaceAgentSession
 import com.blackbox.ai.agent.workspace.WorkspaceStore
 import com.blackbox.ai.data.AppContainer
 import com.blackbox.ai.data.DefaultAppContainer
+import com.blackbox.ai.agent.voice.BlackboxVoice
 import com.blackbox.ai.engine.AgentEngineAdapter
 import com.blackbox.ai.engine.EngineKeysStore
 import com.blackbox.ai.service.AiRuntimeJobStore
@@ -44,6 +46,8 @@ class BlackboxApplication : Application() {
     private var _featureAccessStore: FeatureAccessStore? = null
     private var _workspaceSession: WorkspaceAgentSession? = null
     private var _engineAdapter: AgentEngineAdapter? = null
+    private var _calendarAccess: CalendarAccess? = null
+    private var _voice: BlackboxVoice? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -60,6 +64,8 @@ class BlackboxApplication : Application() {
         _featureAccessStore = FeatureAccessStore(this)
         _workspaceSession = WorkspaceAgentSession(this, _engineKeysStore!!, _workspaceStore!!)
         _engineAdapter = AgentEngineAdapter(this, _engineKeysStore!!)
+        _calendarAccess = CalendarAccess(this, _featureAccessStore!!)
+        _voice = BlackboxVoice(this)
 
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             runRemovedLlmTrainingCleanupOnce()
@@ -121,6 +127,8 @@ class BlackboxApplication : Application() {
     fun getFeatureAccessStore(): FeatureAccessStore = _featureAccessStore!!
     fun getWorkspaceSession(): WorkspaceAgentSession = _workspaceSession!!
     fun getEngineAdapter(): AgentEngineAdapter = _engineAdapter!!
+    fun getCalendarAccess(): CalendarAccess = _calendarAccess!!
+    fun getVoice(): BlackboxVoice = _voice!!
 
     private fun installCrashBreadcrumbHandler() {
         val previousHandler = Thread.getDefaultUncaughtExceptionHandler()
