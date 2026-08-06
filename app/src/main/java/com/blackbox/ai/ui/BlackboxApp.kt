@@ -285,6 +285,7 @@ fun BlackboxApp(
         Screen.NotesManager,
         Screen.Tama,  // Virtual pet tab
         Screen.ModelManager,
+        Screen.Agents,
         Screen.Settings
     )
     
@@ -325,6 +326,14 @@ fun BlackboxApp(
                             Screen.LiteRtModels.route
                         )
                     
+                    // For Agents, also highlight agent-related sub-screens
+                    val isAgentRoute = screen == Screen.Agents &&
+                        currentRoute in listOf(
+                            Screen.Agents.route, Screen.Agent.route,
+                            Screen.AgentRuntime.route, Screen.AgentImporter.route,
+                            Screen.AgentWorkspace.route
+                        )
+                    
                     NavigationBarItem(
                         icon = { 
                             when(screen) {
@@ -333,6 +342,7 @@ fun BlackboxApp(
                                 Screen.NotesManager -> Icon(Icons.Default.Edit, null)
                                 Screen.Tama -> Icon(Icons.Default.Favorite, null)  // Heart for pet
                                 Screen.ModelManager -> Icon(Icons.Default.Star, null)
+                                Screen.Agents -> Icon(Icons.Default.SmartToy, null)
                                 Screen.Settings -> Icon(Icons.Default.Settings, null)
                                 Screen.Logs -> Icon(Icons.Default.Info, null)
                                 else -> Icon(Icons.Default.Home, null)
@@ -346,13 +356,14 @@ fun BlackboxApp(
                                     Screen.NotesManager -> stringResource(R.string.nav_notes)
                                     Screen.Tama -> stringResource(R.string.nav_tama)
                                     Screen.ModelManager -> stringResource(R.string.nav_models)
+                                    Screen.Agents -> stringResource(R.string.nav_agents)
                                     Screen.Settings -> stringResource(R.string.nav_settings)
                                     Screen.Logs -> stringResource(R.string.nav_logs)
                                     else -> ""
                                 }
                             )
                         },
-                        selected = currentRoute == screen.route || isAIRoute || isModelRoute,
+                        selected = currentRoute == screen.route || isAIRoute || isModelRoute || isAgentRoute,
                         onClick = {
                             // For hub screens, don't restore state - always go to hub
                             // This lets users switch between sub-screens
@@ -529,6 +540,12 @@ fun BlackboxApp(
             // AI Agent
             composable(Screen.Agent.route) {
                 com.blackbox.ai.ui.agent.AgentScreen(navController)
+            }
+            composable(Screen.Agents.route) {
+                com.blackbox.ai.ui.agent.AgentHubScreen(navController)
+            }
+            composable(Screen.AgentRuntime.route) {
+                com.blackbox.ai.ui.agent.AgentRuntimeScreen(navController)
             }
             
             // Tama Farming

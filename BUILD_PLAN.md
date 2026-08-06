@@ -1,95 +1,163 @@
-# Blackbox — Full Build Plan (DRAFT)
+# Blackbox — Master Build Plan (LIVING DOCUMENT)
 
-> Author: Hermes (reins handed over by Kevin). 2026-08-01.
-> Grounded in: repo inspection + GitHub `Project-Blackbox` + ADT upstream comparison.
-> Status: PLAN ONLY. Do not execute until SDK install confirmed by Kevin.
+> Maintained continuously as the merge progresses. Updated: 2026-08-06.
+> This is the single source of truth for what Blackbox is, what has been built,
+> what is next, and where the code lives. The debugger/tester agent reads this
+> file first, then `AGENTS.md`.
 
-## 0. Critical finding (read first)
-The extracted/bundled repo is a **partial snapshot** of AI-Doomsday-Toolbox. `app/build.gradle.kts`
-references files that are NOT in the repo (neither bundle nor GitHub `Project-Blackbox`):
-- `gradlew` + `gradle-wrapper.jar`  → MISSING (CI regenerates via checkout+chmod, but not committed)
-- `app/src/main/cpp/CMakeLists.txt` (declared in `externalNativeBuild`) → MISSING
-- `tools/tama_dialog_excel.py` (Gradle task runs it) → MISSING
-- `app/src/main/tama-dialogs/pet_dialogs.xlsx` (input to that task) → MISSING
-- dynamic feature modules (`feature_*`, `asset_upscaler`) → MISSING (and `settings.gradle.kts`
-  already disables them: "TEMP: disabled - no source")
+---
 
-ADT upstream HAS: gradlew, gradle-wrapper.jar, cpp/CMakeLists.txt, tools/tama_dialog_excel.py,
-tama-dialogs/pet_dialogs.xlsx. So the fix is to **restore the missing build-support files from
-upstream ADT** (Apache-2.0, compatible) and disable the dynamic-feature + asset-pack blocks that
-have no source. Then build debug APK.
+## 1. Goal
 
-## 1. Toolchain (what Kevin is installing)
-- Android SDK (cmdline-tools, platforms-35, build-tools) — IN PROGRESS
-- Plus we must add (after SDK lands):
-  - JDK 17 (Temurin) — CI uses '17'; `libs.versions.toml` AGP 8.6 needs JDK 17
-  - NDK 29.0.14206865 (exact version pinned in build.gradle; `sdkmanager "ndk;29.0.14206865"`)
-  - CMake 3.22.1 (pinned; `sdkmanager "cmake;3.22.1"`)
-  - Python 3 (for the Tama dialog Excel→JSON task)
-  - ~4–6 GB download total
+**One app.** Merge the capabilities of four proven projects into a single,
+private, local-first Android application:
 
-## 2. Restore missing build-support files from ADT upstream
-```bash
-UP=https://github.com/ManuXD32/AI-Doomsday-Toolbox
-# wrapper (so ./gradlew works)
-gh api repos/ManuXD32/AI-Doomsday-Toolbox/contents/gradlew --jq '.content' | base64 -d > gradlew
-gh api repos/ManuXD32/AI-Doomsday-Toolbox/contents/gradle/wrapper/gradle-wrapper.jar --jq '.content' | base64 -d > gradle/wrapper/gradle-wrapper.jar
-chmod +x gradlew
-# native build (CPU feature detection via arm64 headers)
-mkdir -p app/src/main/cpp && (download cpp/CMakeLists.txt + sources from $UP/app/src/main/cpp)
-# Tama dialog generator
-mkdir -p tools && (download tools/tama_dialog_excel.py from $UP)
-mkdir -p app/src/main/tama-dialogs && (download app/src/main/tama-dialogs/pet_dialogs.xlsx from $UP)
+| Source | What it contributes | Repo |
+|---|---|---|
+| AI-Doomsday-Toolbox (ADT) | Local AI core: llama.cpp chat, models, media gen, voice, Kiwix, Organizer, Tama/P.E.T., Termux+SSH tools, PDF/dataset tools | `ManuXD32/AI-Doomsday-Toolbox` (already the base of this repo) |
+| AnyClaw / OpenClaw-android | Self-contained coding runtime: Termux bootstrap in app sandbox, Node.js, proot, Codex CLI, OpenClaw gateway | `OpenClawAndroid/openclaw-android-assistant` |
+| Kai | Voice-first assistant: background daemon, `ACTION_ASSIST` entry, task scheduler, calendar, TTS/STT | `SimonSchubert/Kai` |
+| termux-agents-hub | Agent manager: install/launch/health/session-history for Hermes, Codex, OpenClaw | `Ryuupyroxi/termux-agents-hub` |
+
+**Hard constraints**
+- Repo stays **private** until the app is finished. No Play Store push yet.
+- No local JDK/SDK on the dev box → **compile verification happens on GitHub Actions** (push to private `main` triggers `build.yml`). Use CI runs sparingly.
+- Do **not** lose essential ADT code when merging. Everything new is additive; ADT services/screens remain untouched unless explicitly noted.
+
+---
+
+## 2. Current Status (2026-08-06)
+
+- [x] Debug APK builds on GitHub Actions (94 MB, arm64-v8a) — heap settings fixed in `gradle.properties`
+- [x] Agents bottom tab added (route `Screen.Agents`, label `nav_agents`)
+- [x] New routes: `Screen.AgentRuntime`, `Screen.Agents`
+- [x] `EngineKeysStore` — API keys (OpenAI / OpenRouter / Anthropic) + local server + Termux SSH settings
+- [x] `ChatChannel` + `ChatChannelClient` — unified chat engine: local llama/Ollama OR any API key
+- [x] `WorkspaceStore` — multi-workspace support (add/switch/delete, per-workspace channel Local/SSH/Kai)
+- [x] `FeatureAccessStore` — assistant feature authorization grants (Organizer, Notes, Calendar, Kiwix, PDF, Tama, Models, Chat)
+- [x] `RuntimeAgent` catalog + `AgentRuntimeManager` — Hermes / Codex CLI / OpenClaw over the local Termux/Ubuntu SSH channel (commands from termux-agents-hub)
+- [x] `AgentHubScreen` — channel status, API keys, workspace manager, quick agent chat, daemon toggle
+- [x] `AgentRuntimeScreen` — install/start/stop/health/logs/web-UI for runtime agents
+- [x] `AssistantDaemonService` (Kai-style foreground daemon) + `ACTION_ASSIST` manifest filter + MainActivity hook → opens agent chat
+- [x] ProGuard rules renamed to `com.blackbox.ai.*` (was stale `com.example.llamadroid`)
+- [x] CI compile check of the new merge code (pending one private push) — pushed 2026-08-06, see Actions run
+- [x] Fix any compile errors reported by the debugger/tester agent or CI — FIXES.md P0/P1/P2/P3 batch implemented
+- [ ] Deep integration: route existing `AgentService` tool calls through the unified channels
+- [ ] Port OpenClaw `BootstrapInstaller` (zero-Termux embedded runtime) + `download-bootstrap.sh`
+
+---
+
+## 3. Architecture (added layers)
+
 ```
-> Verify each restored file is byte-identical to upstream where Blackbox made no changes.
-> If Blackbox DID modify any of these, prefer the Blackbox version (none found yet).
-
-## 3. Disable blocks with no source (avoid build failure)
-In `app/build.gradle.kts`, neutralize (comment out) the dynamic-feature + asset-pack references
-since the modules don't exist:
-- `assetPacks += setOf(":asset_upscaler")`  (line ~141)
-- `dynamicFeatures += setOf(...)`  (lines ~146-152)
-(They reference modules that are absent; leaving them in fails config resolution.)
-Keep `externalNativeBuild { cmake ... }` — it has source after step 2.
-
-## 4. Environment
-```bash
-export ANDROID_HOME=$HOME/Android/Sdk      # or wherever Kevin installs
-export JAVA_HOME=$(path to JDK17)
-export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
-sdkmanager "platforms;android-35" "build-tools;35.0.0" "ndk;29.0.14206865" "cmake;3.22.1"
+Blackbox (ADT core, unchanged)
+└── Agents tab (bottom nav)                        → ui/agent/AgentHubScreen.kt
+    ├── Workspaces (multi, per-workspace channel)  → agent/workspace/WorkspaceStore.kt
+    ├── Engine channels (local OR any API key)     → engine/EngineKeysStore.kt, engine/ChatChannel.kt
+    ├── Runtime agents (Termux/SSH channel)        → agent/runtime/RuntimeAgent.kt, AgentRuntimeManager.kt
+    ├── Runtime manager screen                     → ui/agent/AgentRuntimeScreen.kt
+    └── Assistant daemon (Kai-style)               → service/AssistantDaemonService.kt
+                                                     + MainActivity ACTION_ASSIST → Screen.Agent
 ```
 
-## 5. Build
-```bash
-cd ~/projects/blackbox
-./gradlew assembleDebug --no-daemon --stacktrace
-# output: app/build/outputs/apk/debug/app-debug.apk
-```
-If CMake native build complains (no `.so` produced), the app still compiles Kotlin; native piece
-is only CPU-feature detection (`CpuFeatures.kt`) — low risk.
+**Unified engine concept** — every feature can run through:
+1. **Local**: on-device OpenAI-compatible server (llama.cpp / Ollama), URL editable in Agent Hub
+2. **SSH**: local Termux/Ubuntu runtime (ADT style, default `127.0.0.1:8025`)
+3. **Kai**: assistant daemon (voice-first, `ACTION_ASSIST`)
+4. **Any API key**: OpenAI / OpenRouter / Anthropic — stored in `blackbox_engine` prefs, testable in the hub
 
-## 6. Risks / gotchas
-- **Gradle version**: wrapper pins 8.11.1. If network to services.gradle.org is blocked, fall
-  back to system Gradle 8.11.1 if installable, else adjust wrapper.
-- **First build downloads ~hundreds of Maven deps** (ONNX 1.21, LiteRT-LM, parquet, ML Kit,
-  play-delivery, etc.) — needs internet; large (first sync ~1–2 GB).
-- **play-delivery / asset-delivery** libs are fine for debug; only matter for Play publishing.
-- **`AppContainer` is an empty stub** (DI not wired) — may or may not break runtime; compile is fine.
-- **NDK exact version 29.0.14206865** must match or CMake config fails.
+**Workspaces** — `WorkspaceStore` seeds ADT's `default_project` so nothing is lost.
+`AgentService.setCurrentProjectFolder(folder)` switches the active workspace
+(brain path `/workspace/<folder>`). Each workspace remembers its execution channel.
 
-## 7. Acceptance (done when)
-- [ ] `./gradlew assembleDebug` succeeds
-- [ ] `app-debug.apk` produced
-- [ ] APK installs + opens on arm64 device/emulator (runtime check later)
-- [ ] Rebrand strings verified present (Blackbox, no Doomsday/llamadroid)
+---
 
-## 8. After build works
-Then tackle the real Blackbox differentiator: **B1 self-contained coding runtime** (Node24/ARM64,
-no Termux) layered beside ADT's Termux path. Separate plan.
+## 4. Step-by-Step Tasks
 
-## Open decisions for Kevin
-- D1: OK to restore build-support files (gradlew, cpp/, tools/, tama-dialogs/) from upstream ADT
-  (Apache-2.0, same license) to make the build work? (Recommended — they're build infra, not app logic)
-- D2: Confirm SDK install path so I set ANDROID_HOME correctly.
-- D3: Where to install JDK17/NDK/CMake — system or a local toolchain dir under ~/projects/blackbox/.toolchain?
+### Phase 1 — Foundation (DONE, needs CI compile)
+- [x] Add `Screen.Agents` + `Screen.AgentRuntime` routes
+- [x] Add `nav_agents` string
+- [x] `EngineKeysStore` (API keys + local + Termux settings)
+- [x] `ChatChannel` / `ChatChannelClient` (local + OpenAI + OpenRouter + Anthropic)
+- [x] `WorkspaceStore` / `FeatureAccessStore`
+- [x] `RuntimeAgent` catalog + `AgentRuntimeManager` (SSH-driven)
+- [x] `AgentHubScreen` / `AgentRuntimeScreen`
+- [x] `AssistantDaemonService` + manifest + MainActivity assist hook
+- [x] Bottom nav: Agents tab wired in `BlackboxApp.kt`
+- [x] ProGuard package renames
+- [ ] Push to private repo → CI compile check → fix errors
+
+### Phase 2 — Deep integration
+- [ ] Wire `AgentService` tool calls through `ChatChannel` (local → key → SSH fallback)
+- [ ] Assistant feature dispatch: assistant can open/act on granted features (Organizer, Kiwix, PDF, Tama) with user authorization
+- [ ] Workspace-aware agent sessions (each workspace keeps its own conversation/context)
+- [ ] Task scheduler (Kai `TaskScheduler` pattern) under `AssistantDaemonService`
+
+### Phase 3 — Self-contained coding runtime (AnyClaw/OpenClaw)
+- [ ] Port `BootstrapInstaller` (extract Termux bootstrap into app sandbox, fix apt/dpkg paths)
+- [ ] Add `scripts/download-bootstrap.sh` + bundle `bootstrap-aarch64.zip` at build time
+- [ ] Node.js + Codex CLI install flow (`CodexServerManager` pattern)
+- [ ] OpenClaw gateway + control UI ports (18789 / 19001)
+- [ ] Workspace channel `LOCAL` uses this embedded runtime
+
+### Phase 4 — Voice assistant (Kai deep)
+- [ ] TTS/STT voice round-trip in agent chat
+- [ ] Heartbeat deep-link + scheduled tasks
+- [ ] Calendar integration (read/write, user-gated)
+
+---
+
+## 5. Reference Source (cloned locally at `/tmp/ref/`)
+
+| App | Key files to steal patterns from |
+|---|---|
+| ADT | `SSHService.kt`, `TermuxTools.kt`, `AgentService.kt` (already in this repo) |
+| OpenClaw | `BootstrapInstaller.kt`, `CodexServerManager.kt`, `CodexForegroundService.kt`, `scripts/download-bootstrap.sh` |
+| Kai | `DaemonService.kt`, `DaemonController.android.kt`, `TaskScheduler.kt`, `DataRepository.kt` (assist/heartbeat) |
+| termux-agents-hub | `termux-agents-hub.sh` (install/launch/health commands, ports, session history) |
+
+---
+
+## 6. Known Risks / Open Items
+
+- **CI run budget**: only a few GitHub Actions runs/day. Batch pushes; do not push per-file.
+- **Compose compile risks** in new screens: verify icons used exist in material-icons-extended (`SmartToy`, `MonitorHeart`); avoid composables-in-LaunchedEffect; keep Material3 API usage standard.
+- **SSH availability**: runtime agents require the Termux-hosted Ubuntu SSH channel (port 8025) or Termux SSH (8022) — the app already ships the tooling (`SSHService`); user config lives in Agent Hub.
+- **Large-file merge discipline**: never rewrite `AgentService.kt` wholesale; add adapter layers instead.
+- **Release**: keystore/secrets, version bump, and Play readiness are intentionally deferred until the merge is finished.
+
+---
+
+## 7. Handoff to Debugger/Tester Agent
+
+See `AGENTS.md` (repo root) for orientation. Key focus areas for the next agent:
+1. Compile the private `main` on GitHub Actions after the next push; fix Kotlin/Compose errors.
+2. Audit new files for API misuse: `agent/runtime/`, `agent/workspace/`, `engine/`, `ui/agent/AgentHubScreen.kt`, `ui/agent/AgentRuntimeScreen.kt`, `service/AssistantDaemonService.kt`.
+3. Confirm no ADT functionality was removed (diff scope is purely additive).
+4. Suggest improvements — record them in this file under "Decisions & Improvements" below.
+
+## 8. Decisions & Improvements (append-only)
+
+- 2026-08-06: Debugger audit produced `FIXES.md` (plan only, no code). Summary:
+  - **P0 (compile blocker):** `ui/agent/AgentRuntimeScreen.kt:86` — `connected = true` on a
+    `val ...collectAsState()` delegate (State has no setter) → fail `assembleDebug`. Delete the line.
+  - **P1:** assist gesture needs a real `AssistService` + `singleTop` (manifest filter alone doesn't
+    hook the system gesture); Quick Chat should fall through to next enabled channel instead of
+    always hitting local-first; `AssistantDaemonService` running flag goes stale (derive from real
+    FGS, use `stopService`); SSH exec has no timeout (wrap install/start); tighten stop patterns +
+    DEAD vs MISSING health; wire (or hide) `WorkspaceChannel`/grants/daemon.
+  - **P2:** encrypt `EngineKeysStore` secrets + exclude `blackbox_engine` from backups.
+  - **P3:** strings/indent, 7-item nav, Anthropic role mapping, install console copy.
+  - Suggested order for one batched CI push: P0 → P1 → P2 → P3.
+- 2026-08-06: Reference sources re-audited (`/tmp/ref/{adt,kai,openclaw,tah}`) for the fix
+  plan. Key deltas captured in `FIXES.md` §"Reference context": runtime agents must pass
+  `EngineKeysStore` keys at launch (tah `launch_background`), install base deps once, use
+  `pgrep` health (Codex has no HTTP port), free-port fallback; Phase 3 ports
+  `BootstrapInstaller.kt` + `download-bootstrap.sh` with package paths remapped
+  `com.codex.mobile` → `com.blackbox.ai`; Kai `DaemonService` should try/catch
+  `startForeground`, add `onTimeout`, and host a `TaskScheduler`-style long-lived scope.
+- 2026-08-06: SID-OS integration deferred — no new SID work this cycle (`AgentImporter` stays as-is).
+- 2026-08-06: No Play Store until the merge is finished.
+- 2026-08-06: Unified channel order for quick agent chat: local → OpenRouter → OpenAI → Anthropic.
+
+- 2026-08-06: FIXES.md (Coder's audit) fully triaged — P0/P1/P2/P3 implemented in one batch, pending CI compile.

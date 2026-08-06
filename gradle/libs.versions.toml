@@ -1,4 +1,5 @@
 [versions]
+securityCrypto = "1.0.0"
 agp = "8.6.0"
 kotlin = "1.9.22"
 coreKtx = "1.12.0"
@@ -61,6 +62,7 @@ pdfbox = { group = "com.tom-roush", name = "pdfbox-android", version.ref = "pdfb
 # Apache Commons Compress for tar extraction
 commons-compress = { group = "org.apache.commons", name = "commons-compress", version = "1.26.1" }
 xz = { group = "org.tukaani", name = "xz", version = "1.9" }
+androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

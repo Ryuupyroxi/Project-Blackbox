@@ -6748,4 +6748,5 @@
     <string name="ai_servers_type_docs_datasets_desc">PDF tools, summaries, translation paths, video summaries, and dataset projects.</string>
     <string name="ai_servers_type_llama_chat">Llama Chat</string>
     <string name="ai_servers_type_llama_chat_desc">Native Llama chats, server status, attachments, and chat history from the browser.</string>
+    <string name="nav_agents">Agents</string>
 </resources>

@@ -24,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import com.blackbox.ai.ui.theme.BlackboxTheme
 import com.blackbox.ai.ui.BlackboxApp
+import com.blackbox.ai.ui.navigation.Screen
 import com.blackbox.ai.service.GenerationDiagnosticsStore
 import com.blackbox.ai.service.DatasetForegroundService
 import com.blackbox.ai.tama.notifications.TamaNotificationScheduler
@@ -163,6 +164,7 @@ class MainActivity : ComponentActivity() {
         // Handle share intent
         handleShareIntent(intent)
         pendingNavigationRoute.value = extractNavigationRoute(intent)
+        handleAssistIntent(intent)
 
         GenerationDiagnosticsStore.consumePendingRelaunchWarning()?.let {
             Toast.makeText(
@@ -193,6 +195,7 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         handleShareIntent(intent)
         pendingNavigationRoute.value = extractNavigationRoute(intent)
+        handleAssistIntent(intent)
     }
 
     override fun onStart() {
@@ -224,6 +227,16 @@ class MainActivity : ComponentActivity() {
 
     private fun extractNavigationRoute(intent: Intent?): String? {
         return intent?.getStringExtra(EXTRA_OPEN_ROUTE)
+    }
+
+    /**
+     * Kai-style assist entry: the system assist gesture (long-press home /
+     * power button) opens the agent chat directly.
+     */
+    private fun handleAssistIntent(intent: Intent?) {
+        if (intent?.action == Intent.ACTION_ASSIST) {
+            pendingNavigationRoute.value = Screen.Agent.route
+        }
     }
 
     @Suppress("DEPRECATION")

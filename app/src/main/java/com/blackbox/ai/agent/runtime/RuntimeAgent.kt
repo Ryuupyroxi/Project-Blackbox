@@ -1,0 +1,90 @@
+package com.blackbox.ai.agent.runtime
+
+/**
+ * A coding agent that can be installed and run inside the local Termux/Ubuntu
+ * runtime over the SSH channel. The commands below are taken directly from the
+ * termux-agents-hub script so behavior matches the proven Termux workflow.
+ */
+data class RuntimeAgent(
+    val id: String,
+    val name: String,
+    val emoji: String,
+    val description: String,
+    val port: Int,
+    val webUrl: String?,
+    val installCheckCommand: String,
+    val installCommands: List<String>,
+    val runCommand: String,
+    val stopPattern: String
+)
+
+object AgentCatalog {
+
+    private const val DEPS = "if command -v pkg >/dev/null 2>&1; then pkg install -y nodejs python git curl 2>&1; else DEBIAN_FRONTEND=noninteractive apt-get update -y 2>&1 && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs npm python3 python3-pip curl git 2>&1; fi"
+
+    val hermesDashboard = RuntimeAgent(
+        id = "hermes-dashboard",
+        name = "Hermes Dashboard",
+        emoji = "🪄",
+        description = "Nous Research agent dashboard web UI",
+        port = 9119,
+        webUrl = "http://127.0.0.1:9119",
+        installCheckCommand = "command -v hermes >/dev/null 2>&1 && echo INSTALLED || echo MISSING",
+        installCommands = listOf(
+            DEPS,
+            "pip install --no-input hermes-agent 2>&1 || pip3 install --no-input hermes-agent 2>&1"
+        ),
+        runCommand = "hermes dashboard --host 0.0.0.0 --port 9119 --no-open",
+        stopPattern = "hermes.*dashboard"
+    )
+
+    val hermesApi = RuntimeAgent(
+        id = "hermes-serve",
+        name = "Hermes API",
+        emoji = "🪄",
+        description = "Hermes chat API server (OpenAI-compatible)",
+        port = 9120,
+        webUrl = "http://127.0.0.1:9120",
+        installCheckCommand = "command -v hermes >/dev/null 2>&1 && echo INSTALLED || echo MISSING",
+        installCommands = listOf(
+            DEPS,
+            "pip install --no-input hermes-agent 2>&1 || pip3 install --no-input hermes-agent 2>&1"
+        ),
+        runCommand = "hermes chat --host 0.0.0.0 --port 9120",
+        stopPattern = "hermes.*serve"
+    )
+
+    val codex = RuntimeAgent(
+        id = "codex",
+        name = "Codex CLI",
+        emoji = "🤖",
+        description = "OpenAI Codex CLI coding agent",
+        port = 8082,
+        webUrl = null,
+        installCheckCommand = "command -v codex >/dev/null 2>&1 && echo INSTALLED || echo MISSING",
+        installCommands = listOf(
+            DEPS,
+            "npm install -g --no-audit --no-fund @openai/codex 2>&1"
+        ),
+        runCommand = "codex",
+        stopPattern = "node.*codex"
+    )
+
+    val openclaw = RuntimeAgent(
+        id = "openclaw",
+        name = "OpenClaw Gateway",
+        emoji = "🐙",
+        description = "Multi-agent gateway with web control UI",
+        port = 18789,
+        webUrl = "http://127.0.0.1:18789",
+        installCheckCommand = "command -v openclaw >/dev/null 2>&1 && echo INSTALLED || echo MISSING",
+        installCommands = listOf(
+            DEPS,
+            "npm install -g --no-audit --no-fund openclaw 2>&1"
+        ),
+        runCommand = "openclaw gateway --host 0.0.0.0 --port 18789",
+        stopPattern = "openclaw"
+    )
+
+    val all = listOf(hermesDashboard, hermesApi, codex, openclaw)
+}

@@ -195,6 +195,9 @@ dependencies {
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.work.runtime.ktx)
     
+    // Encrypted storage for API keys (EngineKeysStore)
+    implementation(libs.androidx.security.crypto)
+    
     // Document file support for SAF
     implementation("androidx.documentfile:documentfile:1.0.1")
     

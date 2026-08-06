@@ -4,8 +4,8 @@
 }
 
 # Keep Kotlin data classes for serialization
--keep class com.example.llamadroid.data.** { *; }
--keep class com.example.llamadroid.service.**.* { *; }
+-keep class com.blackbox.ai.data.** { *; }
+-keep class com.blackbox.ai.service.**.* { *; }
 
 # Keep Room entities
 -keep class * extends androidx.room.RoomDatabase { *; }
@@ -34,7 +34,7 @@
 -keep class androidx.compose.** { *; }
 
 # Keep model classes that might be serialized
--keep class com.example.llamadroid.**.model.** { *; }
+-keep class com.blackbox.ai.**.model.** { *; }
 
 # Preserve line numbers for crash reports
 -keepattributes SourceFile,LineNumberTable
@@ -51,13 +51,13 @@
 -keep class * extends com.google.gson.reflect.TypeToken
 
 # Explicitly keep HuggingFace API DTOs (Gson needs these for generic List<T>)
--keep class com.example.llamadroid.data.api.HfModelDto { *; }
--keep class com.example.llamadroid.data.api.HfRepoInfoDto { *; }
--keep class com.example.llamadroid.data.api.HfSiblingDto { *; }
--keep class com.example.llamadroid.data.api.HfTreeItemDto { *; }
+-keep class com.blackbox.ai.data.api.HfModelDto { *; }
+-keep class com.blackbox.ai.data.api.HfRepoInfoDto { *; }
+-keep class com.blackbox.ai.data.api.HfSiblingDto { *; }
+-keep class com.blackbox.ai.data.api.HfTreeItemDto { *; }
 
 # Keep all API data classes
--keep class com.example.llamadroid.data.api.** { *; }
+-keep class com.blackbox.ai.data.api.** { *; }
 
 # Keep ONNX Runtime Java bindings
 -keep class ai.onnxruntime.** { *; }
@@ -140,9 +140,6 @@
 -dontwarn org.apache.hadoop.shaded.com.sun.jna.Structure
 -dontwarn org.apache.hadoop.shaded.com.sun.jna.WString
 -dontwarn org.apache.hadoop.shaded.com.sun.jna.platform.win32.Win32Exception
--dontwarn org.apache.hadoop.shaded.com.sun.jna.ptr.IntByReference
--dontwarn org.apache.hadoop.shaded.com.sun.jna.win32.StdCallLibrary
--dontwarn org.apache.hadoop.shaded.com.sun.jna.win32.W32APIOptions
 -dontwarn org.apache.hadoop.shaded.com.sun.msv.reader.GrammarReaderController
 -dontwarn org.apache.hadoop.shaded.com.sun.msv.reader.util.IgnoreController
 -dontwarn org.apache.hadoop.shaded.org.apache.curator.shaded.com.google.errorprone.annotations.CanIgnoreReturnValue
@@ -159,7 +156,7 @@
 }
 
 # Keep all Retrofit service interfaces in the api package
--keep interface com.example.llamadroid.data.api.HuggingFaceService { *; }
+-keep interface com.blackbox.ai.data.api.HuggingFaceService { *; }
 
 # Keep method signature information for all Retrofit interfaces
 -keepclassmembers,allowshrinking,allowobfuscation interface * {

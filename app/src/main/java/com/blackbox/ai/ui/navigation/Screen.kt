@@ -72,8 +72,10 @@ sealed class Screen(val route: String) {
     object TermuxFileManager : Screen("termux_file_manager")  // File manager for Termux tools
     object FastsdGallery : Screen("fastsd_gallery")           // FastSD CPU generated images gallery
     // AI Agent screens
+    object Agents : Screen("agents_hub")                       // Agents tab landing
     object Agent : Screen("agent")                             // AI coding agent chat
     object AgentWorkspace : Screen("agent_workspace")          // Agent workspace file manager
+    object AgentRuntime : Screen("agent_runtime")                 // Local runtime agents (Termux channel)
     // Tama virtual pet
     object Tama : Screen("tama")                               // Virtual pet companion
     object TamaChat : Screen("tama_chat")                     // AI Chat with pet
