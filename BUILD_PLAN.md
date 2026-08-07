@@ -58,7 +58,9 @@ APK upload used `if-no-files-found: warn`, so runs showed success while
 `:app:compileDebugKotlin` failed with 34 errors and no `blackbox-debug` APK was
 produced (last real APK artifact: 2026-08-06 10:56). The debugger batch below fixed
 all 34 errors and hardened `build.yml` (compile failures now fail the run; missing
-APK fails the upload step). Push pending CI verification.
+APK fails the upload step). **Verified green on run 31140699510 (`17ecdfe`)** —
+`assembleDebug` SUCCESS and `blackbox-debug` APK uploaded (124 MB arm64, includes
+`assets/bootstrap-aarch64.zip` 30 MB + all ADT dex/native libs).
 
 ---
 
@@ -153,6 +155,14 @@ See `AGENTS.md` (repo root) for orientation. Key focus areas for the next agent:
 4. Suggest improvements — record them in this file under "Decisions & Improvements" below.
 
 ## 8. Decisions & Improvements (append-only)
+
+- 2026-08-07: Compile now verified green (run 31140699510, `17ecdfe`) — `assembleDebug`
+  SUCCESS and `blackbox-debug` APK artifact uploaded (124 MB arm64). Remaining follow-ups
+  for the next debugger/tester cycle: `assist_voice_interaction` requires the user to pick
+  Blackbox as the default Digital Assistant (needs on-device validation of the
+  VoiceInteraction flow); LOCAL embedded runtime needs an on-device install/start test;
+  `FeatureDispatch`/grants UI wiring; quick-agent-chat channel fallback order; daemon
+  running-flag derived from real FGS.
 
 - 2026-08-07: Debugger batch — root-caused and fixed ALL 34 `:app:compileDebugKotlin`
   errors from run 31128671993 (these had been silently failing CI since Phase 2; the
