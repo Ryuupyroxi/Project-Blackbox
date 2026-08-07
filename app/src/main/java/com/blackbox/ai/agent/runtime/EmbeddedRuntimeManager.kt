@@ -176,6 +176,32 @@ object EmbeddedRuntimeManager {
         return runCatching { EngineKeysStore(context).getOpenAiKey() }.getOrDefault("")
     }
 
+    // OpenClaw gateway / Control UI endpoints (state in CodexServerManager).
+    val gatewayUrl: String
+        get() = "http://127.0.0.1:${CodexServerManager.OPENCLAW_GATEWAY_PORT}"
+    val controlUiUrl: String
+        get() = "http://127.0.0.1:${CodexServerManager.OPENCLAW_CONTROL_UI_PORT}"
+
+    /**
+     * Starts the OpenClaw gateway (18789) and its Control UI (19001). Requires
+     * the LOCAL runtime + openclaw to have been installed.
+     */
+    suspend fun startOpenClaw(context: Context): Result<String> = runWithConsole(context, "Start OpenClaw gateway") {
+        val m = manager(context)
+        if (!m.isOpenClawInstalled()) {
+            appendConsole("OpenClaw not installed yet")
+            return@runWithConsole "OpenClaw not installed — run Install first"
+        }
+        val gateway = runCatching {
+            withTimeout(START_TIMEOUT_MS) { withContext(Dispatchers.IO) { m.startOpenClawGateway() } }
+        }.getOrDefault(false)
+        val controlUi = runCatching {
+            withTimeout(START_TIMEOUT_MS) { withContext(Dispatchers.IO) { m.startOpenClawControlUiServer() } }
+        }.getOrDefault(false)
+        appendConsole("Gateway (18789): $gateway  Control UI (19001): $controlUi")
+        if (gateway && controlUi) "OpenClaw gateway + Control UI running" else "OpenClaw gateway=$gateway controlUi=$controlUi"
+    }
+
     private suspend fun runWithConsole(
         context: Context,
         label: String,

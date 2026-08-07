@@ -49,8 +49,9 @@ private, local-first Android application:
 - [x] TTS/STT voice round-trip in agent chat (`BlackboxVoice` + mic / speak-replies in Quick Agent Chat)
 - [x] Heartbeat + scheduled tasks: daemon tick refreshes ADT `LlamaScheduledTaskScheduler` alarms + records heartbeat
 - [x] Calendar integration: `CalendarAccess` (create events, ISO parsing, reminders) gated by `FeatureAccessStore.FEATURE_CALENDAR`
-- [ ] LOCAL channel full UI: progress stream, login flow, web UI (Control UI port 19001)
-- [ ] OpenClaw gateway/control-UI startup from the Agent Hub (ports 18789 / 19001)
+- [x] LOCAL channel full UI: progress stream, login flow, web UI (Control UI port 19001)
+- [x] OpenClaw gateway/control-UI startup from the Agent Hub (ports 18789 / 19001)
+- [x] Workspace channel wires execution: `LOCAL` workspace + installed runtime routes Quick Chat through the embedded codex server (18923) ahead of API channels (`engineChannelsForWorkspace`)
 
 **Compile status (2026-08-07):** the "green" CI runs since Phase 2 were **false
 positives** — `build.yml` had `continue-on-error: true` on the build step and the
@@ -233,3 +234,15 @@ See `AGENTS.md` (repo root) for orientation. Key focus areas for the next agent:
   (Kai CalendarRepository port, user-gated), and daemon heartbeat that re-asserts
   ADT scheduled-task alarms every poll. Pushed together with Phase 3 to conserve
   CI runs after the runner queue cancelled the Phase 3-only dispatch.
+- 2026-08-07: Completed the two open LOCAL-channel items. Agent Hub LOCAL card now has:
+  (1) OpenClaw gateway + Control UI startup (ports 18789/19001) via `EmbeddedRuntimeManager.startOpenClaw`,
+  (2) a Codex login-key field + Login button backed by `EmbeddedRuntimeManager.login`,
+  (3) a live monospace progress stream (`EmbeddedRuntimeManager.console` StateFlow, scrollable),
+  (4) a "Web UI" button navigating to `Screen.TermuxWebView` (`http://127.0.0.1:19001`,
+  route `openclaw-control`), and (5) a status `LaunchedEffect` that reflects
+  `EmbeddedRuntimeManager.isInstalled`. Dropped an unused `loginWithStoredKey` helper.
+  Also wired workspace routing: Quick Chat now calls `engineChannelsForWorkspace()`, which —
+  for a `LOCAL` workspace with the embedded runtime installed — prepends
+  `ChatChannel.LocalOpenAi("http://127.0.0.1:18923", …)` ahead of the API-key channels
+  (used embedded codex server port `CodexServerManager.SERVER_PORT = 18923`).
+  Not yet CI-compiled at time of writing — batch with this push and verify on Actions.

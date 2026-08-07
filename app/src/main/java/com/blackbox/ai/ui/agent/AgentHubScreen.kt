@@ -89,6 +89,23 @@ fun AgentHubScreen(navController: NavController) {
     var localRuntimeStatus by remember { mutableStateOf("Not installed") }
     var localRuntimeOutput by remember { mutableStateOf("") }
     var localRuntimeBusy by remember { mutableStateOf(false) }
+    val localConsole by EmbeddedRuntimeManager.console.collectAsState()
+    var loginApiKey by remember { mutableStateOf(keys.getOpenAiKey()) }
+    var localRuntimeInstalled by remember { mutableStateOf(false) }
+
+    // Active workspace decides execution routing (LOCAL/SSH/KAI).
+    val activeWorkspace = remember(activeWorkspaceId) {
+        workspaces.firstOrNull { it.id == activeWorkspaceId } ?: workspaces.first()
+    }
+    fun engineChannelsForWorkspace(): List<ChatChannel> {
+        var base = enabledChannels(keys)
+        if (activeWorkspace.channel == WorkspaceChannel.LOCAL && localRuntimeInstalled) {
+            // Prefer the embedded LOCAL codex server (OpenAI-compatible) when it is up.
+            val local = ChatChannel.LocalOpenAi("http://127.0.0.1:18923", keys.getLocalModel())
+            base = if (base.isEmpty()) listOf(local) else listOf(local) + base.filterNot { it is ChatChannel.LocalOpenAi }
+        }
+        return base
+    }
 
     // Quick chat state
     var chatPrompt by remember { mutableStateOf("") }
@@ -337,6 +354,9 @@ fun AgentHubScreen(navController: NavController) {
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.height(8.dp))
+                        LaunchedEffect(Unit) {
+                            localRuntimeStatus = if (EmbeddedRuntimeManager.isInstalled(context)) "Installed" else "Not installed"
+                        }
                         Text("Status: $localRuntimeStatus", fontSize = 12.sp, color = Color.Gray)
                         Spacer(modifier = Modifier.height(8.dp))
                         Row(
@@ -400,12 +420,78 @@ fun AgentHubScreen(navController: NavController) {
                             ) { Text("Health") }
                         }
                         Spacer(modifier = Modifier.height(8.dp))
-                        if (localRuntimeOutput.isNotBlank()) {
+                        // OpenClaw gateway / Control UI + login (LOCAL channel full UI)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Button(
+                                onClick = {
+                                    scope.launch {
+                                        localRuntimeBusy = true
+                                        localRuntimeOutput = ""
+                                        localRuntimeOutput = EmbeddedRuntimeManager.startOpenClaw(context)
+                                            .getOrElse { it.message ?: "OpenClaw start failed" }
+                                        localRuntimeStatus = localRuntimeOutput
+                                        localRuntimeBusy = false
+                                    }
+                                },
+                                enabled = !localRuntimeBusy,
+                                modifier = Modifier.weight(1f)
+                            ) { Text("OpenClaw") }
+                            Button(
+                                onClick = {
+                                    navController.navigate(
+                                        Screen.TermuxWebView.createRoute(
+                                            EmbeddedRuntimeManager.controlUiUrl,
+                                            "OpenClaw Control UI",
+                                            "openclaw-control"
+                                        )
+                                    )
+                                },
+                                enabled = !localRuntimeBusy,
+                                modifier = Modifier.weight(1f)
+                            ) { Text("Web UI") }
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            OutlinedTextField(
+                                value = loginApiKey,
+                                onValueChange = { loginApiKey = it },
+                                label = { Text("Codex login key") },
+                                singleLine = true,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Button(
+                                onClick = {
+                                    scope.launch {
+                                        localRuntimeBusy = true
+                                        localRuntimeOutput = ""
+                                        localRuntimeOutput = EmbeddedRuntimeManager.login(context, loginApiKey)
+                                            .getOrElse { it.message ?: "Login failed" }
+                                        localRuntimeStatus = localRuntimeOutput
+                                        localRuntimeBusy = false
+                                    }
+                                },
+                                enabled = !localRuntimeBusy && loginApiKey.isNotBlank()
+                            ) { Text("Login") }
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        // Live progress stream
+                        if (localConsole.isNotBlank() || localRuntimeOutput.isNotBlank()) {
                             Text(
-                                localRuntimeOutput.takeLast(2400),
+                                (if (localConsole.isNotBlank()) localConsole else localRuntimeOutput).takeLast(3200),
                                 fontSize = 11.sp,
                                 fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(max = 200.dp)
+                                    .verticalScroll(rememberScrollState())
                             )
                         }
                     }
@@ -559,7 +645,7 @@ fun AgentHubScreen(navController: NavController) {
                             }
                             Button(
                                 onClick = {
-                                    val channels = enabledChannels(keys)
+                                    val channels = engineChannelsForWorkspace()
                                     if (channels.isEmpty()) {
                                         chatError = "No channel enabled. Save an API key or enable the local server."
                                         return@Button
