@@ -24,7 +24,7 @@ class WorkspaceAgentSession(
     private val _currentWorkspace = MutableStateFlow<AgentWorkspace>(workspaceStore.active())
     val currentWorkspace: StateFlow<AgentWorkspace> = _currentWorkspace
 
-    private val engineAdapter by lazy { AgentEngineAdapter(context, keys) }
+    private val adapter by lazy { AgentEngineAdapter(context, keys) }
 
     fun getActiveWorkspace(): AgentWorkspace = _currentWorkspace.value
 
@@ -34,7 +34,7 @@ class WorkspaceAgentSession(
         // AgentService.setCurrentProjectFolder(workspace.folder) // caller applies
     }
 
-    fun getEngineAdapter(): AgentEngineAdapter = engineAdapter
+    fun getEngineAdapter(): AgentEngineAdapter = adapter
 
     /**
      * Returns the channel configured for the active workspace.
