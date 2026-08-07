@@ -26,11 +26,9 @@ private, local-first Android application:
 
 ---
 
-## 2. Current Status (2026-08-06)
+## 2. Current Status (2026-08-07)
 
-- [x] Debug APK builds on GitHub Actions (94 MB, arm64-v8a) — heap settings fixed in `gradle.properties`
-- [x] Agents bottom tab added (route `Screen.Agents`, label `nav_agents`)
-- [x] New routes: `Screen.AgentRuntime`, `Screen.Agents`
+- [x] Agents bottom tab added (route `Screen.Agents`, label `nav_agents`) + new routes `Screen.AgentRuntime`, `Screen.Agents`
 - [x] `EngineKeysStore` — API keys (OpenAI / OpenRouter / Anthropic) + local server + Termux SSH settings
 - [x] `ChatChannel` + `ChatChannelClient` — unified chat engine: local llama/Ollama OR any API key
 - [x] `WorkspaceStore` — multi-workspace support (add/switch/delete, per-workspace channel Local/SSH/Kai)
@@ -40,8 +38,6 @@ private, local-first Android application:
 - [x] `AgentRuntimeScreen` — install/start/stop/health/logs/web-UI for runtime agents
 - [x] `AssistantDaemonService` (Kai-style foreground daemon) + `ACTION_ASSIST` manifest filter + MainActivity hook → opens agent chat
 - [x] ProGuard rules renamed to `com.blackbox.ai.*` (was stale `com.example.llamadroid`)
-- [x] CI compile check — Phase 1 build `7c64456` green; Phase 2 build `0c7faa4` green; Phase 3+4 build `6d14325` green
-- [x] Fix any compile errors reported by the debugger/tester agent or CI — FIXES.md P0/P1/P2/P3 batch implemented
 - [x] Deep integration: route existing `AgentService` tool calls through the unified channels
 - [x] Assistant feature dispatch: `FeatureDispatch` enforces `FeatureAccessStore` grants
 - [x] Workspace-aware agent sessions: `WorkspaceAgentSession` (per-workspace channel/context)
@@ -53,35 +49,16 @@ private, local-first Android application:
 - [x] TTS/STT voice round-trip in agent chat (`BlackboxVoice` + mic / speak-replies in Quick Agent Chat)
 - [x] Heartbeat + scheduled tasks: daemon tick refreshes ADT `LlamaScheduledTaskScheduler` alarms + records heartbeat
 - [x] Calendar integration: `CalendarAccess` (create events, ISO parsing, reminders) gated by `FeatureAccessStore.FEATURE_CALENDAR`
-
-
-- [x] Debug APK builds on GitHub Actions (94 MB, arm64-v8a) — heap settings fixed in `gradle.properties`
-- [x] Agents bottom tab added (route `Screen.Agents`, label `nav_agents`)
-- [x] New routes: `Screen.AgentRuntime`, `Screen.Agents`
-- [x] `EngineKeysStore` — API keys (OpenAI / OpenRouter / Anthropic) + local server + Termux SSH settings
-- [x] `ChatChannel` + `ChatChannelClient` — unified chat engine: local llama/Ollama OR any API key
-- [x] `WorkspaceStore` — multi-workspace support (add/switch/delete, per-workspace channel Local/SSH/Kai)
-- [x] `FeatureAccessStore` — assistant feature authorization grants (Organizer, Notes, Calendar, Kiwix, PDF, Tama, Models, Chat)
-- [x] `RuntimeAgent` catalog + `AgentRuntimeManager` — Hermes / Codex CLI / OpenClaw over the local Termux/Ubuntu SSH channel (commands from termux-agents-hub)
-- [x] `AgentHubScreen` — channel status, API keys, workspace manager, quick agent chat, daemon toggle
-- [x] `AgentRuntimeScreen` — install/start/stop/health/logs/web-UI for runtime agents
-- [x] `AssistantDaemonService` (Kai-style foreground daemon) + `ACTION_ASSIST` manifest filter + MainActivity hook → opens agent chat
-- [x] ProGuard rules renamed to `com.blackbox.ai.*` (was stale `com.example.llamadroid`)
-- [x] CI compile check of the new merge code — Phase 1 build `7c64456` green; Phase 2 build `0c7faa4` green (31127686809)
-- [x] Fix any compile errors reported by the debugger/tester agent or CI — FIXES.md P0/P1/P2/P3 batch implemented
-- [x] Deep integration: route existing `AgentService` tool calls through the unified channels
-- [x] Assistant feature dispatch: `FeatureDispatch` enforces `FeatureAccessStore` grants
-- [x] Workspace-aware agent sessions: `WorkspaceAgentSession` (per-workspace channel/context)
-- [x] Task scheduler loop under `AssistantDaemonService` (Kai `TaskScheduler` pattern, 60s poll)
-- [x] Port OpenClaw `BootstrapInstaller` (zero-Termux embedded runtime) + `download-bootstrap.sh`
-- [x] Port OpenClaw `CodexServerManager` (Node.js, Codex CLI, platform binary, CONNECT proxy, OpenClaw gateway)
-- [x] `EmbeddedRuntimeManager` — LOCAL channel wraps bootstrap + Codex runtime; Agent Hub card added
-- [x] CI downloads Termux bootstrap into assets before `assembleDebug` (`.gitignore`d, not committed)
 - [ ] LOCAL channel full UI: progress stream, login flow, web UI (Control UI port 19001)
 - [ ] OpenClaw gateway/control-UI startup from the Agent Hub (ports 18789 / 19001)
-- [x] TTS/STT voice round-trip in agent chat (`BlackboxVoice` + mic / speak-replies in Quick Agent Chat)
-- [x] Heartbeat + scheduled tasks: daemon tick refreshes ADT `LlamaScheduledTaskScheduler` alarms + records heartbeat
-- [x] Calendar integration: `CalendarAccess` (create events, ISO parsing, reminders) gated by `FeatureAccessStore.FEATURE_CALENDAR`
+
+**Compile status (2026-08-07):** the "green" CI runs since Phase 2 were **false
+positives** — `build.yml` had `continue-on-error: true` on the build step and the
+APK upload used `if-no-files-found: warn`, so runs showed success while
+`:app:compileDebugKotlin` failed with 34 errors and no `blackbox-debug` APK was
+produced (last real APK artifact: 2026-08-06 10:56). The debugger batch below fixed
+all 34 errors and hardened `build.yml` (compile failures now fail the run; missing
+APK fails the upload step). Push pending CI verification.
 
 ---
 
@@ -176,6 +153,37 @@ See `AGENTS.md` (repo root) for orientation. Key focus areas for the next agent:
 4. Suggest improvements — record them in this file under "Decisions & Improvements" below.
 
 ## 8. Decisions & Improvements (append-only)
+
+- 2026-08-07: Debugger batch — root-caused and fixed ALL 34 `:app:compileDebugKotlin`
+  errors from run 31128671993 (these had been silently failing CI since Phase 2; the
+  "green" runs were false positives caused by `continue-on-error` + `if-no-files-found: warn`):
+  - `AgentRuntimeManager.kt` — deleted duplicate `import ...SSHService` (introduced by the
+    earlier "fix" commit `0a0e891`, which made the build worse).
+  - `WorkspaceAgentSession.kt` — `MutableStateFlow` lives in `kotlinx.coroutines.flow` (was
+    imported from `kotlinx.coroutines`); `SSHConfig` is a **top-level** type in package
+    `com.blackbox.ai.engine` (was wrongly imported as `EngineKeysStore.SSHConfig`).
+  - `AgentEngineAdapter.kt` — `AgentTool` is a **top-level** type in `com.blackbox.ai.service`
+    (was imported as `OllamaService.AgentTool`); `JSONObject` has no `toRequestBody` extension
+    (use `body.toString().toRequestBody(...)`); `parseAnthropicResponse` /
+    `parseOpenAiStreamingResponse` now take `channel` so `backend = channel.label` resolves.
+  - `EngineKeysStore.kt` — `MasterKey.Builder` does not exist in `security-crypto:1.0.0`
+    (verified in the AAR: only `MasterKeys`); 1.0.0 `EncryptedSharedPreferences.create`
+    signature is `(masterKeyAlias: String, fileName: String, context: Context, ...)` —
+    rewritten to `MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)` + the old arg order;
+    deleted duplicate `import android.content.Context`.
+  - `AssistantDaemonService.kt` — removed unused `import kotlin.time.Clock` (stdlib lacks it
+    here) + duplicate `import android.content.Context`.
+  - `BlackboxAssistService.kt` — `android.service.assist.AssistService` **does not exist** in
+    the SDK (verified against API 35 `android.jar`; that package only has
+    `classification.FieldClassification`). Rewrote as the real assist-gesture stack:
+    `VoiceInteractionService` + `VoiceInteractionSessionService` + `VoiceInteractionSession`
+    (new `res/xml/blackbox_voice_interaction.xml`, manifest now uses `BIND_VOICE_INTERACTION`
+    + `android.service.voice.VoiceInteractionService` action + `android.voice_interaction`
+    metadata). User must pick Blackbox as the default Digital Assistant.
+  - `build.yml` — removed `continue-on-error: true` from the build step and switched the APK
+    upload to `if-no-files-found: error` so future compile breaks fail the run visibly.
+  - FIXES.md P0 (`connected = true` in `AgentRuntimeScreen.kt`) was already resolved in the
+    current tree — no change needed.
 
 - 2026-08-06: Debugger audit produced `FIXES.md` (plan only, no code). Summary:
   - **P0 (compile blocker):** `ui/agent/AgentRuntimeScreen.kt:86` — `connected = true` on a

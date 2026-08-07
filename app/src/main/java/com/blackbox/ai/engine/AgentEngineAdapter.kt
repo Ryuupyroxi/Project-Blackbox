@@ -2,7 +2,7 @@ package com.blackbox.ai.engine
 
 import android.content.Context
 import com.blackbox.ai.service.OllamaService
-import com.blackbox.ai.service.OllamaService.AgentTool
+import com.blackbox.ai.service.AgentTool
 import com.blackbox.ai.service.OllamaService.ChatMessage
 import com.blackbox.ai.service.OllamaService.ChatResponse
 import com.blackbox.ai.service.OllamaService.ChatUsage
@@ -102,7 +102,7 @@ class AgentEngineAdapter(
             is ChatChannel.LocalOpenAi -> channel.baseUrl.trimEnd('/') + "/v1/chat/completions"
         }
 
-        val requestBuilder = Request.Builder().url(url).post(body.toRequestBody(jsonMediaType))
+        val requestBuilder = Request.Builder().url(url).post(body.toString().toRequestBody(jsonMediaType))
         when (channel) {
             is ChatChannel.Anthropic -> {
                 requestBuilder.header("x-api-key", channel.apiKey)
@@ -120,8 +120,8 @@ class AgentEngineAdapter(
             }
 
             val result = when (channel) {
-                is ChatChannel.Anthropic -> parseAnthropicResponse(text, onChunk)
-                else -> parseOpenAiStreamingResponse(text, onChunk)
+                is ChatChannel.Anthropic -> parseAnthropicResponse(channel, text, onChunk)
+                else -> parseOpenAiStreamingResponse(channel, text, onChunk)
             }
             Result.success(result)
         }
@@ -182,7 +182,11 @@ class AgentEngineAdapter(
         return body
     }
 
-    private fun parseAnthropicResponse(jsonText: String, onChunk: (String?, String?) -> Unit): ChatResponse {
+    private fun parseAnthropicResponse(
+        channel: ChatChannel,
+        jsonText: String,
+        onChunk: (String?, String?) -> Unit,
+    ): ChatResponse {
         val json = JSONObject(jsonText)
         val content = json.getJSONArray("content")
         var fullText = ""
@@ -304,7 +308,11 @@ class AgentEngineAdapter(
         return body
     }
 
-    private fun parseOpenAiStreamingResponse(jsonText: String, onChunk: (String?, String?) -> Unit): ChatResponse {
+    private fun parseOpenAiStreamingResponse(
+        channel: ChatChannel,
+        jsonText: String,
+        onChunk: (String?, String?) -> Unit,
+    ): ChatResponse {
         val json = JSONObject(jsonText)
         val choice = json.getJSONArray("choices").getJSONObject(0)
         val message = choice.getJSONObject("message")

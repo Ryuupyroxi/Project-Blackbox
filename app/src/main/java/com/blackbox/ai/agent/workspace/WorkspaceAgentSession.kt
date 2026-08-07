@@ -3,9 +3,9 @@ package com.blackbox.ai.agent.workspace
 import android.content.Context
 import com.blackbox.ai.engine.AgentEngineAdapter
 import com.blackbox.ai.engine.EngineKeysStore
-import com.blackbox.ai.engine.EngineKeysStore.SSHConfig
+import com.blackbox.ai.engine.SSHConfig
 import com.blackbox.ai.service.AgentService
-import kotlinx.coroutines.MutableStateFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -45,9 +45,9 @@ class WorkspaceAgentSession(
     /**
      * Gets the Termux/SSH config for SSH-channel workspaces.
      */
-    fun getTermuxConfig(): EngineKeysStore.SSHConfig {
+    fun getTermuxConfig(): SSHConfig {
         val ws = _currentWorkspace.value
-        return EngineKeysStore.SSHConfig(
+        return SSHConfig(
             host = keys.getTermuxHost(),
             port = keys.getTermuxPort(),
             user = keys.getTermuxUser(),
