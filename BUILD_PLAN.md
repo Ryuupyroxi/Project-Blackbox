@@ -246,3 +246,5 @@ See `AGENTS.md` (repo root) for orientation. Key focus areas for the next agent:
   `ChatChannel.LocalOpenAi("http://127.0.0.1:18923", …)` ahead of the API-key channels
   (used embedded codex server port `CodexServerManager.SERVER_PORT = 18923`).
   Not yet CI-compiled at time of writing — batch with this push and verify on Actions.
+  **Verified green on run 31145985936 (`ccdb67e`)** — `assembleDebug` SUCCESS and
+  `blackbox-debug` APK uploaded (124 MB). LOCAL channel full UI + workspace routing compile.
