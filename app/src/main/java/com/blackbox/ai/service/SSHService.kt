@@ -264,10 +264,22 @@ class SSHService(private val context: Context) {
             
             Result.success(Unit)
         } catch (e: Exception) {
-            DebugLog.log("SSH: Connection failed - ${e.message}")
+            val reason = when {
+                e.message?.contains("Connection refused", ignoreCase = true) == true ->
+                    "Connection refused on ${config.host}:${config.port}. Is the SSH server running? " +
+                    "Termux default port is 8022; ADT Ubuntu proot uses 8025. " +
+                    "Start sshd in Termux or adjust the port in Agent Hub."
+                e.message?.contains("timed out", ignoreCase = true) == true ->
+                    "Connection timed out to ${config.host}:${config.port}. Check the address/port and that the server is reachable."
+                e.message?.contains("auth", ignoreCase = true) == true ->
+                    "Authentication failed for ${config.user}@${config.host}:${config.port}. Check username and password."
+                else -> e.message ?: "Unknown SSH error"
+            }
+            val msg = "SSH connection failed: $reason"
+            DebugLog.log("SSH: $msg")
             _isConnected.value = false
-            _output.value = "Connection failed: ${e.message}\n"
-            Result.failure(e)
+            _output.value = "$msg\n"
+            Result.failure(Exception(msg))
         }
     }
     

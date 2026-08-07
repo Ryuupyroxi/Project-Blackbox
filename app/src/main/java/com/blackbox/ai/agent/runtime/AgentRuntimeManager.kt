@@ -55,6 +55,10 @@ object AgentRuntimeManager {
 
     suspend fun install(context: Context, agent: RuntimeAgent): Result<String> {
         return runWithConsole(context, "Install ${agent.name}") {
+            val ssh = sshService(context)
+            if (!ssh.checkConnection()) {
+                return@runWithConsole "SSH not connected. Open Agent Hub → connect to 127.0.0.1:8025 (ADT Ubuntu) or 8022 (Termux) first."
+            }
             var lastOutput = "Install complete"
             var failed = false
             for (cmd in agent.installCommands) {
@@ -83,6 +87,10 @@ object AgentRuntimeManager {
 
     suspend fun start(context: Context, agent: RuntimeAgent): Result<String> {
         return runWithConsole(context, "Start ${agent.name}") {
+            val ssh = sshService(context)
+            if (!ssh.checkConnection()) {
+                return@runWithConsole "SSH not connected. Open Agent Hub → connect to 127.0.0.1:8025 (ADT Ubuntu) or 8022 (Termux) first."
+            }
             val cmd = buildString {
                 append("mkdir -p \$HOME/.blackbox-agents\n")
                 append("cd \$HOME\n")

@@ -77,10 +77,21 @@ object BootstrapInstaller {
 
         Log.i(TAG, "Extracting $assetName to $stagingPath")
 
+        // ── Step 1: open the asset ───────────────────────────────────────
+        val assetStream = runCatching {
+            context.assets.open(assetName).also { onProgress("Opened asset: $assetName") }
+        }.getOrElse { e ->
+            val msg = "BOOTSTRAP ASSET MISSING: $assetName not found in APK assets. " +
+                      "CI must download it before assembleDebug. Error: ${e.message}"
+            Log.e(TAG, msg)
+            onProgress(msg)
+            throw RuntimeException(msg)
+        }
+
         val buffer = ByteArray(8192)
         val symlinks = mutableListOf<Pair<String, String>>()
 
-        context.assets.open(assetName).use { assetStream ->
+        try {
             ZipInputStream(assetStream).use { zip ->
                 var entry = zip.nextEntry
                 while (entry != null) {
@@ -91,7 +102,6 @@ object BootstrapInstaller {
                             val parts = line.split("←")
                             if (parts.size == 2) {
                                 var target = parts[0]
-                                // Remap absolute Termux paths to our actual prefix
                                 if (target.startsWith(termuxPrefix)) {
                                     target = target.replace(termuxPrefix, paths.prefixDir)
                                 }
@@ -120,46 +130,72 @@ object BootstrapInstaller {
                                 }
                             }
                             if (shouldBeExecutable(entry.name)) {
-                                Os.chmod(targetFile.absolutePath, 0b111_000_000) // 0700
+                                val chmodOk = runCatching {
+                                    Os.chmod(targetFile.absolutePath, 0b111_000_000)
+                                }.getOrElse { e ->
+                                    Log.w(TAG, "chmod denied on ${targetFile.absolutePath}: ${e.message}")
+                                }
+                                if (!runCatching { targetFile.canExecute() }.getOrDefault(false) &&
+                                    !runCatching { Os.chmod(targetFile.absolutePath, 0b111_000_000) }.isSuccess) {
+                                    Log.w(TAG, "File may not be executable after chmod: ${targetFile.absolutePath}")
+                                }
                             }
                         }
                     }
                     entry = zip.nextEntry
                 }
             }
+        } catch (e: Exception) {
+            val msg = "BOOTSTRAP EXTRACTION FAILED: ${e.message}"
+            Log.e(TAG, msg, e)
+            onProgress(msg)
+            throw RuntimeException(msg, e)
+        } finally {
+            runCatching { assetStream.close() }
         }
 
         if (symlinks.isEmpty()) {
-            throw RuntimeException("No SYMLINKS.txt found in bootstrap archive")
+            val msg = "BOOTSTRAP FORMAT ERROR: No SYMLINKS.txt found in $assetName"
+            Log.e(TAG, msg)
+            onProgress(msg)
+            throw RuntimeException(msg)
         }
 
-        onProgress("Creating symlinks…")
+        // ── Step 2: create symlinks ──────────────────────────────────────
+        onProgress("Creating symlinks (${symlinks.size} entries)…")
+        var symlinkFailures = 0
         for ((target, linkPath) in symlinks) {
             try {
                 val linkFile = File(linkPath)
-                // Remove any existing file/directory at the symlink location
                 if (linkFile.exists() || linkFile.isDirectory) {
                     deleteRecursive(linkFile)
                 }
                 Os.symlink(target, linkPath)
             } catch (e: Exception) {
-                Log.w(TAG, "Failed to create symlink $linkPath -> $target: ${e.message}")
+                Log.w(TAG, "Symlink failed $linkPath -> $target: ${e.message}")
+                symlinkFailures++
             }
         }
+        if (symlinkFailures > 0) {
+            onProgress("WARNING: $symlinkFailures symlinks failed (may affect runtime)")
+        }
 
-        // Atomically move staging to final prefix
+        // ── Step 3: atomic rename ────────────────────────────────────────
         if (prefixFile.exists()) {
             deleteRecursive(prefixFile)
         }
-        if (!stagingFile.renameTo(prefixFile)) {
-            throw RuntimeException("Failed to rename $stagingPath to ${paths.prefixDir}")
+        val renameOk = runCatching { stagingFile.renameTo(prefixFile) }.getOrDefault(false)
+        if (!renameOk) {
+            val msg = "BOOTSTRAP MOVE FAILED: could not rename $stagingPath to ${paths.prefixDir}"
+            Log.e(TAG, msg)
+            onProgress(msg)
+            throw RuntimeException(msg)
         }
 
-        // Create home and tmp directories
+        // ── Step 4: post-extraction setup ────────────────────────────────
         File(paths.homeDir).mkdirs()
         File(paths.tmpDir).mkdirs()
 
-        // Fix hardcoded Termux paths in apt config and package metadata
         onProgress("Configuring package manager…")
         fixTermuxPaths(paths)
 
