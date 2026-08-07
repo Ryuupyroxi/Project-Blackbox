@@ -235,7 +235,7 @@ class MainActivity : ComponentActivity() {
      */
     private fun handleAssistIntent(intent: Intent?) {
         if (intent?.action == Intent.ACTION_ASSIST) {
-            pendingNavigationRoute.value = Screen.Agent.route
+            pendingNavigationRoute.value = Screen.Agents.route
         }
     }
 

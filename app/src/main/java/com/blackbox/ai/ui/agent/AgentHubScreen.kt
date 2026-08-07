@@ -3,6 +3,7 @@ package com.blackbox.ai.ui.agent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -179,7 +180,9 @@ fun AgentHubScreen(navController: NavController) {
             )
         }
     ) { padding ->
+        val listState = rememberLazyListState()
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
@@ -188,10 +191,45 @@ fun AgentHubScreen(navController: NavController) {
         ) {
             item {
                 Text(
-                    "All agent features, one place. Every option can run via the local server, the Termux/SSH runtime, or any API key you add below.",
+                    "All agent features, one place. Every feature can run via the local server, the Termux/SSH runtime, or any API key you add below.",
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
+
+            // Prompts the user to add an API key or a local llama server when none
+            // is configured, so the Kai-style assistant has a backend to talk to.
+            if (enabledChannels(keys).isEmpty()) {
+                item {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        )
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                "Connect an AI backend to get started",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                "Add an API key below, or point Blackbox at a local llama.cpp / Ollama server to use the assistant fully offline.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Button(onClick = {
+                                    scope.launch { listState.animateScrollToItem(6) }
+                                }) { Text("Add API key") }
+                                OutlinedButton(onClick = {
+                                    scope.launch { listState.animateScrollToItem(6) }
+                                }) { Text("Link local server") }
+                            }
+                        }
+                    }
+                }
             }
 
             // ── Workspaces ──────────────────────────────────────────────

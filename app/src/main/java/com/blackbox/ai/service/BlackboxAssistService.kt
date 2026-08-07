@@ -49,7 +49,7 @@ class BlackboxAssistSession(context: Context) : VoiceInteractionSession(context)
         val intent = Intent(context, MainActivity::class.java).apply {
             action = Intent.ACTION_ASSIST
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            putExtra(MainActivity.EXTRA_OPEN_ROUTE, Screen.Agent.route)
+            putExtra(MainActivity.EXTRA_OPEN_ROUTE, Screen.Agents.route)
         }
         runCatching { context.startActivity(intent) }
         finish()

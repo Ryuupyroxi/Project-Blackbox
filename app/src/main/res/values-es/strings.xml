@@ -1780,7 +1780,7 @@
     <string name="about_quadtrix_cpp_desc">Quadtrix.cpp - Entrenamiento nativo</string>
     <string name="about_ffmpeg">FFmpeg - Media</string>
     <string name="about_sdai_desc">Equipo de SDAI - Referencia Android para difusión local e inspiración</string>
-    <string name="about_thanks">¡Gracias por usar AI Doomsday Toolbox!</string>
+    <string name="about_thanks">¡Gracias por usar Blackbox! Creado para IA local y privada en tu dispositivo.</string>
     <string name="about_zim_desc">Wikipedia offline y servidor de archivos ZIM</string>
     <string name="about_compatible_tools">Frontends y Herramientas Compatibles</string>
     <string name="about_easy_dataset_desc">Procesamiento y preparación de conjuntos de datos</string>

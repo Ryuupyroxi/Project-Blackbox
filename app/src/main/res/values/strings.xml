@@ -1614,7 +1614,7 @@
     <string name="about_quadtrix_cpp_desc">Quadtrix.cpp - Native training</string>
     <string name="about_ffmpeg">FFmpeg - Media processing</string>
     <string name="about_sdai_desc">SDAI team - Local diffusion Android reference and inspiration</string>
-    <string name="about_thanks">Thank you for using Blackbox! Based on AI Doomsday Toolbox by ManuXD32 (Apache-2.0).</string>
+    <string name="about_thanks">Thank you for using Blackbox! Crafted for local, private AI on your device.</string>
     <string name="about_zim_desc">Offline Wikipedia and ZIM file server</string>
     <string name="about_compatible_tools">Compatible Frontends &amp; Tools</string>
     <string name="about_easy_dataset_desc">Dataset processing and preparation</string>
