@@ -1,6 +1,6 @@
 # Blackbox — Master Build Plan (LIVING DOCUMENT)
 
-> Maintained continuously as the merge progresses. Updated: 2026-08-06.
+> Maintained continuously as the merge progresses. Updated: 2026-08-07 (v1beta prep).
 > This is the single source of truth for what Blackbox is, what has been built,
 > what is next, and where the code lives. The debugger/tester agent reads this
 > file first, then `AGENTS.md`.
@@ -27,6 +27,10 @@ private, local-first Android application:
 ---
 
 ## 2. Current Status (2026-08-07)
+- [x] v1beta release prep: applied audit fixes (LOCAL runtime routing now gates on a live
+  server, install/start/stop/health update the ready flag, status derives from full runtime
+  readiness), version bumped to `1.0-beta` (versionCode 1000), README created for public
+  release. NOTE: repo is intentionally PUBLIC now (user-authorized v1beta public release).
 
 - [x] Agents bottom tab added (route `Screen.Agents`, label `nav_agents`) + new routes `Screen.AgentRuntime`, `Screen.Agents`
 - [x] `EngineKeysStore` — API keys (OpenAI / OpenRouter / Anthropic) + local server + Termux SSH settings
@@ -248,3 +252,27 @@ See `AGENTS.md` (repo root) for orientation. Key focus areas for the next agent:
   Not yet CI-compiled at time of writing — batch with this push and verify on Actions.
   **Verified green on run 31145985936 (`ccdb67e`)** — `assembleDebug` SUCCESS and
   `blackbox-debug` APK uploaded (124 MB). LOCAL channel full UI + workspace routing compile.
+
+- 2026-08-07: Codebase audit of `17ecdfe..HEAD` (LOCAL UI + theme + assist routing, green on CI run 31149697058, APK `blackbox-debug` 124 MB downloaded; on-device install pending user). Findings:
+  - **P1 (logic bug):** `ui/agent/AgentHubScreen.kt:95` — `localRuntimeInstalled` is only ever initialized to `false` and never updated; `engineChannelsForWorkspace()` (line 103) therefore NEVER routes Quick Chat through the embedded LOCAL codex server (18923) even after a successful Install. The BUILD_PLAN claim "workspace routing wires Quick Chat through the embedded codex server" is currently dead code. Fix: set `localRuntimeInstalled = true` after `EmbeddedRuntimeManager.install(...)` success and after `status(context).ready` on screen load / health check.
+  - **P2 (inconsistent health gating):** quick chat (`ChatChannelClient.chat` in `engine/ChatChannel.kt`) does NOT health-check `ChatChannel.LocalOpenAi` — it posts straight to `127.0.0.1:18923/v1/chat/completions` and errors if the server is down. `AgentEngineAdapter.selectChannel` DOES health-check (`/v1/models` HEAD) and falls back. After P1 is fixed, a stopped LOCAL server would break quick chat even when API keys are configured (LOCAL is prepended unconditionally). Gate `engineChannelsForWorkspace()` on `EmbeddedRuntimeManager.status().serverRunning` or add a client-side health check + fallback.
+  - **P3 (minor):** `AgentHubScreen.kt` — `listState.animateScrollToItem(6)` is a hardcoded index; the conditional "Connect an AI backend" empty-state card shifts item indices when present, so the scroll target can be wrong.
+  - **P4 (minor):** `localRuntimeStatus = "Installed"` derives from `BootstrapInstaller.isBootstrapInstalled` only (bootstrap presence), not `RuntimeStatus.ready` (node/codex/platform binary). `RuntimeStatus.ready` exists but the UI never uses it.
+  - **P5 (nit):** `ui/theme/Color.kt` and `Theme.kt` missing trailing newlines.
+  - Verified OK: assist routing (`Screen.Agent`→`Screen.Agents` in MainActivity + BlackboxAssistService) matches the Agents bottom tab; `EmbeddedRuntimeManager.gatewayUrl/controlUiUrl/startOpenClaw` match `CodexServerManager` constants (18789/19001) and methods; daemon `isRunning` derives from `getRunningServices` (real FGS state); feature-grant UI wiring present (grant/revoke checkboxes in Agent Hub); `WorkspaceStore.list()` always seeds ≥1 workspace (no `first()` crash); theme de-brand strings consistent in en/es.
+
+- 2026-08-07: v1beta release batch (single push, CI run recorded in §2 once green): applied the audit fixes —
+  - P1/P2: `AgentHubScreen.kt` now drives `localRuntimeReady` from `EmbeddedRuntimeManager.status()`; the
+    LOCAL workspace routing only prepends the embedded codex server (18923) when it is actually running
+    (`serverRunning`), so Quick Chat falls back to API channels when it is down (quick chat already
+    retries channels in order). Install/Start/Stop/Health buttons and the on-load `LaunchedEffect`
+    refresh the flag.
+  - P4: "Installed" status now comes from `RuntimeStatus.ready` (bootstrap+node+codex+platformBinary);
+    partial installs show "Installed (partial)".
+  - P3: re-investigated — the `animateScrollToItem(6)` target is correct because the buttons only exist
+    inside the conditional empty-state card (item 1), which keeps API Key Channels at index 6 whenever
+    the buttons are visible. No change needed.
+  - P5: added trailing newlines to `ui/theme/Color.kt` + `ui/theme/Theme.kt`.
+  - Version: `versionCode 1000`, `versionName "1.0-beta"` (matches release tag `v1beta`).
+  - Docs: created `README.md` for the public release (features, download, build, quick start, privacy,
+    license/credits); verified repo visibility is PUBLIC (user-authorized for v1beta).

@@ -92,15 +92,26 @@ fun AgentHubScreen(navController: NavController) {
     var localRuntimeBusy by remember { mutableStateOf(false) }
     val localConsole by EmbeddedRuntimeManager.console.collectAsState()
     var loginApiKey by remember { mutableStateOf(keys.getOpenAiKey()) }
-    var localRuntimeInstalled by remember { mutableStateOf(false) }
+    // True only while the embedded LOCAL codex server is actually running, so
+    // Quick Chat routes through it only when it is up (and falls back otherwise).
+    var localRuntimeReady by remember { mutableStateOf(false) }
 
     // Active workspace decides execution routing (LOCAL/SSH/KAI).
     val activeWorkspace = remember(activeWorkspaceId) {
         workspaces.firstOrNull { it.id == activeWorkspaceId } ?: workspaces.first()
     }
+    suspend fun refreshLocalRuntime() {
+        val st = EmbeddedRuntimeManager.status(context)
+        localRuntimeStatus = when {
+            st.ready -> "Installed"
+            st.bootstrap -> "Installed (partial)"
+            else -> "Not installed"
+        }
+        localRuntimeReady = st.serverRunning
+    }
     fun engineChannelsForWorkspace(): List<ChatChannel> {
         var base = enabledChannels(keys)
-        if (activeWorkspace.channel == WorkspaceChannel.LOCAL && localRuntimeInstalled) {
+        if (activeWorkspace.channel == WorkspaceChannel.LOCAL && localRuntimeReady) {
             // Prefer the embedded LOCAL codex server (OpenAI-compatible) when it is up.
             val local = ChatChannel.LocalOpenAi("http://127.0.0.1:18923", keys.getLocalModel())
             base = if (base.isEmpty()) listOf(local) else listOf(local) + base.filterNot { it is ChatChannel.LocalOpenAi }
@@ -393,7 +404,7 @@ fun AgentHubScreen(navController: NavController) {
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         LaunchedEffect(Unit) {
-                            localRuntimeStatus = if (EmbeddedRuntimeManager.isInstalled(context)) "Installed" else "Not installed"
+                            refreshLocalRuntime()
                         }
                         Text("Status: $localRuntimeStatus", fontSize = 12.sp, color = Color.Gray)
                         Spacer(modifier = Modifier.height(8.dp))
@@ -408,7 +419,7 @@ fun AgentHubScreen(navController: NavController) {
                                         localRuntimeOutput = ""
                                         val result = EmbeddedRuntimeManager.install(context)
                                         localRuntimeOutput = result.getOrElse { it.message ?: "Install failed" }
-                                        localRuntimeStatus = if (result.isSuccess) "Installed" else "Install failed"
+                                        if (result.isSuccess) refreshLocalRuntime() else localRuntimeStatus = "Install failed"
                                         localRuntimeBusy = false
                                     }
                                 },
@@ -423,6 +434,7 @@ fun AgentHubScreen(navController: NavController) {
                                         localRuntimeOutput = EmbeddedRuntimeManager.startServer(context)
                                             .getOrElse { it.message ?: "Start failed" }
                                         localRuntimeStatus = if (localRuntimeOutput.startsWith("Server running")) "Running" else localRuntimeOutput
+                                        localRuntimeReady = localRuntimeOutput.startsWith("Server running")
                                         localRuntimeBusy = false
                                     }
                                 },
@@ -436,6 +448,7 @@ fun AgentHubScreen(navController: NavController) {
                                         localRuntimeOutput = EmbeddedRuntimeManager.stop(context)
                                             .getOrElse { it.message ?: "Stop failed" }
                                         localRuntimeStatus = "Stopped"
+                                        localRuntimeReady = false
                                         localRuntimeBusy = false
                                     }
                                 },
@@ -450,6 +463,7 @@ fun AgentHubScreen(navController: NavController) {
                                         localRuntimeOutput = EmbeddedRuntimeManager.healthCheck(context)
                                             .getOrElse { it.message ?: "Health failed" }
                                         localRuntimeStatus = localRuntimeOutput
+                                        localRuntimeReady = localRuntimeOutput.startsWith("Health check passed")
                                         localRuntimeBusy = false
                                     }
                                 },
