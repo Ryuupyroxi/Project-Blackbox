@@ -93,6 +93,7 @@ object TamaStudySessionSupport {
         var changed = false
         var completed = false
         var lastPhaseForNotification: TamaStudyPhase? = null
+        val roundsPlanned = session.roundsPlanned.coerceAtLeast(1)
 
         while (session.status == TamaStudyStatus.ACTIVE.name) {
             val phaseEnd = session.phaseEndsAt ?: break
@@ -103,7 +104,7 @@ object TamaStudySessionSupport {
             session = addPhaseDuration(session, phase, phaseDuration)
             changed = true
 
-            if (phase == TamaStudyPhase.FOCUS && session.currentRound >= session.roundsPlanned) {
+            if (phase == TamaStudyPhase.FOCUS && session.currentRound >= roundsPlanned) {
                 completed = true
                 session = session.copy(
                     status = TamaStudyStatus.COMPLETED.name,
@@ -124,7 +125,7 @@ object TamaStudySessionSupport {
             val nextRound = if (phase == TamaStudyPhase.FOCUS) {
                 session.currentRound
             } else {
-                (session.currentRound + 1).coerceAtMost(session.roundsPlanned)
+                (session.currentRound + 1).coerceAtMost(roundsPlanned)
             }
             session = session.copy(
                 currentRound = nextRound,

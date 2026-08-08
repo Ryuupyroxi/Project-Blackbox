@@ -367,7 +367,7 @@ fun TamaChatScreen(
         ) {
             items(messages, key = { it.id ?: UUID.randomUUID().toString() }) { message ->
                 TamaChatBubble(message) {
-                    agentService.deleteMessage(message.id!!)
+                    agentService.deleteMessage(message.id)
                 }
             }
 
@@ -399,7 +399,7 @@ fun TamaChatScreen(
 
                 if (attachedImagePath != null) {
                     TamaChatImageAttachmentChip(
-                        imagePath = attachedImagePath!!,
+                        imagePath = attachedImagePath,
                         onPreview = { imagePreviewPath = attachedImagePath },
                         onRemove = { dropImageAttachment(deleteFile = true) }
                     )
@@ -407,7 +407,7 @@ fun TamaChatScreen(
 
                 if (attachedAudioPath != null) {
                     TamaChatAudioAttachmentChip(
-                        audioPath = attachedAudioPath!!,
+                        audioPath = attachedAudioPath,
                         audioDurationMs = attachedAudioDurationMs,
                         onPreview = {
                             // no-op preview handled inside chip
@@ -521,7 +521,7 @@ fun TamaChatScreen(
     }
 
     if (imagePreviewPath != null) {
-        val previewFile = File(imagePreviewPath!!)
+        val previewFile = File(imagePreviewPath)
         if (previewFile.exists()) {
             TamaPopupDialog(
                 title = stringResource(R.string.llama_image_attached),
@@ -557,17 +557,21 @@ fun TamaChatScreen(
     }
 
     if (showSummaryDialog) {
+        val summaryPet = pet ?: run {
+            showSummaryDialog = false
+            return
+        }
         SummaryEditDialog(
             currentSummary = currentSummary,
             isLoading = isLoading,
             onSave = {
                 scope.launch {
-                    agentService.updateSummary(pet!!, it)
+                    agentService.updateSummary(summaryPet, it)
                 }
                 showSummaryDialog = false
             },
             onRecreateMemory = {
-                agentService.requestSummaryRefresh(pet!!)
+                agentService.requestSummaryRefresh(summaryPet)
             },
             onDismiss = { showSummaryDialog = false }
         )

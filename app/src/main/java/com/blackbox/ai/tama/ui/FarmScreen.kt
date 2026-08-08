@@ -1983,7 +1983,7 @@ fun handleTileClick(
             if (tile.status == TileStatus.WET_FARMLAND && tile.crop == null) {
                 onSeedPlantRequest()
             } else if (tile.crop?.stage == 3) {
-                val crop = tile.crop!!
+                val crop = tile.crop
                 onAction(tile.copy(crop = null, status = TileStatus.SOIL))
                 scope.launch {
                     val result = gameEngine.harvestCrop(crop)

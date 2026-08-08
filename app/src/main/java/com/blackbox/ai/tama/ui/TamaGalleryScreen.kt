@@ -271,7 +271,7 @@ fun TamaGalleryScreen(
 private fun buildGalleryEntries(artworks: List<TamaArtworkEntity>): List<TamaGalleryEntry> {
     val albumEntries = artworks
         .filter { it.kind == TamaArtworkKind.DAILY_DREAM.name && !it.albumId.isNullOrBlank() }
-        .groupBy { it.albumId!! }
+        .groupBy { it.albumId ?: return@buildGalleryEntries emptyList() }
         .values
         .map { albumItems ->
             val sorted = albumItems.sortedBy { it.albumIndex }
