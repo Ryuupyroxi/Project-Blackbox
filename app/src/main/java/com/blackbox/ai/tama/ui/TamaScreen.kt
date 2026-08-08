@@ -484,7 +484,7 @@ fun TamaScreen(
                     artworks = albumArtworks
                 )
                 if (isDeepDream && pet != null) {
-                    agentService.scheduleSummary(pet!!, force = false)
+                    agentService.scheduleSummary(pet, force = false)
                 }
                 dreamAlbumAwaitingRevealId = null
             }
@@ -533,7 +533,7 @@ fun TamaScreen(
                 ) {
                     TamaEmojiIcon(TAMA_HEADER_EMOJI, fontSize = 16.sp)
                     Text(
-                        text = pet!!.name,
+                        text = pet.name,
                         color = TamaLight,
                         fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.Bold,
@@ -638,7 +638,7 @@ fun TamaScreen(
 
         // Stats display
         if (pet != null) {
-            TamaStatsBar(pet = pet!!)
+            TamaStatsBar(pet = pet)
         }
 
         // Control buttons - location-aware
@@ -838,7 +838,7 @@ fun TamaScreen(
     // Status Dialog
     if (showStatusDialog && pet != null) {
         PetStatusDialog(
-            pet = pet!!,
+            pet = pet,
             onDismiss = { showStatusDialog = false }
         )
     }
@@ -869,9 +869,10 @@ fun TamaScreen(
     // Location details dialog
     if (selectedLocation != null && pet != null) {
         val loc = selectedLocation!!
-        val isDiscovered = pet!!.discoveredLocationIds.contains(loc.id) || loc.type == LocationType.HOME
+        val isDiscovered = pet.discoveredLocationIds.contains(loc.id) || loc.type == LocationType.HOME
         val isHere = currentLocation?.id == loc.id || (currentLocation == null && loc.x == 0 && loc.y == 0)
         val travelCost = if (isHere) 0 else gameEngine.previewTravelEnergyCost(currentLocation, loc)
+        val currentPet = pet
 
         TamaPopupDialog(
             title = if (isDiscovered) loc.type.localizedName(context) else stringResource(R.string.tama_unknown_place),
@@ -927,7 +928,7 @@ fun TamaScreen(
                         }
                         LocationType.SCHOOL -> {
                             Text(stringResource(R.string.tama_study_gain), fontFamily = FontFamily.Monospace, fontSize = 12.sp)
-                            Text(stringResource(R.string.tama_current_edu, pet!!.educationLevel.toInt()), fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                            Text(stringResource(R.string.tama_current_edu, currentPet.educationLevel.toInt()), fontFamily = FontFamily.Monospace, fontSize = 11.sp)
                         }
                         LocationType.WORKPLACE -> {
                             Text(stringResource(R.string.tama_avail_jobs), fontFamily = FontFamily.Monospace, fontSize = 12.sp)
@@ -946,7 +947,7 @@ fun TamaScreen(
                         }
                         LocationType.BOXING_RING -> {
                             Text(stringResource(R.string.tama_training_gain), fontFamily = FontFamily.Monospace, fontSize = 12.sp)
-                            Text(stringResource(R.string.tama_current_exercise, pet!!.exerciseLevel.toInt()), fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                            Text(stringResource(R.string.tama_current_exercise, currentPet.exerciseLevel.toInt()), fontFamily = FontFamily.Monospace, fontSize = 11.sp)
                         }
                         LocationType.PARK -> {
                             Text(stringResource(R.string.tama_park_relax), fontFamily = FontFamily.Monospace, fontSize = 12.sp)
@@ -969,10 +970,10 @@ fun TamaScreen(
                 } else {
                     Text(
                         stringResource(R.string.tama_travel_cost, travelCost),
-                        color = if (pet!!.stats.energy >= travelCost) TamaAccent else Color.Red,
+                        color = if (currentPet.stats.energy >= travelCost) TamaAccent else Color.Red,
                         fontFamily = FontFamily.Monospace
                     )
-                    if (pet!!.stats.energy < travelCost) {
+                    if (currentPet.stats.energy < travelCost) {
                         Text(stringResource(R.string.tama_not_enough_energy), color = Color.Red, fontFamily = FontFamily.Monospace, fontSize = 12.sp)
                     }
                 }
@@ -981,7 +982,7 @@ fun TamaScreen(
                 if (!isHere) {
                     TextButton(
                         onClick = {
-                            val alreadyDiscovered = pet!!.discoveredLocationIds.contains(loc.id)
+                            val alreadyDiscovered = currentPet.discoveredLocationIds.contains(loc.id)
                             scope.launch {
                                 val result = gameEngine.travelTo(loc)
                                 if (result.success) {
@@ -995,7 +996,7 @@ fun TamaScreen(
                             }
                             selectedLocation = null
                         },
-                        enabled = pet!!.stats.energy >= travelCost
+                        enabled = currentPet.stats.energy >= travelCost
                     ) {
                         Text(if (isDiscovered) stringResource(R.string.tama_btn_travel) else stringResource(R.string.tama_btn_explore))
                     }
@@ -1003,7 +1004,7 @@ fun TamaScreen(
                     when (loc.type) {
                         LocationType.SHOP -> {
                             TextButton(onClick = {
-                                if (pet!!.money >= 10) {
+                                if (currentPet.money >= 10) {
                                     scope.launch {
                                         Toast.makeText(context, context.getString(R.string.tama_bought_apple), Toast.LENGTH_SHORT).show()
                                     }
@@ -1110,7 +1111,7 @@ fun TamaScreen(
     // Feeding dialog with food selection
     if (showFeedDialog && pet != null) {
         FeedingDialog(
-            pet = pet!!,
+            pet = pet,
             onFeed = { foodType, hungerGain, happinessGain ->
                 performAction { gameEngine.feedWithFood(foodType, hungerGain, happinessGain) }
             },
@@ -1127,7 +1128,7 @@ fun TamaScreen(
     // Shop dialog for buying items
     if (showShopDialog && pet != null) {
         ShopDialog(
-            pet = pet!!,
+            pet = pet,
             onBuy = { item, cost ->
                 scope.launch {
                     val result = gameEngine.buyItem(item, 1, cost)
@@ -1140,7 +1141,7 @@ fun TamaScreen(
 
     if (showInventoryDialog && pet != null) {
         TamaInventoryDialog(
-            pet = pet!!,
+            pet = pet,
             onUseRoom = { roomId ->
                 scope.launch {
                     val result = gameEngine.setHomeRoom(roomId)
@@ -1163,7 +1164,7 @@ fun TamaScreen(
 
     if (showQuestChecklistDialog && pet != null) {
         TamaQuestChecklistDialog(
-            pet = pet!!,
+            pet = pet,
             checklist = questChecklist,
             onAddItem = { itemId ->
                 scope.launch {
@@ -1195,7 +1196,7 @@ fun TamaScreen(
 
     if (showWorkDialog && pet != null) {
         TamaWorkDialog(
-            pet = pet!!,
+            pet = pet,
             onDismiss = { showWorkDialog = false },
             onStartJob = { jobId ->
                 scope.launch {
@@ -1211,7 +1212,7 @@ fun TamaScreen(
 
     if (showTrainingDialog && pet != null) {
         TamaTrainingDialog(
-            pet = pet!!,
+            pet = pet,
             onDismiss = { showTrainingDialog = false },
             onStartTier = { tierId ->
                 scope.launch {
@@ -1270,7 +1271,7 @@ fun TamaScreen(
 
     if (showAlchemistDialog && pet != null) {
         AlchemistDialog(
-            pet = pet!!,
+            pet = pet,
             onBuy = { item, cost ->
                 scope.launch {
                     val result = gameEngine.buyItem(item, 1, cost)
@@ -1284,7 +1285,7 @@ fun TamaScreen(
 
     if (showHospitalDialog && pet != null) {
         HospitalDialog(
-            pet = pet!!,
+            pet = pet,
             onBuy = { item, cost ->
                 scope.launch {
                     val result = gameEngine.buyItem(item, 1, cost)
@@ -1297,7 +1298,7 @@ fun TamaScreen(
 
     if (showQuestBoardDialog && pet != null) {
         ParkQuestBoardDialog(
-            pet = pet!!,
+            pet = pet,
             board = questBoard,
             checklist = questChecklist,
             currentTime = currentTime,
@@ -1374,7 +1375,7 @@ fun TamaScreen(
 
     pet?.currentParkEncounter?.takeIf { currentLocation?.type == com.blackbox.ai.tama.data.LocationType.PARK }?.let { encounter ->
         TamaParkEncounterDialog(
-            pet = pet!!,
+            pet = pet,
             encounter = encounter,
             onDismissRegular = {
                 scope.launch {

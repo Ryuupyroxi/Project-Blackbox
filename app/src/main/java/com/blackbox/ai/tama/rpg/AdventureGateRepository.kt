@@ -40,6 +40,9 @@ class AdventureGateRepository(
         const val AWAKE_MANA_PER_MINUTE = 2
     }
 
+    private suspend fun petFor(petId: String): TamaPet? =
+        dao.getPet(petId)?.let(PetMapper::toDomain)
+
     fun observeProfile(petId: String): Flow<AdventureGateProfile?> =
         dao.observeAdventureGateProfile(petId).combine(dao.observePet(petId)) { entity, pet ->
             entity?.toDomain()?.let { profile ->

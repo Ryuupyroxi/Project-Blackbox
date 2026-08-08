@@ -381,7 +381,7 @@ private object TamaFarmWidgetRenderer {
         val cropBitmap = if (crop.isDecayed) {
             loadBitmap(context, "farm/Others/rotten_crop.png")
         } else {
-            loadCropBitmap(context, crop)
+            loadBitmap(context, "farm/Crops/${stageFolder(crop)}/${crop.type}.png")
         }
         cropBitmap?.let {
             val scale = cropScale(crop)
@@ -448,9 +448,6 @@ private object TamaFarmWidgetRenderer {
         }
         canvas.drawBitmap(bitmap, null, rect, paint)
     }
-
-    private fun loadCropBitmap(context: Context, crop: PlantedCrop): Bitmap? =
-        loadBitmap(context, "farm/Crops/${stageFolder(crop)}/${crop.type}.png")
 
     private fun loadBitmap(context: Context, path: String): Bitmap? =
         runCatching { context.assets.open(path).use(BitmapFactory::decodeStream) }.getOrNull()

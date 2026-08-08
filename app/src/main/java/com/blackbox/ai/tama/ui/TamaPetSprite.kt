@@ -78,12 +78,7 @@ fun TamaPetSprite(
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = androidx.compose.ui.layout.ContentScale.Fit,
-            filterQuality = androidx.compose.ui.graphics.FilterQuality.None,
-            error = {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "?", color = Color.White.copy(alpha = 0.7f), fontSize = 24.sp)
-                }
-            }
+            filterQuality = androidx.compose.ui.graphics.FilterQuality.None
         )
     }
 }
@@ -189,10 +184,7 @@ fun TamaLocationBackdrop(
             contentDescription = null,
             modifier = modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
-            filterQuality = FilterQuality.None,
-            error = {
-                PixelScene(locationId = sceneKey, locationType = sceneKey, modifier = Modifier.fillMaxSize())
-            }
+            filterQuality = FilterQuality.None
         )
     } else {
         PixelScene(locationId = sceneKey, locationType = sceneKey, modifier = modifier)

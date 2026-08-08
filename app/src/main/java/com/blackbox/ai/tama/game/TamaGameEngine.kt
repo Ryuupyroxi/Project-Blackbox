@@ -73,6 +73,9 @@ class TamaGameEngine(
     private val _currentLocation = MutableStateFlow<TamaLocation?>(null)
     val currentLocation: StateFlow<TamaLocation?> = _currentLocation.asStateFlow()
 
+    private val activePet: TamaPet?
+        get() = _pet.value
+
     // Time tracking for real-time updates
     private var lastUpdateTime = 0L
     private var hasLoggedReturnThisSession = false  // Prevent OWNER_RETURNED spam
@@ -225,8 +228,10 @@ class TamaGameEngine(
     /**
      * Load existing pet from database.
      */
-    suspend fun loadPet(): TamaPet? {
-        val entity = dao.getActivePet() ?: return null
+    private suspend fun activePetEntity() = dao.getActivePet()
+
+    private suspend fun loadPet(): TamaPet? {
+        val entity = activePetEntity() ?: return null
         val pet = PetMapper.toDomain(entity)
         pruneExtraPetsKeeping(pet.id)
         _pet.value = pet
@@ -252,8 +257,7 @@ class TamaGameEngine(
     private suspend fun ensurePetLoadedForBackgroundUpdates(): TamaPet? {
         val currentPet = _pet.value
         if (currentPet != null) return currentPet
-        val entity = dao.getActivePet() ?: return null
-        val pet = PetMapper.toDomain(entity)
+        val pet = activePetEntity()?.let(PetMapper::toDomain) ?: return null
         pruneExtraPetsKeeping(pet.id)
         _pet.value = pet
         _currentLocation.value = resolveLocation(pet.currentLocationId)
@@ -275,7 +279,7 @@ class TamaGameEngine(
      * Called on app open and periodically.
      */
     suspend fun updateForTimePassed() {
-        val pet = _pet.value ?: return
+        val pet = activePet ?: return
         val now = System.currentTimeMillis()
         if (lastUpdateTime > 0L && now - lastUpdateTime < 4_500L) {
             return
@@ -483,7 +487,7 @@ class TamaGameEngine(
     }
 
     fun maybeCreateSleepyFairyReminder(now: Long = System.currentTimeMillis()): TamaSleepyFairyReminder? {
-        val pet = _pet.value ?: return null
+        val pet = activePet ?: return null
         val currentLocation = _currentLocation.value ?: resolveLocation(pet.currentLocationId)
         if (currentLocation?.type != LocationType.HOME) return null
         if (pet.homeRoomId != TamaRoomCatalog.PRINCIPAL_ROOM_ID) return null
@@ -586,7 +590,7 @@ class TamaGameEngine(
     }
 
     private fun stagePotionDetails(targetStage: GrowthStage): Pair<Boolean, String> {
-        val pet = _pet.value ?: return false to context.getString(R.string.tama_error_no_pet)
+        val pet = activePet ?: return false to context.getString(R.string.tama_error_no_pet)
         if (targetStage == GrowthStage.EGG) {
             return false to context.getString(R.string.tama_potion_stage_invalid)
         }
@@ -597,7 +601,7 @@ class TamaGameEngine(
     }
 
     private fun speciesPotionDetails(targetSpecies: PetSpeciesLine): Pair<Boolean, String> {
-        val pet = _pet.value ?: return false to context.getString(R.string.tama_error_no_pet)
+        val pet = activePet ?: return false to context.getString(R.string.tama_error_no_pet)
         if (pet.species.equals(targetSpecies.id, ignoreCase = true)) {
             return false to context.getString(
                 R.string.tama_potion_species_same,
@@ -676,7 +680,7 @@ class TamaGameEngine(
     // ==================== Care Actions ====================
 
     suspend fun feed(): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         if (pet.isSleeping) return ActionResult(false, context.getString(R.string.tama_sleeping_busy, pet.name))
         if (pet.stage == GrowthStage.EGG) return ActionResult(false, context.getString(R.string.tama_action_egg_cannot_eat))
         if (pet.stats.hunger >= 100) return ActionResult(false, context.getString(R.string.tama_action_food_full, pet.name))
@@ -695,7 +699,7 @@ class TamaGameEngine(
     }
 
     suspend fun feedWithFood(foodId: String, hungerGain: Int, happinessGain: Int): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         if (pet.isSleeping) return ActionResult(false, context.getString(R.string.tama_sleeping_busy, pet.name))
         if (pet.stage == GrowthStage.EGG) return ActionResult(false, context.getString(R.string.tama_action_egg_cannot_eat))
 
@@ -741,7 +745,7 @@ class TamaGameEngine(
     }
 
     suspend fun usePotion(potionId: String): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         if (pet.isSleeping) return ActionResult(false, context.getString(R.string.tama_sleeping_busy, pet.name))
 
         val potion = TamaPotionCatalog.byId(potionId)
@@ -865,7 +869,7 @@ class TamaGameEngine(
     }
 
     suspend fun useAdventureGateSupply(supplyId: String): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val supply = AdventureGateCatalog.supply(supplyId)
             ?: return ActionResult(false, context.getString(R.string.tama_potion_missing))
         val existingEntity = dao.getAdventureGateProfile(pet.id)
@@ -964,7 +968,7 @@ class TamaGameEngine(
     }
 
     suspend fun brewAdventureGatePotion(ingredientItemIds: List<String>): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         if (ingredientItemIds.isEmpty()) {
             return ActionResult(false, context.getString(R.string.tama_alchemist_kitchen_empty_selection))
         }
@@ -1119,7 +1123,7 @@ class TamaGameEngine(
     }
 
     suspend fun clean(): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         if (pet.isSleeping) return ActionResult(false, context.getString(R.string.tama_sleeping_busy, pet.name))
         if (pet.stage == GrowthStage.EGG) return ActionResult(false, context.getString(R.string.tama_action_egg_cannot_bathe))
         if (pet.poopCount > 0) {
@@ -1157,7 +1161,7 @@ class TamaGameEngine(
     }
 
     suspend fun play(): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         if (pet.isSleeping) return ActionResult(false, context.getString(R.string.tama_sleeping_busy, pet.name))
         if (pet.stage == GrowthStage.EGG) return ActionResult(false, context.getString(R.string.tama_action_egg_cannot_play))
         if (pet.stats.happiness >= 100) return ActionResult(false, context.getString(R.string.tama_action_already_super_happy, pet.name))
@@ -1184,7 +1188,7 @@ class TamaGameEngine(
      * Put pet to bed - they stay asleep until woken up.
      */
     suspend fun goToBed(): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         if (pet.isSleeping) return ActionResult(false, context.getString(R.string.tama_action_already_asleep, pet.name))
         if (pet.stage == GrowthStage.EGG) return ActionResult(false, context.getString(R.string.tama_action_egg_cannot_sleep))
         if (pet.stats.energy >= 100) return ActionResult(false, context.getString(R.string.tama_action_not_tired, pet.name))
@@ -1220,7 +1224,7 @@ class TamaGameEngine(
      * Wake pet up - restores energy based on time slept.
      */
     suspend fun wakeUp() {
-        val initialPet = _pet.value ?: return
+        val initialPet = activePet ?: return
         val now = System.currentTimeMillis()
         val latestPet = dao.getPet(initialPet.id)?.let(PetMapper::toDomain) ?: initialPet
         val currentPet = maybeQueueDailyDream(latestPet, now)
@@ -1256,7 +1260,7 @@ class TamaGameEngine(
     }
 
     suspend fun triggerDeepDreamDebug(): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         if (!pet.isSleeping) {
             return ActionResult(false, context.getString(R.string.tama_deep_dream_debug_requires_sleep))
         }
@@ -1275,7 +1279,7 @@ class TamaGameEngine(
      * Check if action is allowed (blocked when sleeping).
      */
     fun canDoAction(): Boolean {
-        val pet = _pet.value ?: return false
+        val pet = activePet ?: return false
         return !pet.isSleeping && pet.stage != GrowthStage.EGG
     }
 
@@ -1288,7 +1292,7 @@ class TamaGameEngine(
         if (activity == ActivityType.STUDYING) {
             return startNormalStudySession(emptySet(), emptyList())
         }
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         if (pet.isSleeping) return ActionResult(false, context.getString(R.string.tama_sleeping_busy, pet.name))
         if (pet.currentActivity != ActivityType.NONE) {
             return ActionResult(false, context.getString(R.string.tama_action_already_busy, pet.name))
@@ -1342,7 +1346,7 @@ class TamaGameEngine(
         selectedLabelIds: Set<String>,
         newLabelNames: List<String>
     ): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val validation = validateStudyStart(pet)
         if (validation != null) return validation
         val now = System.currentTimeMillis()
@@ -1378,7 +1382,7 @@ class TamaGameEngine(
         newLabelNames: List<String>,
         settings: TamaPomodoroSettings
     ): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val validation = validateStudyStart(pet)
         if (validation != null) return validation
         val normalized = settings.normalized()
@@ -1411,7 +1415,7 @@ class TamaGameEngine(
     }
 
     suspend fun refreshActiveStudySession(now: Long = System.currentTimeMillis()): TamaStudySessionEntity? {
-        val pet = _pet.value ?: return null
+        val pet = activePet ?: return null
         val result = TamaStudySessionSupport.advanceActiveSession(
             context = context,
             dao = dao,
@@ -1501,7 +1505,7 @@ class TamaGameEngine(
      * Stop current activity and collect rewards.
      */
     suspend fun stopActivity(): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         if (pet.currentActivity == ActivityType.NONE) {
             return ActionResult(false, context.getString(R.string.tama_action_not_doing_anything))
         }
@@ -1631,7 +1635,7 @@ class TamaGameEngine(
      * Start a job.
      */
     suspend fun startWork(jobId: String): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val job = TamaWorkCatalog.jobById(jobId)
             ?: return ActionResult(false, context.getString(R.string.tama_work_job_missing))
         if (pet.educationLevel < job.requiredEducation) {
@@ -1672,7 +1676,7 @@ class TamaGameEngine(
     }
 
     suspend fun finishWork(): Long {
-        val pet = _pet.value ?: return 0
+        val pet = activePet ?: return 0
         if (pet.currentActivity != ActivityType.WORKING) return 0
         val before = pet.money
         stopActivity()
@@ -1680,7 +1684,7 @@ class TamaGameEngine(
     }
 
     suspend fun startTraining(tierId: String): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val tier = TamaTrainingCatalog.tierById(tierId)
             ?: return ActionResult(false, context.getString(R.string.tama_training_tier_missing))
         if (pet.exerciseLevel < tier.requiredExercise) {
@@ -1727,7 +1731,7 @@ class TamaGameEngine(
      * Travel to a new location (costs energy).
      */
     suspend fun travelTo(location: TamaLocation): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         if (pet.isSleeping) return ActionResult(false, context.getString(R.string.tama_sleeping_busy, pet.name))
         if (pet.currentActivity != ActivityType.NONE) return ActionResult(false, context.getString(R.string.tama_busy_cannot_travel, pet.name))
         if (pet.stage == GrowthStage.EGG) return ActionResult(false, context.getString(R.string.tama_eggs_cannot_travel))
@@ -1836,7 +1840,7 @@ class TamaGameEngine(
     }
 
     suspend fun dismissParkEncounter(): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         if (pet.currentParkEncounter == null) {
             return ActionResult(false, context.getString(R.string.tama_park_no_encounter))
         }
@@ -1847,7 +1851,7 @@ class TamaGameEngine(
     }
 
     suspend fun acceptRecyclerEncounter(): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val encounter = pet.currentParkEncounter
             ?: return ActionResult(false, context.getString(R.string.tama_park_no_encounter))
         if (encounter.type != TamaParkEncounterType.RECYCLER) {
@@ -1864,7 +1868,7 @@ class TamaGameEngine(
     }
 
     suspend fun declineRecyclerEncounter(): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val encounter = pet.currentParkEncounter
             ?: return ActionResult(false, context.getString(R.string.tama_park_no_encounter))
         if (encounter.type != TamaParkEncounterType.RECYCLER) {
@@ -1888,7 +1892,7 @@ class TamaGameEngine(
     }
 
     suspend fun finishRecyclerEncounter(): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val encounter = pet.currentParkEncounter
             ?: return ActionResult(false, context.getString(R.string.tama_park_no_encounter))
         if (encounter.type != TamaParkEncounterType.RECYCLER) {
@@ -1912,7 +1916,7 @@ class TamaGameEngine(
     }
 
     suspend fun acceptSellerEncounter(): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val encounter = pet.currentParkEncounter
             ?: return ActionResult(false, context.getString(R.string.tama_park_no_encounter))
         if (encounter.type != TamaParkEncounterType.SELLER) {
@@ -1927,7 +1931,7 @@ class TamaGameEngine(
     }
 
     suspend fun declineSellerEncounter(): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val encounter = pet.currentParkEncounter
             ?: return ActionResult(false, context.getString(R.string.tama_park_no_encounter))
         if (encounter.type != TamaParkEncounterType.SELLER) {
@@ -1947,7 +1951,7 @@ class TamaGameEngine(
     }
 
     suspend fun finishSellerEncounter(): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val encounter = pet.currentParkEncounter
             ?: return ActionResult(false, context.getString(R.string.tama_park_no_encounter))
         if (encounter.type != TamaParkEncounterType.SELLER) {
@@ -1989,7 +1993,7 @@ class TamaGameEngine(
     }
 
     suspend fun getParkMarketBoard(now: Long = System.currentTimeMillis()): TamaMarketBoard {
-        val pet = _pet.value ?: return TamaMarketBoard(emptyList(), TamaMarketPricing.quoteWeekKey(now), TamaMarketPricing.nextFridayRefreshAt(now))
+        val pet = activePet ?: return TamaMarketBoard(emptyList(), TamaMarketPricing.quoteWeekKey(now), TamaMarketPricing.nextFridayRefreshAt(now))
         val quotes = ensureMarketQuotesForPet(pet.id, now)
         return TamaMarketBoard(
             quotes = quotes,
@@ -2069,7 +2073,7 @@ class TamaGameEngine(
     }
 
     suspend fun getParkQuestBoard(now: Long = System.currentTimeMillis()): TamaQuestBoard {
-        val pet = _pet.value ?: return TamaQuestBoard(emptyList(), emptyList(), nextLocalMidnightMillis(now))
+        val pet = activePet ?: return TamaQuestBoard(emptyList(), emptyList(), nextLocalMidnightMillis(now))
         val dateKey = questDateKey(now)
         dao.deleteStaleAvailableQuests(pet.id, dateKey)
         expireAcceptedParkQuests(pet.id, now)
@@ -2093,7 +2097,7 @@ class TamaGameEngine(
     }
 
     suspend fun acceptParkQuest(questId: String, now: Long = System.currentTimeMillis()): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val quest = dao.getQuestsForPet(pet.id)
             .map(::questEntityToDomain)
             .firstOrNull { it.id == questId }
@@ -2120,7 +2124,7 @@ class TamaGameEngine(
     }
 
     suspend fun addQuestToChecklist(questId: String, now: Long = System.currentTimeMillis()): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val quest = dao.getQuestsForPet(pet.id)
             .map(::questEntityToDomain)
             .firstOrNull { it.id == questId }
@@ -2161,7 +2165,7 @@ class TamaGameEngine(
         quantity: Int = 1,
         now: Long = System.currentTimeMillis()
     ): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         if (!FarmTradeItemCatalog.isTradeItem(itemId)) {
             return ActionResult(false, context.getString(R.string.tama_quest_checklist_invalid_item))
         }
@@ -2190,7 +2194,7 @@ class TamaGameEngine(
         checked: Boolean,
         now: Long = System.currentTimeMillis()
     ): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val existing = dao.getQuestChecklistItem(pet.id, itemId)
             ?: return ActionResult(false, context.getString(R.string.tama_quest_checklist_not_found))
         if (quantity <= 0) {
@@ -2208,13 +2212,13 @@ class TamaGameEngine(
     }
 
     suspend fun deleteQuestChecklistItem(itemId: String): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         dao.deleteQuestChecklistItem(pet.id, itemId)
         return ActionResult(true, context.getString(R.string.tama_quest_checklist_item_deleted))
     }
 
     suspend fun clearCheckedQuestChecklistItems(): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val checkedCount = dao.getQuestChecklist(pet.id).count { it.checked }
         if (checkedCount == 0) {
             return ActionResult(false, context.getString(R.string.tama_quest_checklist_no_checked))
@@ -2224,7 +2228,7 @@ class TamaGameEngine(
     }
 
     suspend fun canFinishParkQuest(questId: String): Boolean {
-        val pet = _pet.value ?: return false
+        val pet = activePet ?: return false
         val quest = dao.getQuestsForPet(pet.id)
             .map(::questEntityToDomain)
             .firstOrNull { it.id == questId } ?: return false
@@ -2232,7 +2236,7 @@ class TamaGameEngine(
     }
 
     suspend fun finishParkQuest(questId: String, now: Long = System.currentTimeMillis()): ParkQuestFinishResult {
-        val pet = _pet.value ?: return ParkQuestFinishResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ParkQuestFinishResult(false, context.getString(R.string.tama_error_no_pet))
         expireAcceptedParkQuests(pet.id, now)
         val quest = dao.getQuestsForPet(pet.id)
             .map(::questEntityToDomain)
@@ -2286,7 +2290,7 @@ class TamaGameEngine(
     }
 
     suspend fun harvestCrop(crop: PlantedCrop): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         return if (crop.isDecayed) {
             grantItem(
                 InventoryItem(
@@ -2337,7 +2341,7 @@ class TamaGameEngine(
     suspend fun setCurrentLocation(location: TamaLocation) {
         _currentLocation.value = location
         // Also mark as discovered
-        val pet = _pet.value ?: return
+        val pet = activePet ?: return
         if (!pet.discoveredLocationIds.contains(location.id)) {
             val updatedPet = pet.copy(
                 discoveredLocationIds = pet.discoveredLocationIds + location.id,
@@ -2351,7 +2355,7 @@ class TamaGameEngine(
     // ==================== Economy System ====================
 
     suspend fun buyItem(item: InventoryItem, quantity: Int, pricePerUnit: Int): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         TamaPotionCatalog.byId(item.id)?.let { potion ->
             if (potion.kind == TamaPotionKind.STAGE && potion.targetStage == pet.stage) {
                 return ActionResult(false, context.getString(R.string.tama_potion_stage_already_current))
@@ -2448,7 +2452,7 @@ class TamaGameEngine(
     }
 
     suspend fun grantItem(item: InventoryItem, quantity: Int = 1): Boolean {
-        val pet = _pet.value ?: return false
+        val pet = activePet ?: return false
         farmToolFamilyId(item.id)?.takeIf { item.type == ItemType.TOOL }?.let { familyId ->
             val currentDurability = farmToolTotalDurability(pet.inventory, familyId)
             val addedDurability = (item.durability ?: item.maxDurability ?: FARM_TOOL_REPAIR_AMOUNT) * quantity.coerceAtLeast(1)
@@ -2490,7 +2494,7 @@ class TamaGameEngine(
     }
 
     suspend fun collectHarvesterDroneStorage(): Boolean {
-        val currentPet = _pet.value ?: return false
+        val currentPet = activePet ?: return false
         val now = System.currentTimeMillis()
         val database = TamaDatabase.getInstance(context.applicationContext)
         val updatedPet = database.withTransaction {
@@ -2529,7 +2533,7 @@ class TamaGameEngine(
     }
 
     suspend fun setHomeRoom(roomId: String): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val room = TamaRoomCatalog.roomById(roomId)
             ?: return ActionResult(false, context.getString(R.string.tama_room_not_found))
 
@@ -2563,7 +2567,7 @@ class TamaGameEngine(
     }
 
     suspend fun placeDecoration(decorId: String, slot: TamaDecorSlot): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val decor = TamaDecorCatalog.decorById(decorId)
             ?: return ActionResult(false, context.getString(R.string.tama_toy_not_found))
         val decorItem = pet.inventory.find { it.id.equals(decor.id, ignoreCase = true) }
@@ -2616,7 +2620,7 @@ class TamaGameEngine(
     }
 
     suspend fun removeDecoration(slot: TamaDecorSlot): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val currentDecorId = when (slot) {
             TamaDecorSlot.LEFT -> pet.leftDecorationId
             TamaDecorSlot.RIGHT -> pet.rightDecorationId
@@ -2660,7 +2664,7 @@ class TamaGameEngine(
     }
 
     suspend fun clearPendingDreamAlbum(albumId: String? = null) {
-        val pet = _pet.value ?: return
+        val pet = activePet ?: return
         if (albumId != null && pet.pendingDreamAlbumId != albumId) return
         val updatedPet = pet.copy(pendingDreamAlbumId = null)
         _pet.value = updatedPet
@@ -2672,7 +2676,7 @@ class TamaGameEngine(
      * Used for planting, crafting, etc.
      */
     suspend fun consumeItem(item: InventoryItem, quantity: Int = 1): Boolean {
-        val pet = _pet.value ?: return false
+        val pet = activePet ?: return false
         val existing = pet.inventory.find { it.id == item.id } ?: return false
 
         if (existing.quantity < quantity) return false
@@ -2693,7 +2697,7 @@ class TamaGameEngine(
     }
 
     suspend fun consumeFarmToolDurability(familyId: String, amount: Int): Int {
-        val pet = _pet.value ?: return 0
+        val pet = activePet ?: return 0
         val safeFamilyId = farmToolFamilyId(familyId) ?: familyId
         if (safeFamilyId != "hoe" && safeFamilyId != "watering_can") return 0
         val currentDurability = farmToolTotalDurability(pet.inventory, safeFamilyId)
@@ -2742,7 +2746,7 @@ class TamaGameEngine(
      * Spend money.
      */
     suspend fun spendMoney(amount: Long): Boolean {
-        val pet = _pet.value ?: return false
+        val pet = activePet ?: return false
         if (pet.money < amount) return false
 
         val updatedPet = pet.copy(money = pet.money - amount)
@@ -2752,7 +2756,7 @@ class TamaGameEngine(
     }
 
     suspend fun awardMoney(amount: Long, details: String? = null): Boolean {
-        val pet = _pet.value ?: return false
+        val pet = activePet ?: return false
         val safeAmount = amount.coerceAtLeast(0)
         if (safeAmount == 0L) {
             if (!details.isNullOrBlank()) {
@@ -2773,7 +2777,7 @@ class TamaGameEngine(
     }
 
     suspend fun awardHappiness(amount: Float, details: String? = null): Boolean {
-        val pet = _pet.value ?: return false
+        val pet = activePet ?: return false
         val safeAmount = amount.coerceAtLeast(0f)
         if (safeAmount == 0f) {
             if (!details.isNullOrBlank()) {
@@ -2796,7 +2800,7 @@ class TamaGameEngine(
     }
 
     suspend fun sellItem(item: InventoryItem, quantity: Int = 1, price: Long): ActionResult {
-        val pet = _pet.value ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
+        val pet = activePet ?: return ActionResult(false, context.getString(R.string.tama_error_no_pet))
         val totalGain = price * quantity
         val displayName = inventoryItemDisplayName(context, item)
 
@@ -3944,7 +3948,7 @@ class TamaGameEngine(
     }
 
     suspend fun reduceToolDurability(tool: InventoryItem, amount: Int): Boolean {
-        val pet = _pet.value ?: return false
+        val pet = activePet ?: return false
         val inventory = pet.inventory.toMutableList()
         val index = inventory.indexOfFirst { it.id == tool.id }
         if (index == -1) return false

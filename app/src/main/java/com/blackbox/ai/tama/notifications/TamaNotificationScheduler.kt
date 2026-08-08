@@ -284,12 +284,19 @@ object TamaNotificationScheduler {
 
         val pendingIntent = buildAlarmPendingIntent(context, alert.petId, alert.kind, alert)
         val triggerAt = max(System.currentTimeMillis() + 1_000L, alert.dueAtMillis)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager.canScheduleExactAlarms()) {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
-        } else {
-            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
+        val scheduled = runCatching {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager.canScheduleExactAlarms()) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
+            } else {
+                alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
+            }
+        }.onFailure {
+            DebugLog.log("[TamaNotificationScheduler] Alarm scheduling failed for ${alert.kind}: ${it.message}")
+        }.isSuccess
+        if (!scheduled && !wasDelivered(context, alert.kind, alert.petId, alert.signature)) {
+            DebugLog.log("[TamaNotificationScheduler] Alarm not scheduled for ${alert.kind}; will retry on next tick")
         }
     }
 
