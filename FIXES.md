@@ -257,3 +257,5 @@ LOCAL channel works without Termux; review `EmbeddedRuntimeManager` timeouts and
 - [x] **P5.26** `AiServersHubScreen` renders "Runtime agents" section with Start/Stop/Health/Open controls for all web-UI agent servers.
 - [x] **P5.27** 133 placeholder Tama assets added: 111 pet sprites (3 species × 6 stages), 8 room backgrounds, 2 NPCs, 12 crop sprites. `TamaPetSprite` draws species-colored fallback behind `AsyncImage` to prevent crashes on missing assets.
 - [x] **P5.28** Version bumped to `1.0.1` (`versionCode 1001`), `README.md` updated, release tag `v1.0.1` pushed to `main`.
+- [x] **P5.29** Version bumped to `1.0.2` (`versionCode 1002`), `README.md` updated, release tag `v1.0.2` pushed to `main`.
+- [x] **P5.30** Tama robustness pass: centralized active-pet lookups, hardened study session round handling, stripped brittle `!!` assertions, normalized active-pet query by newest pet, guarded adventure battle actions behind pet existence. `versionCode 1003`, `versionName 1.0.3`, release tag `v1.0.3`.
