@@ -273,6 +273,11 @@ See `AGENTS.md` (repo root) for orientation. Key focus areas for the next agent:
     inside the conditional empty-state card (item 1), which keeps API Key Channels at index 6 whenever
     the buttons are visible. No change needed.
   - P5: added trailing newlines to `ui/theme/Color.kt` + `ui/theme/Theme.kt`.
-  - Version: `versionCode 1000`, `versionName "1.0-beta"` (matches release tag `v1beta`).
-  - Docs: created `README.md` for the public release (features, download, build, quick start, privacy,
-    license/credits); verified repo visibility is PUBLIC (user-authorized for v1beta).
+  - Version: `versionCode 1001`, `versionName "1.0.1"` (tag `v1.0.1`).
+  - Docs: updated `README.md` version badge from `v1beta` to `v1.0.1`.
+  - New fixes in this release:
+    - **Kiwix catalog:** `KiwixCatalogClient` now uses `HttpURLConnection`, checks HTTP status, follows redirects, and accepts both `atom+xml` and `json`. Added `parseJsonCatalog()` fallback. Fixed XML `author`/`publisher` nested text accumulation.
+    - **Zim manager retry:** `retryKey` state added so retry button actually forces fresh `fetchCatalog()` instead of being a no-op.
+    - **AI Servers Hub:** New `RuntimeAgentServerStore` polls runtime agent status every 5s and renders Codex/OpenClaw/Hermes cards with Start/Stop/Health/Open controls.
+    - **Tama assets:** 133 placeholder PNGs added (`pets` 111, `backgrounds` 8, `npcs` 2, `crops` 12). `TamaPetSprite` now draws species-colored fallback behind `AsyncImage` so missing assets don't crash.
+  - ZIM download path: `DownloadManager` + `ZimDownloadReceiver` correctly registers completed downloads by ID and inserts them into the DB.

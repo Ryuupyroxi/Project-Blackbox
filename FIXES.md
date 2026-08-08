@@ -246,3 +246,14 @@ LOCAL channel works without Termux; review `EmbeddedRuntimeManager` timeouts and
 - [x] **P4.22** Daemon tick refreshes ADT `LlamaScheduledTaskScheduler` alarms + heartbeat pref
 - Ask Coder to re-audit voice/calendar API usage (minSdk 26, Android 13+ notification
   permission, STT on-device availability) after the combined Phase 3+4 build lands.
+
+---
+
+## Implementation status — updated by builder (2026-08-07, v1.0.1)
+
+- [x] **P5.23** `KiwixCatalogClient` rewritten to use `HttpURLConnection` with explicit HTTP status checks and redirect following. Added `parseJsonCatalog()` fallback for JSON responses. Fixed XML parser `author`/`publisher` nested text accumulation bug. Catalog entries now download and populate correctly.
+- [x] **P5.24** Zim manager retry button now works: added `retryKey` state to `CatalogTab` that increments on retry click, forcing `LaunchedEffect` to re-run `fetchCatalog()`.
+- [x] **P5.25** New `RuntimeAgentServerStore` service polls agent runtime status every 5s and exposes observable state for Hermes/Codex/OpenClaw servers.
+- [x] **P5.26** `AiServersHubScreen` renders "Runtime agents" section with Start/Stop/Health/Open controls for all web-UI agent servers.
+- [x] **P5.27** 133 placeholder Tama assets added: 111 pet sprites (3 species × 6 stages), 8 room backgrounds, 2 NPCs, 12 crop sprites. `TamaPetSprite` draws species-colored fallback behind `AsyncImage` to prevent crashes on missing assets.
+- [x] **P5.28** Version bumped to `1.0.1` (`versionCode 1001`), `README.md` updated, release tag `v1.0.1` pushed to `main`.
