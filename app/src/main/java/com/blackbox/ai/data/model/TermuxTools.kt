@@ -81,7 +81,7 @@ object ToolInfoCards {
         ),
         integration = "Configure Ollama endpoint in Settings → Models → Ollama. Use 'Beam' for multi-model comparison.",
         features = listOf("AI personas", "Beam multi-model chat", "Code execution", "PDF import", "Response streaming"),
-        githubUrl = "https://github.com/ManuXD32/big-AGI/tree/v2-dev"
+        githubUrl = "https://github.com/Ryuupyroxi/Project-Blackbox"
     )
 
     val oobabooga = ToolInfo(
@@ -94,7 +94,7 @@ object ToolInfoCards {
         ),
         integration = "100% offline, zero telemetry. OpenAI-compatible API for tool calling. Extensions available.",
         features = listOf("Multiple backends (llama.cpp, Transformers, ExLlamaV3)", "Image generation", "Vision models", "Web search", "Extensions"),
-        githubUrl = "https://github.com/ManuXD32/textgen"
+        githubUrl = "https://github.com/Ryuupyroxi/Project-Blackbox"
     )
 
     val fastsdcpu = ToolInfo(
@@ -107,7 +107,7 @@ object ToolInfoCards {
         ),
         integration = "Web UI: http://127.0.0.1:7860. MCP Server: python src/app.py --mcp (port 8000). OpenWebUI: add http://127.0.0.1:8000 in Settings, set Function Calling to Native.",
         features = listOf("Desktop GUI, Web UI, CLI", "OpenVINO support", "LCM-LoRA", "ControlNet", "Real-time generation", "Raspberry Pi + Android support"),
-        githubUrl = "https://github.com/ManuXD32/fastsdcpu"
+        githubUrl = "https://github.com/Ryuupyroxi/Project-Blackbox"
     )
 
     val a1111 = ToolInfo(
@@ -120,7 +120,7 @@ object ToolInfoCards {
         integration = "",
         integrationResId = com.blackbox.ai.R.string.tool_a1111_integration,
         features = listOf("Stable Diffusion WebUI", "Extensions", "ControlNet", "LoRA support"),
-        githubUrl = "https://github.com/ManuXD32/stable-diffusion-webui"
+        githubUrl = "https://github.com/Ryuupyroxi/Project-Blackbox"
     )
 
     // Note: AI Agent has its own setup at AIHubScreen -> AgentScreen
@@ -164,11 +164,11 @@ object TermuxTools {
         const val NONE = ""
     }
 
-    private const val BIG_AGI_REPO = "https://github.com/ManuXD32/big-AGI.git"
+    private const val BIG_AGI_REPO = "https://github.com/Ryuupyroxi/Project-Blackbox/big-AGI.git"
     private const val BIG_AGI_BRANCH = "v2-dev"
-    private const val OOBABOOGA_REPO = "https://github.com/ManuXD32/textgen"
-    private const val FASTSDCPU_REPO = "https://github.com/ManuXD32/fastsdcpu"
-    private const val A1111_REPO = "https://github.com/ManuXD32/stable-diffusion-webui.git"
+    private const val OOBABOOGA_REPO = "https://github.com/Ryuupyroxi/Project-Blackbox"
+    private const val FASTSDCPU_REPO = "https://github.com/Ryuupyroxi/Project-Blackbox"
+    private const val A1111_REPO = "https://github.com/Ryuupyroxi/Project-Blackbox.git"
     private const val OLLAMA_PROCESS_PATTERN = "ollama serve"
     private const val OPEN_WEBUI_PROCESS_PATTERN = "open-webui serve --port 8082"
     private const val BIG_AGI_PROCESS_PATTERN = "next start --port 8081"

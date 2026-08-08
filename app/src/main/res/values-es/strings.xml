@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App Name (keep English) -->
-    <string name="app_name">AI Doomsday Toolbox</string>
+    <string name="app_name">Blackbox</string>
     
     <!-- Navigation -->
     <string name="nav_home">Inicio</string>
@@ -267,7 +267,7 @@
     <string name="llama_server_native_linker_failure">Android no pudo iniciar llama-server porque el binario nativo incluido no pudo cargarse antes de abrir el modelo. Es un problema de compatibilidad del binario nativo, no de RAM del modelo. Detalles: %1$s</string>
     <string name="llama_server_opencl_mtp_top_k_warning">Aviso de OpenCL MTP experimental: este backend GPU informó que TOP_K no está soportado, así que el muestreo o MTP puede ir más lento que CPU.</string>
     <string name="llama_server_opencl_mtp_memory_probe_warning">Aviso de OpenCL MTP experimental: falló la prueba de memoria del modelo borrador. La ejecución puede continuar, pero compárala con CPU o MTP desactivado.</string>
-    <string name="llama_server_opencl_backend_path_warning">Aviso de OpenCL experimental: llama.cpp intentó cargar una ruta de backend como directorio. ADT evitará rutas GGML que sean solo directorios en futuros inicios.</string>
+    <string name="llama_server_opencl_backend_path_warning">Aviso de OpenCL experimental: llama.cpp intentó cargar una ruta de backend como directorio. Blackbox evitará rutas GGML que sean solo directorios en futuros inicios.</string>
     <string name="imagegen_notification_progress">%1$s: %2$d/%3$d</string>
     <string name="imagegen_notification_status">%1$s • %2$s</string>
     <string name="imagegen_notification_complete">Generación de imagen completada</string>
@@ -988,7 +988,7 @@
     <string name="logs_no_rpc">Sin logs de RPC aún</string>
     <string name="logs_no_rpc_desc">Inicia un worker para ver la salida del servidor RPC</string>
     <string name="logs_terminal_header">rpc-server -- /dev/tty</string>
-    <string name="logs_clip_label">Logs de LlamaDroid</string>
+    <string name="logs_clip_label">Logs de Blackbox</string>
     <string name="logs_generation_diag_title">Diagnóstico de generación</string>
     <string name="logs_generation_diag_reason">Último motivo de salida: %1$s (%2$d)</string>
     <string name="logs_generation_diag_time">Hora de salida: %1$s</string>
@@ -1738,12 +1738,12 @@
     <string name="welcome_all_files_skip_desc">Puedes omitir esto y los modelos se copiarán en su lugar</string>
 
     <string name="welcome_model_library_title">Elige tu carpeta de biblioteca de modelos</string>
-    <string name="welcome_model_library_desc">Elige una carpeta compartida opcional para bundles especiales y recursos de IA compartidos. Los archivos nativos de LLM, Whisper y Stable Diffusion se importan a la biblioteca gestionada por ADT dentro de Android/data para que los motores nativos puedan usar una sola copia fiable.</string>
+    <string name="welcome_model_library_desc">Elige una carpeta compartida opcional para bundles especiales y recursos de IA compartidos. Los archivos nativos de LLM, Whisper y Stable Diffusion se importan a la biblioteca gestionada por Blackbox dentro de Android/data para que los motores nativos puedan usar una sola copia fiable.</string>
     <string name="welcome_model_library_selected">Carpeta de biblioteca de modelos seleccionada</string>
     <string name="welcome_model_library_benefits">Por qué ayuda:</string>
     <string name="welcome_model_library_benefit_1">• Mantener bundles especiales y recursos compartidos en una carpeta visible</string>
     <string name="welcome_model_library_benefit_2">• Mantener los modelos nativos funcionando sin acceso amplio al almacenamiento</string>
-    <string name="welcome_model_library_benefit_3">• Permitir que ADT importe automáticamente archivos grandes a su biblioteca gestionada por la app</string>
+    <string name="welcome_model_library_benefit_3">• Permitir que Blackbox importe automáticamente archivos grandes a su biblioteca gestionada por la app</string>
     <string name="welcome_model_library_choose">Elegir carpeta de modelos</string>
     <string name="welcome_model_library_skip_desc">Puedes omitir esto por ahora y seguir usando el almacenamiento gestionado por la app hasta elegir una carpeta más tarde.</string>
 
@@ -1766,7 +1766,7 @@
     <string name="about_native_build_commits">Commits de la compilación nativa</string>
     <string name="about_native_build_commits_unavailable">Los metadatos de commits de la compilación nativa aún no están disponibles.</string>
     <string name="about_developer">Desarrollador</string>
-    <string name="about_developer_name">ManuXD32</string>
+    <string name="about_developer_name">Blackbox</string>
     <string name="about_github">GitHub</string>
     <string name="about_support">Apoyar</string>
     <string name="about_kofi">Ko-fi</string>
@@ -2730,9 +2730,9 @@
     <string name="onnx_models_importing">Importando bundle…</string>
     <string name="onnx_models_empty">Todavía no hay bundles ONNX de imagen instalados. Si desapareció una instalación antigua en almacenamiento compartido, impórtala o descárgala de nuevo.</string>
     <string name="onnx_models_provider_title">Proveedor del catálogo</string>
-    <string name="onnx_models_provider_desc">Cambia entre el catálogo original de SDAI y el fork de ManuXD32 que añade VAE encoders para tener bundles compatibles con img2img.</string>
+    <string name="onnx_models_provider_desc">Cambia entre el catálogo original de SDAI y el fork de Blackbox que añade VAE encoders para tener bundles compatibles con img2img.</string>
     <string name="onnx_models_provider_sdai">SDAI</string>
-    <string name="onnx_models_provider_manuxd32">ManuXD32</string>
+    <string name="onnx_models_provider_manuxd32">Blackbox</string>
     <string name="onnx_models_source_label">Origen: %1$s</string>
     <string name="onnx_models_source_catalog">Catálogo SDAI</string>
     <string name="onnx_models_source_catalog_provider">Catálogo %1$s</string>
@@ -2886,7 +2886,7 @@
     <string name="onnx_image_gen_delete_title">¿Eliminar imagen?</string>
     <string name="onnx_image_gen_delete_desc">Esto eliminará %1$s y sus metadatos ONNX.</string>
     <string name="onnx_image_gen_info_title">Cómo funciona la generación ONNX</string>
-    <string name="onnx_image_gen_info_subtitle">Bundles ORT locales en AI Doomsday Toolbox</string>
+    <string name="onnx_image_gen_info_subtitle">Bundles ORT locales en Blackbox</string>
     <string name="onnx_image_gen_info_bundles_title">Bundles ORT</string>
     <string name="onnx_image_gen_info_bundles_body">Usa bundles extraídos al estilo SDAI con directorios text_encoder, tokenizer, unet y vae_decoder. ONNX img2img también necesita vae_encoder/model.ort. La app carga los ficheros .ort localmente con ONNX Runtime.</string>
     <string name="onnx_image_gen_info_prompts_title">Prompts</string>
@@ -5277,7 +5277,7 @@
     <string name="tama_settings_pic_model_title">Modelo</string>
     <string name="tama_settings_pic_resolution_title">Resolución</string>
     <string name="tama_settings_open_onnx_models">Abrir modelos ONNX</string>
-    <string name="tama_pic_gen_install_default_model">Instala DreamShaper · ManuXD32 si quieres usar el modelo de imagen por defecto de Tama.</string>
+    <string name="tama_pic_gen_install_default_model">Instala DreamShaper · Blackbox si quieres usar el modelo de imagen por defecto de Tama.</string>
     <string name="tama_pic_gen_selected_model_missing">El modelo de imagen seleccionado para Tama ya no está instalado.</string>
     <string name="tama_pic_gen_service_title">Generando imagen de Tama</string>
     <string name="tama_daily_dream_invalid_response">La respuesta del resumen de sueño no fue válida.</string>
@@ -6320,7 +6320,7 @@
     <string name="quadtrix_eyebrow">Entrenamiento nativo</string>
     <string name="quadtrix_subtitle">Crea, reanuda, monitoriza, exporta y chatea con modelos Quadtrix directamente en este teléfono.</string>
     <string name="quadtrix_info">Información</string>
-    <string name="quadtrix_info_body">Quadtrix ahora usa Qwen3 por defecto con el tokenizer Qwen embebido, y mantiene el entrenador antiguo por caracteres para checkpoints legacy. Entrena desde datasets locales de texto, JSON, JSONL o Parquet. Los datasets enlazados se quedan en el almacenamiento del teléfono, así que el binario nativo necesita una ruta directa legible y puede requerir acceso a todos los archivos. Los ajustes cuantizados de pesos y optimizador reducen RAM en entrenamientos largos. El modo distribuido permite que un coordinador divida gradientes entre workers usando el mismo token. Los checkpoints se pueden reanudar si el tokenizer y la forma del modelo siguen coincidiendo. Los checkpoints Qwen3 pueden exportarse o convertirse a GGUF, y los GGUF exportados pueden registrarse en la pestaña general Modelos para chat llama.cpp, exportación y eliminación normales. Stream progress expone este coordinador en el puerto elegido para que otras apps ADT vean estado, logs, datos de gráfica, telemetría y controles de workers. La WebUI opcional arranca localmente por defecto en 127.0.0.1; usa LAN solo en redes de confianza. ETA, logs, gráfica de pérdida, temperatura CPU y batería son telemetría aproximada y pueden no estar disponibles en algunos dispositivos.</string>
+    <string name="quadtrix_info_body">Quadtrix ahora usa Qwen3 por defecto con el tokenizer Qwen embebido, y mantiene el entrenador antiguo por caracteres para checkpoints legacy. Entrena desde datasets locales de texto, JSON, JSONL o Parquet. Los datasets enlazados se quedan en el almacenamiento del teléfono, así que el binario nativo necesita una ruta directa legible y puede requerir acceso a todos los archivos. Los ajustes cuantizados de pesos y optimizador reducen RAM en entrenamientos largos. El modo distribuido permite que un coordinador divida gradientes entre workers usando el mismo token. Los checkpoints se pueden reanudar si el tokenizer y la forma del modelo siguen coincidiendo. Los checkpoints Qwen3 pueden exportarse o convertirse a GGUF, y los GGUF exportados pueden registrarse en la pestaña general Modelos para chat llama.cpp, exportación y eliminación normales. Stream progress expone este coordinador en el puerto elegido para que otras apps Blackbox vean estado, logs, datos de gráfica, telemetría y controles de workers. La WebUI opcional arranca localmente por defecto en 127.0.0.1; usa LAN solo en redes de confianza. ETA, logs, gráfica de pérdida, temperatura CPU y batería son telemetría aproximada y pueden no estar disponibles en algunos dispositivos.</string>
     <string name="quadtrix_tab_datasets">Datasets</string>
     <string name="quadtrix_tab_profiles">Perfiles</string>
     <string name="quadtrix_tab_train">Entrenar</string>
@@ -6489,7 +6489,7 @@
     <string name="quadtrix_notification_running">Quadtrix activo • %1$s</string>
     <string name="quadtrix_simple_title">WebUI y worker Quadtrix</string>
     <string name="quadtrix_simple_subtitle">Abre la WebUI, ejecuta este teléfono como worker y monitoriza el proceso Quadtrix activo.</string>
-    <string name="quadtrix_simple_info_body">Esta pantalla ahora es pequeña a propósito. Usa Iniciar WebUI para abrir la interfaz completa del trainer Quadtrix dentro de la app; la WebUI gestiona datasets, perfiles, entrenamiento, exportación GGUF, modelos generados y chat. La app mantiene un lanzador de worker para entrenamiento distribuido y una tarjeta de monitor para estado, logs, progreso, temperaturas, RAM y batería. El primer arranque de WebUI pide una carpeta del teléfono. ADT crea models, profiles, data, logs, exports, token_cache, checkpoints y workers ahí, y copia qwen3_tokenizer.json para que los flujos Qwen3 estén listos desde la WebUI. Si Android no puede resolver una ruta directa, elige una carpeta local y concede acceso a todos los archivos para que el binario nativo pueda usarla.</string>
+    <string name="quadtrix_simple_info_body">Esta pantalla ahora es pequeña a propósito. Usa Iniciar WebUI para abrir la interfaz completa del trainer Quadtrix dentro de la app; la WebUI gestiona datasets, perfiles, entrenamiento, exportación GGUF, modelos generados y chat. La app mantiene un lanzador de worker para entrenamiento distribuido y una tarjeta de monitor para estado, logs, progreso, temperaturas, RAM y batería. El primer arranque de WebUI pide una carpeta del teléfono. Blackbox crea models, profiles, data, logs, exports, token_cache, checkpoints y workers ahí, y copia qwen3_tokenizer.json para que los flujos Qwen3 estén listos desde la WebUI. Si Android no puede resolver una ruta directa, elige una carpeta local y concede acceso a todos los archivos para que el binario nativo pueda usarla.</string>
     <string name="quadtrix_webui_card_title">WebUI Quadtrix</string>
     <string name="quadtrix_webui_card_desc">Ejecuta localmente la UI integrada del trainer. Todos los controles de entrenamiento, datasets, perfiles, exportación y chat viven ahí.</string>
     <string name="quadtrix_workspace_folder">Carpeta de trabajo</string>
@@ -6499,7 +6499,7 @@
     <string name="quadtrix_workspace_ready">La carpeta Quadtrix está lista.</string>
     <string name="quadtrix_workspace_setup_failed">Error preparando carpeta Quadtrix: %1$s</string>
     <string name="quadtrix_workspace_direct_required">Quadtrix ahora se ejecuta desde un espacio de trabajo gestionado por la app. La carpeta compartida que elijas se usa para sincronización, exportaciones y exploración de archivos.</string>
-    <string name="quadtrix_workspace_hint">ADT prepara la estructura de la carpeta compartida y mantiene un espacio de trabajo de ejecución separado, gestionado por la app, para la WebUI y el worker nativos.</string>
+    <string name="quadtrix_workspace_hint">Blackbox prepara la estructura de la carpeta compartida y mantiene un espacio de trabajo de ejecución separado, gestionado por la app, para la WebUI y el worker nativos.</string>
     <string name="quadtrix_open_webui">Abrir WebUI</string>
     <string name="quadtrix_webui_url">Dirección WebUI</string>
     <string name="quadtrix_webui_loading">Cargando WebUI Quadtrix...</string>
@@ -6592,9 +6592,9 @@
     <string name="kb_litert_embedding_file_missing">No se encontró un archivo LiteRT de embeddings compatible para “%1$s”.</string>
     <string name="kb_litert_embedding_runtime_missing">Esta compilación todavía no incluye el runtime de embeddings de LiteRT. Actualiza la compilación de la app antes de usar embeddings LiteRT en Bases de conocimiento.</string>
     <string name="kb_litert_embedding_string_input_required">“%1$s” todavía no se puede usar directamente porque no expone un tensor de entrada de texto. Elige un modelo LiteRT de embeddings con preprocesado de texto integrado.</string>
-    <string name="kb_litert_embedding_wordpiece_runtime_pending">“%1$s” usa un contrato tensorial WordPiece. ADT detectó la familia del modelo, pero esta compilación todavía no incluye el ejecutor de embeddings WordPiece.</string>
-    <string name="kb_litert_embedding_sentencepiece_runtime_pending">“%1$s” usa un contrato tensorial SentencePiece. ADT detectó el paquete del modelo, pero esta compilación todavía no incluye el ejecutor de embeddings LiteRT con SentencePiece.</string>
-    <string name="kb_litert_embedding_unsupported_contract">“%1$s” expone un contrato tensorial que ADT todavía no puede ejecutar con seguridad como embedder de Bases de conocimiento.</string>
+    <string name="kb_litert_embedding_wordpiece_runtime_pending">“%1$s” usa un contrato tensorial WordPiece. Blackbox detectó la familia del modelo, pero esta compilación todavía no incluye el ejecutor de embeddings WordPiece.</string>
+    <string name="kb_litert_embedding_sentencepiece_runtime_pending">“%1$s” usa un contrato tensorial SentencePiece. Blackbox detectó el paquete del modelo, pero esta compilación todavía no incluye el ejecutor de embeddings LiteRT con SentencePiece.</string>
+    <string name="kb_litert_embedding_unsupported_contract">“%1$s” expone un contrato tensorial que Blackbox todavía no puede ejecutar con seguridad como embedder de Bases de conocimiento.</string>
     <string name="kb_litert_embedding_status_missing_sentencepiece">falta tokenizer.model</string>
     <string name="kb_litert_embedding_status_sentencepiece_pending">ejecutor SentencePiece pendiente</string>
     <string name="kb_litert_embedding_status_missing_wordpiece">falta vocab.txt</string>
@@ -6884,10 +6884,10 @@
     <string name="litert_catalog_group_cpu_desc">Perfiles conservadores que omiten GPU, útiles para pruebas de estabilidad y aceleradores no compatibles.</string>
     <string name="litert_catalog_gpu_entry_desc">Paquete compatible con GPU. Auto prueba GPU primero y luego CPU si el delegado o el paquete fallan.</string>
     <string name="litert_catalog_cpu_entry_desc">Perfil solo CPU. Auto inicia directamente en CPU para un comportamiento predecible.</string>
-    <string name="litert_catalog_qwen3_06_desc">Modelo de chat pequeño Apache-2.0 con valor predeterminado conservador en CPU dentro de ADT.</string>
+    <string name="litert_catalog_qwen3_06_desc">Modelo de chat pequeño Apache-2.0 con valor predeterminado conservador en CPU dentro de Blackbox.</string>
     <string name="litert_catalog_qwen3_4b_desc">Modelo instruct moderno Qwen3 empaquetado como LiteRT-LM con valor predeterminado conservador en CPU.</string>
-    <string name="litert_catalog_qwen3_8b_desc">Opción Qwen3 LiteRT-LM más grande para dispositivos con mucha memoria, predeterminada a CPU en ADT.</string>
-    <string name="litert_catalog_qwen3_14b_desc">Paquete Qwen3 LiteRT-LM moderno y grande para dispositivos con mucha memoria, predeterminado a CPU en ADT.</string>
+    <string name="litert_catalog_qwen3_8b_desc">Opción Qwen3 LiteRT-LM más grande para dispositivos con mucha memoria, predeterminada a CPU en Blackbox.</string>
+    <string name="litert_catalog_qwen3_14b_desc">Paquete Qwen3 LiteRT-LM moderno y grande para dispositivos con mucha memoria, predeterminado a CPU en Blackbox.</string>
     <string name="litert_catalog_gemma3_1b_desc">Modelo instruct compacto con variantes LiteRT publicadas para Android.</string>
     <string name="litert_catalog_gemma3_270m_desc">Modelo instruct Gemma 3 muy pequeño para pruebas rápidas en CPU/GPU.</string>
     <string name="litert_catalog_gemma4_e2b_desc">La ruta LiteRT-LM más cercana al flujo actual de chat Gemma 4.</string>
@@ -6898,7 +6898,7 @@
     <string name="litert_catalog_deepseek_qwen15_desc">Modelo Qwen destilado y orientado a razonamiento en formato LiteRT-LM con valor predeterminado conservador en CPU.</string>
     <string name="litert_catalog_phi4_mini_desc">Modelo instruct compacto de la familia Phi de Microsoft empaquetado para LiteRT-LM con valor predeterminado conservador en CPU.</string>
     <string name="litert_catalog_smollm2_360_desc">Modelo de chat diminuto y rápido para pruebas en CPU y dispositivos con poca memoria.</string>
-    <string name="litert_catalog_functiongemma_desc">Paquete LiteRT-LM pequeño y orientado a acciones móviles, predeterminado a CPU en ADT.</string>
+    <string name="litert_catalog_functiongemma_desc">Paquete LiteRT-LM pequeño y orientado a acciones móviles, predeterminado a CPU en Blackbox.</string>
     <string name="ai_onnx_tts">Texto a Voz</string>
     <string name="ai_onnx_tts_desc">Lee texto y documentos con voces locales Supertonic ONNX</string>
     <string name="onnx_models_provider_supertonic">Supertonic</string>
@@ -7116,7 +7116,7 @@
     <string name="sd_dist_title">Generacion multimedia distribuida</string>
     <string name="sd_dist_subtitle">Ejecuta workers RPC de stable-diffusion.cpp, elige la colocacion del pipeline y aplica el plan a imagen y video.</string>
     <string name="sd_dist_hub_worker_title">Usar este dispositivo como worker multimedia</string>
-    <string name="sd_dist_hub_worker_desc">Aporta hilos de CPU y memoria a otro dispositivo ADT que ejecute stable-diffusion.cpp.</string>
+    <string name="sd_dist_hub_worker_desc">Aporta hilos de CPU y memoria a otro dispositivo Blackbox que ejecute stable-diffusion.cpp.</string>
     <string name="sd_dist_hub_master_title">Coordinar una red multimedia</string>
     <string name="sd_dist_hub_master_desc">Anade workers de confianza manualmente y prepara la colocacion backend para la siguiente generacion.</string>
     <string name="sd_dist_hub_run_title">Ajustar runtime SD</string>
@@ -7201,9 +7201,9 @@
     <string name="sd_dist_placement_auto_fit">Auto-fit</string>
     <string name="sd_dist_placement_components">Componentes</string>
     <string name="sd_dist_placement_manual">Manual</string>
-    <string name="sd_dist_placement_auto_ram_desc">ADT asigna modulos y parte de difusion segun los presupuestos de RAM.</string>
+    <string name="sd_dist_placement_auto_ram_desc">Blackbox asigna modulos y parte de difusion segun los presupuestos de RAM.</string>
     <string name="sd_dist_placement_auto_fit_desc">Deja que stable-diffusion.cpp coloque pesos automaticamente.</string>
-    <string name="sd_dist_placement_components_desc">Introduce colocacion por componente mientras ADT crea la lista de servidores.</string>
+    <string name="sd_dist_placement_components_desc">Introduce colocacion por componente mientras Blackbox crea la lista de servidores.</string>
     <string name="sd_dist_placement_manual_desc">Usa solo los flags expertos y el backend que escribas.</string>
     <string name="sd_dist_auto_fit">Auto-fit</string>
     <string name="sd_dist_auto_fit_desc">Deja que stable-diffusion.cpp coloque pesos y offload segun la memoria disponible.</string>
@@ -7312,7 +7312,7 @@
     <string name="sd_dist_template_summary">%1$s - %2$s pasos - %3$s</string>
     <string name="sd_dist_placement_auto_ram">Plan RAM automatico</string>
     <string name="sd_dist_auto_ram_plan">Plan RAM generado</string>
-    <string name="sd_dist_auto_ram_help">ADT crea una colocacion --backend real desde los workers habilitados. Los porcentajes de capas se estiman por RAM; stable-diffusion.cpp controla los limites exactos internamente.</string>
+    <string name="sd_dist_auto_ram_help">Blackbox crea una colocacion --backend real desde los workers habilitados. Los porcentajes de capas se estiman por RAM; stable-diffusion.cpp controla los limites exactos internamente.</string>
     <string name="sd_dist_auto_ram_scope">Alcance del plan RAM</string>
     <string name="sd_dist_auto_ram_scope_diffusion">Solo difusion</string>
     <string name="sd_dist_auto_ram_scope_diffusion_desc">Opcion mas segura. Envia las capas de difusion a workers RPC y mantiene el codificador de texto, VAE y escalador locales salvo que elijas Componentes o Manual.</string>

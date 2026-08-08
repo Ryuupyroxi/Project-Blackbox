@@ -68,7 +68,7 @@ fun AgentRuntimeScreen(navController: NavController) {
                         Text("Local Termux / Ubuntu runtime", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            "Agents run in the same environment ADT uses for its local Termux tools (SSH into the Termux-hosted Ubuntu proot).",
+                            "Agents run in the same environment Blackbox uses for its local Termux tools (SSH into the Termux-hosted Ubuntu proot).",
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

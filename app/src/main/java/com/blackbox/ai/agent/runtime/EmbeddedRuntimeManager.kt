@@ -17,7 +17,7 @@ import kotlinx.coroutines.withTimeout
  * SSH server is required for this channel.
  *
  * WorkspaceChannel.LOCAL maps to this manager; WorkspaceChannel.SSH keeps
- * routing to [AgentRuntimeManager] (ADT's Termux-hosted Ubuntu proot).
+ * routing to [AgentRuntimeManager] (Blackbox's Termux-hosted Ubuntu proot).
  */
 object EmbeddedRuntimeManager {
 

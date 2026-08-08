@@ -158,8 +158,8 @@ class AssistantDaemonService : Service(), LifecycleEventObserver {
      * Mirrors Kai's TaskScheduler loop.
      */
     private suspend fun runSchedulerTick() {
-        // Real daemon work: keep ADT's scheduled tasks fresh and record a heartbeat.
-        // ADT owns the actual task store (LlamaScheduledTaskScheduler); the daemon
+        // Real daemon work: keep Blackbox's scheduled tasks fresh and record a heartbeat.
+        // Blackbox owns the actual task store (LlamaScheduledTaskScheduler); the daemon
         // re-asserts alarms so a killed process doesn't leave tasks stuck.
         runCatching {
             LlamaScheduledTaskScheduler.rescheduleAll(this)

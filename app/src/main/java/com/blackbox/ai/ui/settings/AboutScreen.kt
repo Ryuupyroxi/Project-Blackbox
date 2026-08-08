@@ -111,7 +111,7 @@ fun AboutScreen(navController: NavController) {
                             }
                             IconButton(
                                 onClick = {
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/ManuXD32"))
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Ryuupyroxi/Project-Blackbox"))
                                     context.startActivity(intent)
                                 }
                             ) {

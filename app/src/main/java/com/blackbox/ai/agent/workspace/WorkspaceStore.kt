@@ -8,7 +8,7 @@ import org.json.JSONObject
 /**
  * Execution channel for a workspace. Every workspace can run through any of:
  *  - [WorkspaceChannel.LOCAL]: on-device embedded/local runtime
- *  - [WorkspaceChannel.SSH]: the local Termux/Ubuntu SSH channel (ADT style)
+ *  - [WorkspaceChannel.SSH]: the local Termux/Ubuntu SSH channel (Blackbox style)
  *  - [WorkspaceChannel.KAI]: the Kai-style assistant daemon (voice-first)
  */
 enum class WorkspaceChannel(val label: String) {
@@ -19,7 +19,7 @@ enum class WorkspaceChannel(val label: String) {
 
 /**
  * A user-managed agent workspace. Blackbox supports any number of workspaces
- * beyond the ADT default ("default_project"). Each workspace carries its own
+ * beyond the Blackbox default ("default_project"). Each workspace carries its own
  * execution channel so the same workspace can run locally, over SSH, or via
  * the Kai assistant.
  */
@@ -33,7 +33,7 @@ data class AgentWorkspace(
 
 /**
  * Persists the list of agent workspaces and grants for assistant feature access.
- * The ADT default workspace is always seeded first so existing functionality is
+ * The Blackbox default workspace is always seeded first so existing functionality is
  * never lost when merging.
  */
 class WorkspaceStore(context: Context) {

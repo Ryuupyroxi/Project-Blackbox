@@ -297,7 +297,7 @@ fun AgentHubScreen(navController: NavController) {
                         Text("Coding Runtimes", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            "Run Hermes, Codex CLI and OpenClaw inside the local Termux/Ubuntu environment (ADT-style SSH channel).",
+                            "Run Hermes, Codex CLI and OpenClaw inside the local Termux/Ubuntu environment (Blackbox-style SSH channel).",
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -338,7 +338,7 @@ fun AgentHubScreen(navController: NavController) {
                         Text("Local Termux / SSH Channel", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            "The same channel ADT uses to run local Termux tools (Ubuntu proot SSH).",
+                            "The same channel Blackbox uses to run local Termux tools (Ubuntu proot SSH).",
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

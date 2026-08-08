@@ -90,7 +90,7 @@ enum class OnnxCatalogProvider(
     ),
     MANUXD32(
         id = "manuxd32",
-        repoOwner = "ManuXD32/Local-Diffusion-Models-SDAI-ONXX"
+        repoOwner = "Ryuupyroxi/Local-Diffusion-Models-SDAI-ONXX"
     ),
     SUPERTONIC(
         id = "supertonic",
@@ -315,7 +315,7 @@ object OnnxCatalog {
         OnnxCatalogEntry(OnnxCatalogProvider.MANUXD32, "dreamshaper", "DreamShaper", "dreamshaper.zip", "vae_encoder", "dreamshaper", "Popular stylized all-rounder with added VAE encoder for img2img.", 652897195L),
         OnnxCatalogEntry(OnnxCatalogProvider.MANUXD32, "epicrealism_pureEvolutionV4", "EpicRealism PureEvolution V4", "epicrealism_pureEvolutionV4.zip", "vae_encoder", "epicrealism_pureEvolutionV4", "High-detail realism bundle patched for img2img.", 652991822L),
         OnnxCatalogEntry(OnnxCatalogProvider.MANUXD32, "fantasticmix", "Fantastic Mix", "fantasticmix.zip", "vae_encoder", "fantasticmix", "Fantasy-biased blend with img2img-ready VAE encoder.", 651512192L),
-        OnnxCatalogEntry(OnnxCatalogProvider.MANUXD32, "ICBINP", "ICBINP", "ICBINP.zip", "vae_encoder", "ICBINP", "Local Diffusion bundle from the ManuXD32 fork with img2img support.", 652273218L),
+        OnnxCatalogEntry(OnnxCatalogProvider.MANUXD32, "ICBINP", "ICBINP", "ICBINP.zip", "vae_encoder", "ICBINP", "Local Diffusion bundle from the Blackbox fork with img2img support.", 652273218L),
         OnnxCatalogEntry(OnnxCatalogProvider.MANUXD32, "Jucy666", "Jucy666", "Jucy666.zip", "vae_encoder", "Jucy666", "High-contrast stylized photoreal bundle with VAE encoder added.", 651751474L),
         OnnxCatalogEntry(OnnxCatalogProvider.MANUXD32, "landscape", "Landscape", "landscape.zip", "vae_encoder", "landscape", "Landscape-focused ORT bundle with img2img support added.", 711165464L),
         OnnxCatalogEntry(OnnxCatalogProvider.MANUXD32, "lyriel", "Lyriel", "lyriel.zip", "vae_encoder", "lyriel", "Painterly fantasy model updated for local img2img.", 650566846L),
@@ -467,7 +467,7 @@ object OnnxStorage {
 
     fun managedModelsRoot(): File = File(
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-        "ADT/onnx"
+        "Blackbox/onnx"
     )
 
     fun ensureManagedRootsReady() {

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withTimeout
 
 /**
- * Drives the local Termux/Ubuntu runtime exactly like ADT does: an SSH channel
+ * Drives the local Termux/Ubuntu runtime exactly like Blackbox does: an SSH channel
  * into the Termux-hosted environment (default 127.0.0.1:8025, user-configurable).
  * Runtime agents (Hermes, Codex CLI, OpenClaw) are installed, started, stopped,
  * and health-checked here using the termux-agents-hub command patterns.
@@ -57,7 +57,7 @@ object AgentRuntimeManager {
         return runWithConsole(context, "Install ${agent.name}") {
             val ssh = sshService(context)
             if (!ssh.checkConnection()) {
-                return@runWithConsole "SSH not connected. Open Agent Hub → connect to 127.0.0.1:8025 (ADT Ubuntu) or 8022 (Termux) first."
+                return@runWithConsole "SSH not connected. Open Agent Hub → connect to 127.0.0.1:8025 (Blackbox Ubuntu) or 8022 (Termux) first."
             }
             var lastOutput = "Install complete"
             var failed = false
@@ -89,7 +89,7 @@ object AgentRuntimeManager {
         return runWithConsole(context, "Start ${agent.name}") {
             val ssh = sshService(context)
             if (!ssh.checkConnection()) {
-                return@runWithConsole "SSH not connected. Open Agent Hub → connect to 127.0.0.1:8025 (ADT Ubuntu) or 8022 (Termux) first."
+                return@runWithConsole "SSH not connected. Open Agent Hub → connect to 127.0.0.1:8025 (Blackbox Ubuntu) or 8022 (Termux) first."
             }
             val cmd = buildString {
                 append("mkdir -p \$HOME/.blackbox-agents\n")

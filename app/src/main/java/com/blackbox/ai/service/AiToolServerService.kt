@@ -4728,7 +4728,7 @@ class AiToolServerService : Service() {
     }
 
     companion object {
-        private const val SESSION_COOKIE = "ADT_AI_SERVER_SESSION"
+        private const val SESSION_COOKIE = "BLACKBOX_AI_SERVER_SESSION"
         private const val SESSION_DURATION_MS = 7L * 24L * 60L * 60L * 1000L
         private val _runtimeStates = MutableStateFlow<List<AiServerRuntimeState>>(emptyList())
         val runtimeStates = _runtimeStates.asStateFlow()

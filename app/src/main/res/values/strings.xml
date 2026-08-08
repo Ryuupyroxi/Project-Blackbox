@@ -2446,7 +2446,7 @@
     <string name="onnx_models_subtitle">SDAI-style ORT bundles for low-RAM local diffusion</string>
     <string name="onnx_models_import_bundle">Import Bundle</string>
     <string name="onnx_models_permission_title">All files access improves local model linking</string>
-    <string name="onnx_models_permission_desc">Granting all files access lets the app link compatible ONNX bundles in place instead of copying them into the managed ADT folder.</string>
+    <string name="onnx_models_permission_desc">Granting all files access lets the app link compatible ONNX bundles in place instead of copying them into the managed Blackbox folder.</string>
     <string name="onnx_models_permission_action">Grant Access</string>
     <string name="onnx_models_tab_installed">Installed (%1$d)</string>
     <string name="onnx_models_tab_downloading">Downloading</string>
@@ -2454,9 +2454,9 @@
     <string name="onnx_models_importing">Importing bundle…</string>
     <string name="onnx_models_empty">No ONNX image bundles installed yet.</string>
     <string name="onnx_models_provider_title">Catalog provider</string>
-    <string name="onnx_models_provider_desc">Switch between the original SDAI catalog and the ManuXD32 fork that adds VAE encoders for img2img-capable bundles.</string>
+    <string name="onnx_models_provider_desc">Switch between the original SDAI catalog and the Blackbox fork that adds VAE encoders for img2img-capable bundles.</string>
     <string name="onnx_models_provider_sdai">SDAI</string>
-    <string name="onnx_models_provider_manuxd32">ManuXD32</string>
+    <string name="onnx_models_provider_manuxd32">Blackbox</string>
     <string name="onnx_models_source_label">Source: %1$s</string>
     <string name="onnx_models_source_catalog">SDAI catalog</string>
     <string name="onnx_models_source_catalog_provider">%1$s catalog</string>
@@ -2481,7 +2481,7 @@
     <string name="onnx_models_import_linked">Linked external bundle</string>
     <string name="onnx_models_import_copying">Copying bundle…</string>
     <string name="onnx_models_import_success_linked">Linked %1$s without copying.</string>
-    <string name="onnx_models_import_success_copied">Imported %1$s into the managed ADT folder.</string>
+    <string name="onnx_models_import_success_copied">Imported %1$s into the managed Blackbox folder.</string>
     <string name="onnx_models_delete_title">Delete ONNX bundle?</string>
     <string name="onnx_models_delete_desc">This will remove %1$s from the device.</string>
     <string name="onnx_models_phase_downloading">Downloading archive</string>
@@ -2497,7 +2497,7 @@
     <string name="onnx_image_gen_empty_desc">This screen works with SDAI-style ORT bundles that include text encoder, UNet, VAE decoder, and tokenizer files. img2img-capable bundles also need vae_encoder/model.ort.</string>
     <string name="onnx_image_gen_open_models">Open ONNX Models</string>
     <string name="onnx_image_gen_setup_title">Setup for local ONNX generation</string>
-    <string name="onnx_image_gen_setup_desc">Grant all files access if you want the app to reuse bundles directly from shared storage, or keep using copied bundles from the managed ADT folder.</string>
+    <string name="onnx_image_gen_setup_desc">Grant all files access if you want the app to reuse bundles directly from shared storage, or keep using copied bundles from the managed Blackbox folder.</string>
     <string name="onnx_image_gen_setup_permission">Open Permission Settings</string>
     <string name="onnx_image_gen_model_label">Model Bundle</string>
     <string name="onnx_image_gen_prompt_label">Prompt</string>
@@ -2632,7 +2632,7 @@
     <string name="onnx_image_gen_info_ram_title">RAM guidance</string>
     <string name="onnx_image_gen_info_ram_body">Start with 512x512 and around 20 steps on lower-RAM devices. CPU is the safest default. NNAPI can help on some phones, but incompatible models or drivers may still fall back to CPU.</string>
     <string name="onnx_image_gen_info_storage_title">Storage</string>
-    <string name="onnx_image_gen_info_storage_body">Catalog installs are managed under Download/ADT/onnx. Imported bundles can stay linked in place or be copied there when direct filesystem access is unavailable. Finished ONNX images keep their app-local copy and are also mirrored into the shared output folder under images/onnx when you configure one, together with the JSON metadata sidecar.</string>
+    <string name="onnx_image_gen_info_storage_body">Catalog installs are managed under Download/Blackbox/onnx. Imported bundles can stay linked in place or be copied there when direct filesystem access is unavailable. Finished ONNX images keep their app-local copy and are also mirrored into the shared output folder under images/onnx when you configure one, together with the JSON metadata sidecar.</string>
     <string name="onnx_image_gen_info_bundle_layout_label">Bundle layout</string>
     <string name="onnx_image_gen_info_bundle_layout_desc">The app expects extracted SDAI-style ORT bundles. Txt2img needs text_encoder, tokenizer, unet, and vae_decoder. Img2img also needs vae_encoder/model.ort. If any of those parts are missing, the feature that depends on them is disabled because the pipeline would no longer match the expected local diffusion contract.</string>
     <string name="onnx_image_gen_info_bundle_runtime_label">How the local pipeline runs</string>
@@ -4735,7 +4735,7 @@
     <string name="tama_settings_pic_model_title">Model</string>
     <string name="tama_settings_pic_resolution_title">Resolution</string>
     <string name="tama_settings_open_onnx_models">Open ONNX models</string>
-    <string name="tama_pic_gen_install_default_model">Install DreamShaper · ManuXD32 if you want the default Tama image model.</string>
+    <string name="tama_pic_gen_install_default_model">Install DreamShaper · Blackbox if you want the default Tama image model.</string>
     <string name="tama_pic_gen_selected_model_missing">The selected Tama image model is no longer installed.</string>
     <string name="tama_pic_gen_service_title">Generating Tama artwork</string>
     <string name="tama_daily_dream_invalid_response">The dream recap response was not valid.</string>
@@ -6110,7 +6110,7 @@
     <string name="quadtrix_hub_desc">Train and use native phone LLMs</string>
     <string name="quadtrix_import_checkpoint">Import checkpoint</string>
     <string name="quadtrix_info">Information</string>
-    <string name="quadtrix_info_body">Quadtrix now defaults to Qwen3 architecture with the embedded Qwen tokenizer, while the legacy character trainer remains available for older checkpoints. It trains from local text, JSON, JSONL, or Parquet datasets. Linked datasets stay in phone storage, so the native binary needs a readable direct path and may need All files access. Quantized weight and optimizer settings reduce RAM for long phone runs. Distributed mode lets a coordinator split gradient work across workers using the same token. Checkpoints can be resumed when the tokenizer and model shape still match. Qwen3 checkpoints can export or convert to GGUF, and exported GGUF files can be registered in the general Models tab for normal llama.cpp chat, export, and removal. Stream progress exposes this coordinator on the selected port for other ADT apps to view state, logs, graph data, telemetry, and worker controls. The optional WebUI starts locally by default at 127.0.0.1; use LAN binding only on trusted networks. ETA, logs, loss graph, CPU temperature, and battery status are best-effort telemetry and may be unavailable on some devices.</string>
+    <string name="quadtrix_info_body">Quadtrix now defaults to Qwen3 architecture with the embedded Qwen tokenizer, while the legacy character trainer remains available for older checkpoints. It trains from local text, JSON, JSONL, or Parquet datasets. Linked datasets stay in phone storage, so the native binary needs a readable direct path and may need All files access. Quantized weight and optimizer settings reduce RAM for long phone runs. Distributed mode lets a coordinator split gradient work across workers using the same token. Checkpoints can be resumed when the tokenizer and model shape still match. Qwen3 checkpoints can export or convert to GGUF, and exported GGUF files can be registered in the general Models tab for normal llama.cpp chat, export, and removal. Stream progress exposes this coordinator on the selected port for other Blackbox apps to view state, logs, graph data, telemetry, and worker controls. The optional WebUI starts locally by default at 127.0.0.1; use LAN binding only on trusted networks. ETA, logs, loss graph, CPU temperature, and battery status are best-effort telemetry and may be unavailable on some devices.</string>
     <string name="quadtrix_intermediate">Intermediate size</string>
     <string name="quadtrix_iteration">Iteration</string>
     <string name="quadtrix_kv_heads">KV heads</string>
@@ -6174,7 +6174,7 @@
     <string name="quadtrix_select">Select</string>
     <string name="quadtrix_shards">Shards</string>
     <string name="quadtrix_show_gguf_models">Show exported GGUF in Models</string>
-    <string name="quadtrix_simple_info_body">This screen is now intentionally small. Use Start WebUI to open the full Quadtrix trainer interface inside the app; the WebUI handles datasets, profiles, training, GGUF export, generated models, and chat. The app keeps a worker launcher for distributed training and a monitor card for status, logs, progress, temperatures, RAM, and battery. The first WebUI launch asks for a phone folder. ADT creates models, profiles, data, logs, exports, token_cache, checkpoints, and workers folders there, then copies qwen3_tokenizer.json so Qwen3 workflows are ready from the WebUI. If Android cannot resolve a direct folder path, choose a local storage folder and grant All files access so the native binary can use it.</string>
+    <string name="quadtrix_simple_info_body">This screen is now intentionally small. Use Start WebUI to open the full Quadtrix trainer interface inside the app; the WebUI handles datasets, profiles, training, GGUF export, generated models, and chat. The app keeps a worker launcher for distributed training and a monitor card for status, logs, progress, temperatures, RAM, and battery. The first WebUI launch asks for a phone folder. Blackbox creates models, profiles, data, logs, exports, token_cache, checkpoints, and workers folders there, then copies qwen3_tokenizer.json so Qwen3 workflows are ready from the WebUI. If Android cannot resolve a direct folder path, choose a local storage folder and grant All files access so the native binary can use it.</string>
     <string name="quadtrix_simple_subtitle">Launch the WebUI, run this phone as a worker, and monitor the active Quadtrix process.</string>
     <string name="quadtrix_simple_title">Quadtrix WebUI and Worker</string>
     <string name="quadtrix_skip_initial_eval">Skip initial eval</string>
@@ -6255,7 +6255,7 @@
     <string name="quadtrix_workspace_choose">Choose workspace</string>
     <string name="quadtrix_workspace_direct_required">The native binary needs a direct filesystem path. Pick a local phone folder and grant All files access if Android blocks it.</string>
     <string name="quadtrix_workspace_folder">Workspace folder</string>
-    <string name="quadtrix_workspace_hint">ADT creates models, profiles, data, logs, exports, token_cache, checkpoints, and workers folders, plus qwen3_tokenizer.json.</string>
+    <string name="quadtrix_workspace_hint">Blackbox creates models, profiles, data, logs, exports, token_cache, checkpoints, and workers folders, plus qwen3_tokenizer.json.</string>
     <string name="quadtrix_workspace_not_set">No Quadtrix workspace selected</string>
     <string name="quadtrix_workspace_ready">Quadtrix workspace is ready.</string>
     <string name="quadtrix_workspace_setup_failed">Quadtrix workspace setup failed: %1$s</string>

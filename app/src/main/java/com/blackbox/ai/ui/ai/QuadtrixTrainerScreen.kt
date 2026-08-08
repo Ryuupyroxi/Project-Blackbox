@@ -77,7 +77,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.Locale
 
-private const val QUADTRIX_RUNTIME_PROFILE = "ADT Quadtrix WebUI"
+private const val QUADTRIX_RUNTIME_PROFILE = "Blackbox Quadtrix WebUI"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

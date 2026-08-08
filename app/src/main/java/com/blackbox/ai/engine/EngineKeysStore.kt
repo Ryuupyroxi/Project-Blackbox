@@ -114,7 +114,7 @@ class EngineKeysStore(context: Context) {
     }
 }
 
-/** SSH config for Termux/Ubuntu channel — mirrors ADT's SSHConfig. */
+/** SSH config for Termux/Ubuntu channel — mirrors Blackbox SSH config. */
 data class SSHConfig(
     val host: String = "127.0.0.1",
     val port: Int = 8025,
