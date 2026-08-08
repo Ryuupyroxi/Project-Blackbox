@@ -338,7 +338,8 @@ fun AgentHubScreen(navController: NavController) {
                         Text("Local Termux / SSH Channel", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            "The same channel Blackbox uses to run local Termux tools (Ubuntu proot SSH).",
+                            "Optional external SSH channel to a separate Termux/Ubuntu proot outside this app. " +
+                            "For agent coding in the app's own runtime, use the Embedded LOCAL Runtime above.",
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

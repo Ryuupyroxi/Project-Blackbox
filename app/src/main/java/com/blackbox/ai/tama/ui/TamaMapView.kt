@@ -212,7 +212,12 @@ fun LocationDetailsDialog(
                             contentDescription = null,
                             modifier = Modifier.size(64.dp),
                             contentScale = ContentScale.Fit,
-                            filterQuality = FilterQuality.None
+                            filterQuality = FilterQuality.None,
+                            error = {
+                                Box(modifier = Modifier.size(64.dp), contentAlignment = Alignment.Center) {
+                                    Text(text = "?", color = TamaDark, fontSize = 28.sp)
+                                }
+                            }
                         )
                         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(
@@ -334,6 +339,11 @@ fun TamaMapIcon(
         contentDescription = null,
         modifier = modifier.size(size),
         contentScale = ContentScale.Fit,
-        filterQuality = FilterQuality.None
+        filterQuality = FilterQuality.None,
+        error = {
+            Box(modifier = Modifier.size(size), contentAlignment = Alignment.Center) {
+                Text(text = "?", color = TamaDark, fontSize = (size.value / 2).sp)
+            }
+        }
     )
 }

@@ -43,6 +43,29 @@ fun AgentRuntimeScreen(navController: NavController) {
     val console by AgentRuntimeManager.console.collectAsState()
     val isBusy by AgentRuntimeManager.isBusy.collectAsState()
 
+    // Auto-connect to local Termux when needed, using stored or default credentials
+    suspend fun ensureLocalTermuxConnection(): Boolean {
+        val keys = com.blackbox.ai.engine.EngineKeysStore(context)
+        val host = keys.getTermuxHost().ifBlank { "127.0.0.1" }
+        val port = keys.getTermuxPort().takeIf { it > 0 } ?: 8025
+        val user = keys.getTermuxUser().ifBlank { "user" }
+        val password = keys.getTermuxPassword().ifBlank { "" }
+        
+        return if (SSHService.isConnected.value) {
+            true
+        } else {
+            val config = com.blackbox.ai.service.SSHConfig(host, port, user, password)
+            AgentRuntimeManager.connect(context)
+                .fold(onSuccess = { 
+                    status = it
+                    true
+                }, onFailure = { 
+                    status = "Auto-connect failed: ${it.message}"
+                    false
+                })
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -102,24 +125,36 @@ fun AgentRuntimeScreen(navController: NavController) {
                     isBusy = isBusy,
                     onInstall = {
                         scope.launch {
+                            if (!ensureLocalTermuxConnection()) {
+                                return@launch
+                            }
                             status = AgentRuntimeManager.install(context, agent)
                                 .fold(onSuccess = { "Installed ${agent.name}" }, onFailure = { "Install failed: ${it.message}" })
                         }
                     },
                     onStart = {
                         scope.launch {
+                            if (!ensureLocalTermuxConnection()) {
+                                return@launch
+                            }
                             status = AgentRuntimeManager.start(context, agent)
                                 .fold(onSuccess = { "Started ${agent.name}" }, onFailure = { "Start failed: ${it.message}" })
                         }
                     },
                     onStop = {
                         scope.launch {
+                            if (!ensureLocalTermuxConnection()) {
+                                return@launch
+                            }
                             status = AgentRuntimeManager.stop(context, agent)
                                 .fold(onSuccess = { "Stopped ${agent.name}" }, onFailure = { "Stop failed: ${it.message}" })
                         }
                     },
                     onHealth = {
                         scope.launch {
+                            if (!ensureLocalTermuxConnection()) {
+                                return@launch
+                            }
                             status = AgentRuntimeManager.health(context, agent)
                                 .fold(onSuccess = { "Health ${agent.name}: ${it.trim()}" }, onFailure = { "Health: ${it.message}" })
                         }

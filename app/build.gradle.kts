@@ -253,7 +253,8 @@ dependencies {
     implementation(libs.pdfbox)
     
     // ML Kit Text Recognition for OCR
-    implementation("com.google.mlkit:text-recognition:16.0.0")
+    implementation("com.google.mlkit:text-recognition:16.0.1")
+    implementation("com.google.mlkit:text-recognition-japanese:16.0.1")
     
     // Model Sharing - HTTP server
     implementation("org.nanohttpd:nanohttpd:2.3.1")

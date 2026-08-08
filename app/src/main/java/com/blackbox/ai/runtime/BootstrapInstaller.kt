@@ -135,8 +135,7 @@ object BootstrapInstaller {
                                 }.getOrElse { e ->
                                     Log.w(TAG, "chmod denied on ${targetFile.absolutePath}: ${e.message}")
                                 }
-                                if (!runCatching { targetFile.canExecute() }.getOrDefault(false) &&
-                                    !runCatching { Os.chmod(targetFile.absolutePath, 0b111_000_000) }.isSuccess) {
+                                if (!runCatching { targetFile.canExecute() }.getOrDefault(false)) {
                                     Log.w(TAG, "File may not be executable after chmod: ${targetFile.absolutePath}")
                                 }
                             }
@@ -186,10 +185,15 @@ object BootstrapInstaller {
         }
         val renameOk = runCatching { stagingFile.renameTo(prefixFile) }.getOrDefault(false)
         if (!renameOk) {
-            val msg = "BOOTSTRAP MOVE FAILED: could not rename $stagingPath to ${paths.prefixDir}"
-            Log.e(TAG, msg)
-            onProgress(msg)
-            throw RuntimeException(msg)
+            onProgress("renameTo failed; falling back to copy+delete...")
+            val copyOk = runCatching { copyRecursive(stagingFile, prefixFile) }.getOrDefault(false)
+            if (!copyOk) {
+                val msg = "BOOTSTRAP MOVE FAILED: could not move $stagingPath to ${paths.prefixDir}"
+                Log.e(TAG, msg)
+                onProgress(msg)
+                throw RuntimeException(msg)
+            }
+            runCatching { deleteRecursive(stagingFile) }
         }
 
         // ── Step 4: post-extraction setup ────────────────────────────────
@@ -321,5 +325,23 @@ object BootstrapInstaller {
             }
         }
         fileOrDir.delete()
+    }
+
+    private fun copyRecursive(src: File, dst: File): Boolean {
+        return try {
+            if (src.isDirectory) {
+                if (!dst.isDirectory && !dst.mkdirs()) return false
+                val children = src.listFiles() ?: return true
+                for (child in children) {
+                    if (!copyRecursive(child, File(dst, child.name))) return false
+                }
+            } else {
+                src.copyTo(dst, overwrite = true)
+            }
+            true
+        } catch (e: Exception) {
+            Log.w(TAG, "copyRecursive failed: ${e.message}")
+            false
+        }
     }
 }
