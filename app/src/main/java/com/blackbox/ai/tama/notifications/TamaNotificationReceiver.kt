@@ -182,7 +182,7 @@ class TamaNotificationReceiver : BroadcastReceiver() {
             }
 
             TamaNotificationScheduler.AlertKind.DEEP_DREAM -> {
-                val refreshedPet = PetMapper.toDomain(database.tamaDao().getPet(petId) ?: return)
+                val refreshedPet = activePet(database.tamaDao(), petId) ?: return
                 val currentRun = database.tamaDao().getDeepDreamRunBySignature(petId, signature)
                 val refreshedAlert = TamaNotificationScheduler.computeDeepDreamAlert(refreshedPet, currentRun)
                 if (refreshedAlert == null) {

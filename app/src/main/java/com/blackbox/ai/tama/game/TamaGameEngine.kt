@@ -230,6 +230,9 @@ class TamaGameEngine(
      */
     private suspend fun activePetEntity() = dao.getActivePet()
 
+    private suspend fun petFor(petId: String): TamaPet? =
+        dao.getPet(petId)?.let(PetMapper::toDomain)
+
     private suspend fun loadPet(): TamaPet? {
         val entity = activePetEntity() ?: return null
         val pet = PetMapper.toDomain(entity)
@@ -1226,7 +1229,7 @@ class TamaGameEngine(
     suspend fun wakeUp() {
         val initialPet = activePet ?: return
         val now = System.currentTimeMillis()
-        val latestPet = dao.getPet(initialPet.id)?.let(PetMapper::toDomain) ?: initialPet
+        val latestPet = petFor(initialPet.id) ?: initialPet
         val currentPet = maybeQueueDailyDream(latestPet, now)
         if (!currentPet.isSleeping) return  // Not sleeping
 
@@ -2498,7 +2501,7 @@ class TamaGameEngine(
         val now = System.currentTimeMillis()
         val database = TamaDatabase.getInstance(context.applicationContext)
         val updatedPet = database.withTransaction {
-            val latestPet = dao.getPet(currentPet.id)?.let(PetMapper::toDomain) ?: currentPet
+            val latestPet = petFor(currentPet.id) ?: currentPet
             val upgrade = database.farmDao().getUpgrade(latestPet.id, FARM_HARVESTING_DRONE_ID)
                 ?: return@withTransaction null
             if (!upgrade.isPurchased) return@withTransaction null
@@ -3332,7 +3335,7 @@ class TamaGameEngine(
     }
 
     private suspend fun maybeQueueDailyDream(pet: TamaPet, now: Long): TamaPet {
-        val latestStoredPet = dao.getPet(pet.id)?.let(PetMapper::toDomain)
+        val latestStoredPet = petFor(pet.id)
         return latestStoredPet?.let { stored ->
             pet.copy(
                 lastDailyDreamDate = stored.lastDailyDreamDate,
@@ -3517,7 +3520,7 @@ class TamaGameEngine(
     private suspend fun savePet(pet: TamaPet) {
         val refreshTamaWidget = TamaPetWidgetProvider.hasWidgets(context.applicationContext)
         val previousWidgetSignature = if (refreshTamaWidget) {
-            dao.getPet(pet.id)?.let(PetMapper::toDomain)?.tamaPetWidgetSignature()
+            petFor(pet.id)?.tamaPetWidgetSignature()
         } else {
             null
         }

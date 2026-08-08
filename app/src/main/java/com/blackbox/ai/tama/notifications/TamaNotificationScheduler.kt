@@ -154,7 +154,7 @@ object TamaNotificationScheduler {
     suspend fun retryPendingDeepDreamForActivePet(context: Context) = withContext(Dispatchers.IO) {
         val appContext = context.applicationContext
         val database = TamaDatabase.getInstance(appContext)
-        val activePetEntity = database.tamaDao().getActivePet() ?: return@withContext
+        val activePetEntity = activePet(database.tamaDao()) ?: return@withContext
         val activePet = PetMapper.toDomain(activePetEntity)
         TamaDeepDreamRunCoordinator.reconcileRunsForPet(
             context = appContext,

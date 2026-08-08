@@ -483,7 +483,7 @@ object TamaDeepDreamRunCoordinator {
         albumId: String?
     ) {
         if (albumId.isNullOrBlank()) return
-        val pet = dao.getPet(petId)?.let(PetMapper::toDomain) ?: return
+        val pet = activePet(dao, petId) ?: return
         if (pet.pendingDreamAlbumId != albumId) return
         dao.savePet(PetMapper.toEntity(pet.copy(pendingDreamAlbumId = null)))
     }
