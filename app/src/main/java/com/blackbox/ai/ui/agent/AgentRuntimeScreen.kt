@@ -22,15 +22,11 @@ import androidx.navigation.NavController
 import com.blackbox.ai.agent.runtime.AgentCatalog
 import com.blackbox.ai.agent.runtime.AgentRuntimeManager
 import com.blackbox.ai.agent.runtime.RuntimeAgent
+import com.blackbox.ai.engine.EngineKeysStore
 import com.blackbox.ai.service.SSHService
 import com.blackbox.ai.ui.navigation.Screen
 import kotlinx.coroutines.launch
 
-/**
- * Local runtime agent manager (termux-agents-hub style): install, start, stop,
- * health-check and view logs for Hermes, Codex CLI and OpenClaw, all running
- * inside the local Termux/Ubuntu SSH channel.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AgentRuntimeScreen(navController: NavController) {
@@ -43,26 +39,40 @@ fun AgentRuntimeScreen(navController: NavController) {
     val console by AgentRuntimeManager.console.collectAsState()
     val isBusy by AgentRuntimeManager.isBusy.collectAsState()
 
+    val keys = remember { EngineKeysStore(context) }
+    var runtimeMode by remember { mutableStateOf(keys.getRuntimeMode()) }
+    var prootInstalled by remember { mutableStateOf(keys.isProotInstalled()) }
+
+    val isProot = runtimeMode == EngineKeysStore.RUNTIME_MODE_PROOT
+
     // Auto-connect to local Termux when needed, using stored or default credentials
-    suspend fun ensureLocalTermuxConnection(): Boolean {
-        val keys = com.blackbox.ai.engine.EngineKeysStore(context)
-        val host = keys.getTermuxHost().ifBlank { "127.0.0.1" }
-        val port = keys.getTermuxPort().takeIf { it > 0 } ?: 8025
-        val user = keys.getTermuxUser().ifBlank { "user" }
-        val password = keys.getTermuxPassword().ifBlank { "" }
-        
-        return if (SSHService.isConnected.value) {
-            true
+    suspend fun ensureConnection(): Boolean {
+        return if (isProot) {
+            if (prootInstalled) {
+                status = "Linux proot runtime is ready."
+                true
+            } else {
+                status = "Linux proot rootfs not installed yet."
+                false
+            }
         } else {
-            val config = com.blackbox.ai.service.SSHConfig(host, port, user, password)
-            AgentRuntimeManager.connect(context)
-                .fold(onSuccess = { 
-                    status = it
-                    true
-                }, onFailure = { 
-                    status = "Auto-connect failed: ${it.message}"
-                    false
-                })
+            val host = keys.getTermuxHost().ifBlank { "127.0.0.1" }
+            val port = keys.getTermuxPort().takeIf { it > 0 } ?: 8025
+            val user = keys.getTermuxUser().ifBlank { "user" }
+            val password = keys.getTermuxPassword().ifBlank { "" }
+            return if (SSHService.isConnected.value) {
+                true
+            } else {
+                val config = com.blackbox.ai.service.SSHConfig(host, port, user, password)
+                AgentRuntimeManager.connect(context)
+                    .fold(onSuccess = {
+                        status = it
+                        true
+                    }, onFailure = {
+                        status = "Auto-connect failed: ${it.message}"
+                        false
+                    })
+            }
         }
     }
 
@@ -88,11 +98,42 @@ fun AgentRuntimeScreen(navController: NavController) {
             item {
                 Card {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Local Termux / Ubuntu runtime", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text(
+                            text = stringResource(R.string.runtime_mode_switch_title),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            "Agents run in the same environment Blackbox uses for its local Termux tools (SSH into the Termux-hosted Ubuntu proot).",
+                            text = stringResource(R.string.runtime_mode_switch_desc),
                             fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            FilterChip(
+                                selected = !isProot,
+                                onClick = {
+                                    runtimeMode = EngineKeysStore.RUNTIME_MODE_TERMUX
+                                    keys.setRuntimeMode(runtimeMode)
+                                },
+                                label = { Text(stringResource(R.string.runtime_mode_termux)) },
+                                modifier = Modifier.weight(1f)
+                            )
+                            FilterChip(
+                                selected = isProot,
+                                onClick = {
+                                    runtimeMode = EngineKeysStore.RUNTIME_MODE_PROOT
+                                    keys.setRuntimeMode(runtimeMode)
+                                },
+                                label = { Text(stringResource(R.string.runtime_mode_proot)) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = if (isProot) stringResource(R.string.runtime_proot_note) else stringResource(R.string.runtime_termux_note),
+                            fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -101,18 +142,50 @@ fun AgentRuntimeScreen(navController: NavController) {
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(status, fontSize = 12.sp, color = if (connected) Color(0xFF4CAF50) else Color.Gray)
-                            Button(
-                                onClick = {
-                                    scope.launch {
-                                        AgentRuntimeManager.connect(context)
-                                            .onSuccess { status = it }
-                                            .onFailure { status = "Error: ${it.message}" }
+                            Text(status, fontSize = 12.sp, color = if (isProot) Color(0xFF4CAF50) else if (connected) Color(0xFF4CAF50) else Color.Gray)
+                            if (isProot) {
+                                if (!prootInstalled) {
+                                    Button(onClick = {
+                                        scope.launch {
+                                            status = "Installing Linux proot rootfs…"
+                                            val result = runCatching {
+                                                val pm = com.blackbox.ai.data.proot.ProotManager(context)
+                                                var ok = false
+                                                runCatching { ok = pm.downloadRootfs { } }.getOrElse { }
+                                                if (ok) runCatching { ok = pm.extractRootfs { } }.getOrElse { }
+                                                ok
+                                            }.getOrDefault(false)
+                                            prootInstalled = result
+                                            keys.setProotInstalled(result)
+                                            status = if (result) "Linux proot runtime ready" else "Proot install failed"
+                                        }
+                                    }, enabled = !isBusy) {
+                                        Text(stringResource(R.string.runtime_proot_install))
                                     }
-                                },
-                                enabled = !isBusy
-                            ) {
-                                Text(if (connected) "Reconnect" else "Connect")
+                                } else {
+                                    OutlinedButton(onClick = {
+                                        scope.launch {
+                                            AgentRuntimeManager.connect(context)
+                                                .onSuccess { status = it }
+                                                .onFailure { status = "Error: ${it.message}" }
+                                        }
+                                    }, enabled = !isBusy) {
+                                        Text("Reconnect")
+                                    }
+                                }
+                            } else {
+                                Button(
+                                    onClick = {
+                                        scope.launch {
+                                            AgentRuntimeManager.connect(context)
+                                                .onSuccess { status = it }
+                                                .onFailure { status = "Error: ${it.message}" }
+                                        }
+                                    },
+                                    enabled = !isBusy
+                                ) {
+                                    Text(if (connected) "Reconnect" else "Connect")
+                                }
                             }
                         }
                     }
@@ -125,7 +198,7 @@ fun AgentRuntimeScreen(navController: NavController) {
                     isBusy = isBusy,
                     onInstall = {
                         scope.launch {
-                            if (!ensureLocalTermuxConnection()) {
+                            if (!ensureConnection()) {
                                 return@launch
                             }
                             status = AgentRuntimeManager.install(context, agent)
@@ -134,7 +207,7 @@ fun AgentRuntimeScreen(navController: NavController) {
                     },
                     onStart = {
                         scope.launch {
-                            if (!ensureLocalTermuxConnection()) {
+                            if (!ensureConnection()) {
                                 return@launch
                             }
                             status = AgentRuntimeManager.start(context, agent)
@@ -143,7 +216,7 @@ fun AgentRuntimeScreen(navController: NavController) {
                     },
                     onStop = {
                         scope.launch {
-                            if (!ensureLocalTermuxConnection()) {
+                            if (!ensureConnection()) {
                                 return@launch
                             }
                             status = AgentRuntimeManager.stop(context, agent)
@@ -152,7 +225,7 @@ fun AgentRuntimeScreen(navController: NavController) {
                     },
                     onHealth = {
                         scope.launch {
-                            if (!ensureLocalTermuxConnection()) {
+                            if (!ensureConnection()) {
                                 return@launch
                             }
                             status = AgentRuntimeManager.health(context, agent)

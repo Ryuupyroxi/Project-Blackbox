@@ -1,6 +1,7 @@
 package com.blackbox.ai.agent.runtime
 
 import android.content.Context
+import com.blackbox.ai.data.proot.ProotManager
 import com.blackbox.ai.engine.EngineKeysStore
 import com.blackbox.ai.service.SSHConfig
 import com.blackbox.ai.service.SSHService
@@ -14,6 +15,10 @@ import kotlinx.coroutines.withTimeout
  * into the Termux-hosted environment (default 127.0.0.1:8025, user-configurable).
  * Runtime agents (Hermes, Codex CLI, OpenClaw) are installed, started, stopped,
  * and health-checked here using the termux-agents-hub command patterns.
+ *
+ * Supports two runtime modes from EngineKeysStore:
+ * - RUNTIME_MODE_TERMUX: existing SSH path
+ * - RUNTIME_MODE_PROOT: ProotManager-based Linux proot environment
  */
 object AgentRuntimeManager {
 
@@ -28,36 +33,38 @@ object AgentRuntimeManager {
     val console: StateFlow<String> = _console.asStateFlow()
 
     private fun sshService(context: Context): SSHService = SSHService(context)
+    private fun prootService(context: Context): ProotManager = ProotManager(context)
 
     private fun logFile(agentId: String): String = "\$HOME/.blackbox-agents/$agentId.log"
     private fun pidFile(agentId: String): String = "\$HOME/.blackbox-agents/$agentId.pid"
 
+    fun runtimeMode(context: Context): String = EngineKeysStore(context).getRuntimeMode()
+
     suspend fun connect(context: Context): Result<String> {
         val keys = EngineKeysStore(context)
-        val config = SSHConfig(
-            host = keys.getTermuxHost(),
-            port = keys.getTermuxPort(),
-            user = keys.getTermuxUser(),
-            password = keys.getTermuxPassword()
-        )
-        return sshService(context).connect(config)
-            .map { "Connected to ${config.host}:${config.port} as ${config.user}" }
+        return when (keys.getRuntimeMode()) {
+            EngineKeysStore.RUNTIME_MODE_PROOT -> connectProot(context, keys)
+            else -> connectTermux(context, keys)
+        }
     }
 
     suspend fun disconnect(context: Context) {
-        sshService(context).disconnect()
+        when (EngineKeysStore(context).getRuntimeMode()) {
+            EngineKeysStore.RUNTIME_MODE_PROOT -> disconnectProot(context)
+            else -> sshService(context).disconnect()
+        }
     }
 
     suspend fun checkInstalled(context: Context, agent: RuntimeAgent): Boolean {
-        val result = sshService(context).executeCommand(agent.installCheckCommand)
-        return result.getOrDefault("MISSING").contains("INSTALLED")
+        return execute(context, agent.installCheckCommand)
+            .map { it.contains("INSTALLED") }
+            .getOrDefault(false)
     }
 
     suspend fun install(context: Context, agent: RuntimeAgent): Result<String> {
         return runWithConsole(context, "Install ${agent.name}") {
-            val ssh = sshService(context)
-            if (!ssh.checkConnection()) {
-                return@runWithConsole "SSH not connected. Open Agent Hub → connect to 127.0.0.1:8025 (Blackbox Ubuntu) or 8022 (Termux) first."
+            if (!isConnected(context)) {
+                return@runWithConsole "Not connected. Connect first, then retry Install."
             }
             var lastOutput = "Install complete"
             var failed = false
@@ -66,7 +73,7 @@ object AgentRuntimeManager {
                 appendConsole("> $cmd")
                 val out = runCatching {
                     withTimeout(INSTALL_TIMEOUT_MS) {
-                        sshService(context).executeCommand(cmd)
+                        execute(context, cmd)
                     }
                 }.getOrElse { Result.failure(it) }
                 out.fold(
@@ -87,9 +94,8 @@ object AgentRuntimeManager {
 
     suspend fun start(context: Context, agent: RuntimeAgent): Result<String> {
         return runWithConsole(context, "Start ${agent.name}") {
-            val ssh = sshService(context)
-            if (!ssh.checkConnection()) {
-                return@runWithConsole "SSH not connected. Open Agent Hub → connect to 127.0.0.1:8025 (Blackbox Ubuntu) or 8022 (Termux) first."
+            if (!isConnected(context)) {
+                return@runWithConsole "Not connected. Connect first, then retry Start."
             }
             val cmd = buildString {
                 append("mkdir -p \$HOME/.blackbox-agents\n")
@@ -101,7 +107,7 @@ object AgentRuntimeManager {
             }
             appendConsole("> ${agent.runCommand}")
             runCatching {
-                withTimeout(START_TIMEOUT_MS) { sshService(context).executeCommand(cmd) }
+                withTimeout(START_TIMEOUT_MS) { execute(context, cmd) }
             }.getOrElse { Result.failure(it) }.fold(
                 onSuccess = { "Start: ${it.trim()}" },
                 onFailure = { e -> "Start failed: ${e.message}" }
@@ -111,13 +117,16 @@ object AgentRuntimeManager {
 
     suspend fun stop(context: Context, agent: RuntimeAgent): Result<String> {
         return runWithConsole(context, "Stop ${agent.name}") {
+            if (!isConnected(context)) {
+                return@runWithConsole "Not connected. Connect first, then retry Stop."
+            }
             val pattern = bracketPattern(agent.stopPattern)
             val cmd = buildString {
                 append("if [ -f ${pidFile(agent.id)} ]; then kill \$(cat ${pidFile(agent.id)}) 2>/dev/null; rm -f ${pidFile(agent.id)}; fi\n")
                 append("pkill -f '$pattern' 2>/dev/null\n")
                 append("echo STOPPED")
             }
-            sshService(context).executeCommand(cmd).fold(
+            execute(context, cmd).fold(
                 onSuccess = { "Stop: ${it.trim()}" },
                 onFailure = { e -> "Stop: ${e.message}" }
             )
@@ -131,26 +140,75 @@ object AgentRuntimeManager {
             append("else echo \"NOT RUNNING\"; fi\n")
             append("curl -s -o /dev/null -w \"PORT ${agent.port} HTTP %{http_code}\" --max-time 5 http://127.0.0.1:${agent.port} 2>/dev/null || echo \"PORT ${agent.port} CLOSED\"")
         }
-        return sshService(context).executeCommand(cmd)
+        return execute(context, cmd)
     }
 
     suspend fun logTail(context: Context, agent: RuntimeAgent, lines: Int = 80): Result<String> {
         val cmd = "tail -n $lines ${logFile(agent.id)} 2>&1 || echo 'No log yet'"
-        return sshService(context).executeCommand(cmd)
+        return execute(context, cmd)
     }
 
     suspend fun ensureWorkspaceFolder(context: Context, folder: String): Result<String> {
         val path = "/workspace/$folder"
         val cmd = "mkdir -p $path && echo OK:$path"
-        return sshService(context).executeCommand(cmd)
+        return execute(context, cmd)
     }
 
-    /**
-     * Turn "codex" into "[c]odex" so pkill -f does not match its own command line.
-     */
-    private fun bracketPattern(pattern: String): String {
-        if (pattern.isEmpty()) return pattern
-        return "[${pattern.first()}]${pattern.drop(1)}"
+    private suspend fun connectTermux(context: Context, keys: EngineKeysStore): Result<String> {
+        val config = SSHConfig(
+            host = keys.getTermuxHost(),
+            port = keys.getTermuxPort(),
+            user = keys.getTermuxUser(),
+            password = keys.getTermuxPassword()
+        )
+        return sshService(context).connect(config)
+            .map { "Connected to ${config.host}:${config.port} as ${config.user}" }
+    }
+
+    private suspend fun connectProot(context: Context, keys: EngineKeysStore): Result<String> {
+        val pm = prootService(context)
+        return runCatching {
+            if (!pm.isRootfsReady()) {
+                throw Exception("Linux proot rootfs is not ready yet. Install it first.")
+            }
+            keys.setProotInstalled(true)
+            "Linux proot runtime ready at rootfs=${pm.rootfsDir.absolutePath}"
+        }
+    }
+
+    private fun disconnectProot(context: Context) {
+        val pm = prootService(context)
+        runCatching { pm.stopRunningServers() }
+    }
+
+    private suspend fun execute(context: Context, command: String): Result<String> {
+        return when (EngineKeysStore(context).getRuntimeMode()) {
+            EngineKeysStore.RUNTIME_MODE_PROOT -> executeProot(context, command)
+            else -> executeTermux(context, command)
+        }
+    }
+
+    private suspend fun executeTermux(context: Context, command: String): Result<String> {
+        return sshService(context).executeCommand(command)
+    }
+
+    private suspend fun executeProot(context: Context, command: String): Result<String> {
+        val pm = prootService(context)
+        return runCatching {
+            val sb = StringBuilder()
+            val code = pm.executeCommand(command, onOutput = { sb.appendLine(it) })
+            if (code == 0) sb.toString() else throw Exception(sb.toString().ifBlank { "Proot command failed with code $code" })
+        }
+    }
+
+    private suspend fun isConnected(context: Context): Boolean {
+        return when (EngineKeysStore(context).getRuntimeMode()) {
+            EngineKeysStore.RUNTIME_MODE_PROOT -> {
+                val pm = prootService(context)
+                pm.isRootfsReady()
+            }
+            else -> sshService(context).checkConnection()
+        }
     }
 
     private suspend fun runWithConsole(
@@ -173,5 +231,10 @@ object AgentRuntimeManager {
     private fun appendConsole(text: String) {
         val updated = _console.value + text + "\n"
         _console.value = if (updated.length > MAX_CONSOLE) updated.takeLast(MAX_CONSOLE) else updated
+    }
+
+    private fun bracketPattern(pattern: String): String {
+        if (pattern.isEmpty()) return pattern
+        return "[${pattern.first()}]${pattern.drop(1)}"
     }
 }

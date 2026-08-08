@@ -87,6 +87,30 @@ class EngineKeysStore(context: Context) {
             .putString(KEY_TERMUX_PASSWORD, password).apply()
     }
 
+    // Runtime mode: TERMUX or PROOT
+    fun getRuntimeMode(): String = prefs.getString(KEY_RUNTIME_MODE, RUNTIME_MODE_TERMUX) ?: RUNTIME_MODE_TERMUX
+    fun setRuntimeMode(mode: String) {
+        prefs.edit().putString(KEY_RUNTIME_MODE, mode).apply()
+    }
+
+    // Proot-specific settings
+    fun getProotPort(): Int = prefs.getInt(KEY_PROOT_PORT, 8025)
+    fun setProotPort(port: Int) {
+        prefs.edit().putInt(KEY_PROOT_PORT, port).apply()
+    }
+    fun getProotUser(): String = prefs.getString(KEY_PROOT_USER, "root") ?: "root"
+    fun setProotUser(user: String) {
+        prefs.edit().putString(KEY_PROOT_USER, user).apply()
+    }
+    fun getProotPassword(): String = prefs.getString(KEY_PROOT_PASSWORD, "") ?: ""
+    fun setProotPassword(password: String) {
+        prefs.edit().putString(KEY_PROOT_PASSWORD, password).apply()
+    }
+    fun isProotInstalled(): Boolean = prefs.getBoolean(KEY_PROOT_INSTALLED, false)
+    fun setProotInstalled(installed: Boolean) {
+        prefs.edit().putBoolean(KEY_PROOT_INSTALLED, installed).apply()
+    }
+
     // Quick agent chat history (kept in memory is fine; store last session log)
     fun getLastSessionLog(): String = prefs.getString(KEY_SESSION_LOG, "") ?: ""
     fun setLastSessionLog(text: String) {
@@ -110,7 +134,14 @@ class EngineKeysStore(context: Context) {
         private const val KEY_TERMUX_PORT = "termux_port"
         private const val KEY_TERMUX_USER = "termux_user"
         private const val KEY_TERMUX_PASSWORD = "termux_password"
+        private const val KEY_RUNTIME_MODE = "runtime_mode"
+        private const val KEY_PROOT_PORT = "proot_port"
+        private const val KEY_PROOT_USER = "proot_user"
+        private const val KEY_PROOT_PASSWORD = "proot_password"
+        private const val KEY_PROOT_INSTALLED = "proot_installed"
         private const val KEY_SESSION_LOG = "session_log"
+        const val RUNTIME_MODE_TERMUX = "termux"
+        const val RUNTIME_MODE_PROOT = "proot"
     }
 }
 

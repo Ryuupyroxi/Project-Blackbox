@@ -243,7 +243,45 @@ fun AgentHubScreen(navController: NavController) {
                 }
             }
 
-            // ── Workspaces ──────────────────────────────────────────────
+            // ── Runtime mode ──────────────────────────────────────────────
+            item {
+                Card {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = stringResource(R.string.runtime_mode_switch_title),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = stringResource(R.string.runtime_mode_switch_desc),
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            FilterChip(
+                                selected = keys.getRuntimeMode() == EngineKeysStore.RUNTIME_MODE_TERMUX,
+                                onClick = {
+                                    keys.setRuntimeMode(EngineKeysStore.RUNTIME_MODE_TERMUX)
+                                },
+                                label = { Text(stringResource(R.string.runtime_mode_termux)) },
+                                modifier = Modifier.weight(1f)
+                            )
+                            FilterChip(
+                                selected = keys.getRuntimeMode() == EngineKeysStore.RUNTIME_MODE_PROOT,
+                                onClick = {
+                                    keys.setRuntimeMode(EngineKeysStore.RUNTIME_MODE_PROOT)
+                                },
+                                label = { Text(stringResource(R.string.runtime_mode_proot)) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+            }
+
+            // ── Workspaces ────────────────────────────────────────────────
             item {
                 Card {
                     Column(modifier = Modifier.padding(16.dp)) {
