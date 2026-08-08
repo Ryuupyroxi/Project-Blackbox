@@ -86,5 +86,20 @@ object AgentCatalog {
         stopPattern = "openclaw"
     )
 
-    val all = listOf(hermesDashboard, hermesApi, codex, openclaw)
+    val kaiAssistant = RuntimeAgent(
+        id = "kai-assistant",
+        name = "Kai Assistant",
+        emoji = "🧠",
+        description = "Kai-style assistant runtime layer inside the proot runtime",
+        port = 9219,
+        webUrl = "http://127.0.0.1:9219",
+        installCheckCommand = "command -v kai >/dev/null 2>&1 || [ -d /opt/kai ]; echo INSTALLED || echo MISSING",
+        installCommands = listOf(
+            "mkdir -p /opt/kai && cd /opt/kai && curl -fsSL https://raw.githubusercontent.com/SimonSchubert/Kai/main/install.sh | bash -s -- --no-shell 2>&1 || echo KAI_INSTALL_SCRIPT_UNAVAILABLE"
+        ),
+        runCommand = "kai assistant --port 9219 --host 0.0.0.0",
+        stopPattern = "kai"
+    )
+
+    val all = listOf(hermesDashboard, hermesApi, codex, openclaw, kaiAssistant)
 }
