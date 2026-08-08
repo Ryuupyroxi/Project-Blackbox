@@ -213,6 +213,7 @@ class AdventureGateRepository(
         targetInstanceId: String?
     ): AdventureGateActionResult? = withContext(Dispatchers.IO) {
         val profile = recoverProfileForPet(petId)
+        val pet = petFor(petId) ?: return@withContext null
         val snapshot = dao.getAdventureGateBattleState(petId)?.toDomainBattle() ?: return@withContext null
         val result = AdventureGateCombatEngine.performSkill(profile, snapshot, skillId, targetInstanceId, educationLevelForPet(petId))
         val finalized = persistActionResult(result)
@@ -221,6 +222,7 @@ class AdventureGateRepository(
 
     suspend fun resolveEnemyTurn(petId: String): AdventureGateActionResult? = withContext(Dispatchers.IO) {
         val profile = recoverProfileForPet(petId)
+        val pet = petFor(petId) ?: return@withContext null
         val snapshot = dao.getAdventureGateBattleState(petId)?.toDomainBattle() ?: return@withContext null
         val result = AdventureGateCombatEngine.resolveEnemyTurn(profile, snapshot, educationLevelForPet(petId))
         persistActionResult(result)
