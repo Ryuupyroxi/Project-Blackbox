@@ -81,6 +81,21 @@ class BlackboxApplication : Application() {
             runCatching { LlamaScheduledTaskScheduler.rescheduleAll(this@BlackboxApplication) }
             // Auto-start assistant daemon if enabled
             runCatching { AssistantDaemonService.start(this@BlackboxApplication) }
+
+            // First-boot/update agent verification: install/start/health all runtime agents
+            // when the app is launched on a new versionCode, then record the result.
+            runCatching {
+                val currentVersion = if (BuildConfig.VERSION_CODE >= 0) BuildConfig.VERSION_CODE.toLong() else System.currentTimeMillis() / 1000L
+                FirstBootAgentVerifier(this@BlackboxApplication).runIfNeeded(currentVersion)
+            }.onFailure { e ->
+                runCatching {
+                    GenerationDiagnosticsStore.recordBreadcrumb(
+                        source = "first_boot_agent_verifier",
+                        event = "startup_agent_verification_failed",
+                        details = "${e.javaClass.simpleName}: ${e.message}"
+                    )
+                }
+            }
         }
         
         // Request native libs installation immediately (Simulate Fast-Follow)
