@@ -602,6 +602,7 @@ fun CatalogTab(repo: ZimRepository, zimFolderUri: String?) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var searchQuery by remember { mutableStateOf("") }
+    var retryKey by remember { mutableIntStateOf(0) }
     var selectedLanguage by remember { mutableStateOf("all") }
     var catalogEntries by remember { mutableStateOf<List<KiwixCatalogClient.CatalogEntry>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -609,7 +610,7 @@ fun CatalogTab(repo: ZimRepository, zimFolderUri: String?) {
     var languageExpanded by remember { mutableStateOf(false) }
     
     // Fetch catalog on load or search/filter change
-    LaunchedEffect(searchQuery, selectedLanguage) {
+    LaunchedEffect(searchQuery, selectedLanguage, retryKey) {
         isLoading = true
         errorMessage = null
         
@@ -700,7 +701,7 @@ fun CatalogTab(repo: ZimRepository, zimFolderUri: String?) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(stringResource(R.string.zim_error_prefix, errorMessage ?: ""))
                         Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = { searchQuery = searchQuery }) {
+                        Button(onClick = { retryKey++ }) {
                             Text(stringResource(R.string.zim_retry))
                         }
                     }

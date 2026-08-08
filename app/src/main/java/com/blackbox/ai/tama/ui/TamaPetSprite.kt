@@ -59,13 +59,27 @@ fun TamaPetSprite(
         )
     }
 
-    AsyncImage(
-        model = "file:///android_asset/$assetPath",
-        contentDescription = null,
-        modifier = modifier.size(size * TAMA_PET_VISUAL_SCALE),
-        contentScale = ContentScale.Fit,
-        filterQuality = FilterQuality.None
-    )
+    val speciesColor = remember(speciesLine) {
+        when (speciesLine.id) {
+            "dragon" -> androidx.compose.ui.graphics.Color(0xFFFF7043)
+            "unicorn" -> androidx.compose.ui.graphics.Color(0xFFF8BBD0)
+            "kitsune" -> androidx.compose.ui.graphics.Color(0xFFFFB74D)
+            else -> androidx.compose.ui.graphics.Color(0xFFB0BEC5)
+        }
+    }
+
+    Box(modifier = modifier.size(size * TAMA_PET_VISUAL_SCALE)) {
+        androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
+            drawRect(speciesColor)
+        }
+        AsyncImage(
+            model = "file:///android_asset/$assetPath",
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = androidx.compose.ui.layout.ContentScale.Fit,
+            filterQuality = androidx.compose.ui.graphics.FilterQuality.None
+        )
+    }
 }
 
 @Composable

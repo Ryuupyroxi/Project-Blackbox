@@ -6748,5 +6748,9 @@
     <string name="ai_servers_type_docs_datasets_desc">PDF tools, summaries, translation paths, video summaries, and dataset projects.</string>
     <string name="ai_servers_type_llama_chat">Llama Chat</string>
     <string name="ai_servers_type_llama_chat_desc">Native Llama chats, server status, attachments, and chat history from the browser.</string>
+    <string name="ai_servers_runtime_agents_title">Runtime agents</string>
+    <string name="ai_servers_runtime_agents_desc">Coding runtimes with a web UI (Hermes, Codex, OpenClaw).</string>
+    <string name="ai_servers_health">Health</string>
+    <string name="ai_servers_open_web">Open</string>
     <string name="nav_agents">Agents</string>
 </resources>

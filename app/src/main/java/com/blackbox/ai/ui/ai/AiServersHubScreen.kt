@@ -95,6 +95,8 @@ import com.blackbox.ai.service.AiServerNetwork
 import com.blackbox.ai.service.AiServerRuntimeState
 import com.blackbox.ai.service.AiServerType
 import com.blackbox.ai.service.AiToolServerService
+import com.blackbox.ai.service.RuntimeAgentServerCard
+import com.blackbox.ai.service.RuntimeAgentServerStore
 import com.blackbox.ai.ui.components.AppContentColumn
 import com.blackbox.ai.ui.components.AppHeroCard
 import com.blackbox.ai.ui.components.AppInfoRow
@@ -120,6 +122,7 @@ fun AiServersHubScreen(navController: NavController) {
     val permissions by db.aiServerDao().observePermissions().collectAsState(initial = emptyList())
     val runtimeStates by AiToolServerService.runtimeStates.collectAsState()
     val logsByServer by AiServerLogStore.logs.collectAsState()
+    val runtimeAgentCards by RuntimeAgentServerStore.cards.collectAsState()
     var boundService by remember { mutableStateOf<AiToolServerService?>(null) }
     var addUserDialogOpen by remember { mutableStateOf(false) }
     var resetPasswordUser by remember { mutableStateOf<AiServerUserEntity?>(null) }
@@ -323,6 +326,77 @@ fun AiServersHubScreen(navController: NavController) {
                     )
                 }
             }
+
+            if (runtimeAgentCards.isNotEmpty()) {
+                item {
+                    AppContentColumn(topPadding = 0.dp, bottomPadding = 0.dp) {
+                        AppSectionTitle(
+                            title = stringResource(R.string.ai_servers_runtime_agents_title),
+                            supporting = stringResource(R.string.ai_servers_runtime_agents_desc)
+                        )
+                    }
+                }
+            }
+            items(runtimeAgentCards, key = { it.id }) { card ->
+                RuntimeAgentServerCard(
+                    card = card,
+                    onStart = {
+                        val agent = AgentCatalog.all.firstOrNull { it.id == card.id }
+                        if (agent != null) {
+                            scope.launch {
+                                val result = when (card.id) {
+                                    "codex", "openclaw" -> EmbeddedRuntimeManager.startServer(context)
+                                    else -> AgentRuntimeManager.start(context, agent)
+                                }
+                                statusMessage = result.exceptionOrNull()?.message
+                                    ?: result.getOrNull()
+                                RuntimeAgentServerStore.refresh(context)
+                            }
+                        }
+                    },
+                    onStop = {
+                        val agent = AgentCatalog.all.firstOrNull { it.id == card.id }
+                        if (agent != null) {
+                            scope.launch {
+                                val result = if (card.id == "codex" || card.id == "openclaw") {
+                                    EmbeddedRuntimeManager.stop(context)
+                                } else {
+                                    AgentRuntimeManager.stop(context, agent)
+                                }
+                                statusMessage = result.exceptionOrNull()?.message
+                                    ?: result.getOrNull()
+                                RuntimeAgentServerStore.refresh(context)
+                            }
+                        }
+                    },
+                    onHealth = {
+                        val agent = AgentCatalog.all.firstOrNull { it.id == card.id }
+                        if (agent != null) {
+                            scope.launch {
+                                val result = if (card.id == "codex" || card.id == "openclaw") {
+                                    EmbeddedRuntimeManager.healthCheck(context)
+                                } else {
+                                    AgentRuntimeManager.health(context, agent)
+                                }
+                                statusMessage = result.exceptionOrNull()?.message
+                                    ?: result.getOrNull()
+                                RuntimeAgentServerStore.refresh(context)
+                            }
+                        }
+                    },
+                    onOpenWeb = card.webUrl?.let { url ->
+                        {
+                            navController.navigate(
+                                Screen.TermuxWebView.createRoute(
+                                    url,
+                                    card.name,
+                                    card.id
+                                )
+                            )
+                        }
+                    }
+                )
+            }
         }
     }
 
@@ -366,7 +440,7 @@ fun AiServersHubScreen(navController: NavController) {
                 resetPasswordUser = null
                 scope.launch(Dispatchers.IO) {
                     val salt = AiServerAuth.createSalt()
-                    db.aiServerDao().upsertUser(
+                    val userId = db.aiServerDao().upsertUser(
                         user.copy(
                             passwordSalt = salt,
                             passwordHash = AiServerAuth.hashPassword(password, salt),
@@ -382,7 +456,87 @@ fun AiServersHubScreen(navController: NavController) {
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun RuntimeAgentServerCard(
+    card: RuntimeAgentServerCard,
+    onStart: () -> Unit,
+    onStop: () -> Unit,
+    onHealth: () -> Unit,
+    onOpenWeb: (() -> Unit)?
+) {
+    AppSectionCard(
+        tonalAccent = if (card.running) {
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+        } else {
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.22f)
+        }
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Surface(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = RoundedCornerShape(18.dp)
+            ) {
+                Text(
+                    text = card.emoji,
+                    modifier = Modifier.padding(12.dp),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = card.name,
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = card.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "Port ${card.port} · ${card.statusText}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (card.running) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            ServerStatusChip(running = card.running, error = card.error)
+        }
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(
+                onClick = if (card.running) onStop else onStart,
+                modifier = Modifier.weight(1f)
+            ) {
+                Icon(
+                    imageVector = if (card.running) Icons.Filled.Stop else Icons.Filled.PlayArrow,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(Modifier.width(6.dp))
+                Text(if (card.running) stringResource(R.string.ai_servers_stop) else stringResource(R.string.ai_servers_start))
+            }
+            OutlinedButton(onClick = onHealth, modifier = Modifier.weight(1f)) {
+                Icon(Icons.Filled.MonitorHeart, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(6.dp))
+                Text(stringResource(R.string.ai_servers_health))
+            }
+            if (onOpenWeb != null && card.running) {
+                OutlinedButton(onClick = onOpenWeb, modifier = Modifier.weight(1f)) {
+                    Icon(Icons.Filled.Language, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(stringResource(R.string.ai_servers_open_web))
+                }
+            }
+        }
+    }
+}
+
+@Composable
 @Composable
 private fun AiServerConfigCard(
     config: AiServerConfigEntity,

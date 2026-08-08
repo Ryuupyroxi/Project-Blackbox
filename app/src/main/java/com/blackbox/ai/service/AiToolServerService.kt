@@ -126,6 +126,7 @@ class AiToolServerService : Service() {
         super.onCreate()
         db = AppDatabase.getDatabase(applicationContext)
         serviceScope.launch { ensureDefaultConfigs(applicationContext) }
+        RuntimeAgentServerStore.startPolling(applicationContext)
     }
 
     override fun onBind(intent: Intent?): IBinder = binder
