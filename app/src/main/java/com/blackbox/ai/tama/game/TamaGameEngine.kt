@@ -260,7 +260,7 @@ class TamaGameEngine(
     private suspend fun ensurePetLoadedForBackgroundUpdates(): TamaPet? {
         val currentPet = _pet.value
         if (currentPet != null) return currentPet
-        val pet = activePetEntity()?.let(PetMapper::toDomain) ?: return null
+        val pet = petFor(activePetEntity()?.id ?: return null) ?: return null
         pruneExtraPetsKeeping(pet.id)
         _pet.value = pet
         _currentLocation.value = resolveLocation(pet.currentLocationId)
