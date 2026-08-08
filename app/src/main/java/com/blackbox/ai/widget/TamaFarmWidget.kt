@@ -111,7 +111,7 @@ class TamaFarmWidgetProvider : AppWidgetProvider() {
 
         private suspend fun loadFarmState(context: Context): TamaFarmWidgetState {
             val database = TamaDatabase.getInstance(context)
-            val pet = database.tamaDao().getActivePet()?.let(PetMapper::toDomain)
+            val pet = activePet(database.tamaDao())
                 ?: return TamaFarmWidgetState(null, emptyList(), unlockedPageCount = 1)
             val repository = FarmRepository(database.farmDao(), context)
             FarmEngine(repository).updateFarm(pet.id)

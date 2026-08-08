@@ -56,7 +56,7 @@ fun DungeonScreen(
     // Load dungeon progress
     LaunchedEffect(Unit) {
         scope.launch {
-            val pet = database.tamaDao().getActivePet()
+            val pet = activePet(database.tamaDao())
             if (pet != null) {
                 val progress = database.tamaDao().getDungeonProgress(pet.id)
                 completedDungeonCount = progress?.completedDungeonCount ?: 0

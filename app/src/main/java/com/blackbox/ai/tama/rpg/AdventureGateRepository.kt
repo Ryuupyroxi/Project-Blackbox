@@ -41,7 +41,7 @@ class AdventureGateRepository(
     }
 
     private suspend fun petFor(petId: String): TamaPet? =
-        dao.getPet(petId)?.let(PetMapper::toDomain)
+        petFor(petId)
 
     fun observeProfile(petId: String): Flow<AdventureGateProfile?> =
         dao.observeAdventureGateProfile(petId).combine(dao.observePet(petId)) { entity, pet ->
@@ -69,7 +69,7 @@ class AdventureGateRepository(
             if (entity?.id == petId) {
                 PetMapper.toDomain(entity).inventory
             } else {
-                dao.getPet(petId)?.let(PetMapper::toDomain)?.inventory.orEmpty()
+                petFor(petId)?.inventory.orEmpty()
             }
         }
 
@@ -113,11 +113,11 @@ class AdventureGateRepository(
         petGrowthProgressForPet(petId).educationLevel
 
     private suspend fun petGrowthProgressForPet(petId: String): PetGrowthProgress {
-        val pet = dao.getPet(petId)
+        val progress = petFor(petId) ?: return PetGrowthProgress()
         return PetGrowthProgress(
-            educationLevel = pet?.educationLevel ?: 0f,
-            exerciseLevel = pet?.exerciseLevel ?: 0f,
-            introspectionLevel = pet?.introspectionLevel ?: 0f
+            educationLevel = progress.educationLevel,
+            exerciseLevel = progress.exerciseLevel,
+            introspectionLevel = progress.introspectionLevel
         )
     }
 
@@ -181,7 +181,7 @@ class AdventureGateRepository(
         levelIndex: Int,
         now: Long = System.currentTimeMillis()
     ): AdventureGateBattleSnapshot? = withContext(Dispatchers.IO) {
-        val pet = dao.getPet(petId)?.let(PetMapper::toDomain) ?: return@withContext null
+        val pet = petFor(petId) ?: return@withContext null
         if (!pet.isSleeping) return@withContext null
         if (!NightArenaGenerator.isActiveWindow(now)) return@withContext null
         val profile = recoverProfileForPet(petId, now)
@@ -305,9 +305,7 @@ class AdventureGateRepository(
     ): AdventureGatePurchaseResult = withContext(Dispatchers.IO) {
         val supply = AdventureGateCatalog.supply(supplyId)
             ?: return@withContext AdventureGatePurchaseResult(false, AdventureGatePurchaseError.UNKNOWN_ITEM)
-        val petEntity = dao.getPet(petId)
-            ?: return@withContext AdventureGatePurchaseResult(false, AdventureGatePurchaseError.NO_PET)
-        val pet = PetMapper.toDomain(petEntity)
+        val pet = petFor(petId) ?: return@withContext AdventureGatePurchaseResult(false, AdventureGatePurchaseError.NO_PET)
         if (!isWorldIndexUnlocked(supply.unlockWorldIndex, getProgress(petId))) {
             return@withContext AdventureGatePurchaseResult(false, AdventureGatePurchaseError.LOCKED)
         }
@@ -338,9 +336,7 @@ class AdventureGateRepository(
             ?: return@withContext AdventureGatePurchaseResult(false, AdventureGatePurchaseError.UNKNOWN_ITEM)
         val supply = AdventureGateCatalog.supply(recipe.supplyId)
             ?: return@withContext AdventureGatePurchaseResult(false, AdventureGatePurchaseError.UNKNOWN_ITEM)
-        val petEntity = dao.getPet(petId)
-            ?: return@withContext AdventureGatePurchaseResult(false, AdventureGatePurchaseError.NO_PET)
-        val pet = PetMapper.toDomain(petEntity)
+        val pet = petFor(petId) ?: return@withContext AdventureGatePurchaseResult(false, AdventureGatePurchaseError.NO_PET)
         if (!isWorldIndexUnlocked(recipe.unlockWorldIndex, getProgress(petId))) {
             return@withContext AdventureGatePurchaseResult(false, AdventureGatePurchaseError.LOCKED)
         }
@@ -375,9 +371,7 @@ class AdventureGateRepository(
         if (equipment.uniqueDrop) {
             return@withContext AdventureGatePurchaseResult(false, AdventureGatePurchaseError.LOCKED)
         }
-        val petEntity = dao.getPet(petId)
-            ?: return@withContext AdventureGatePurchaseResult(false, AdventureGatePurchaseError.NO_PET)
-        val pet = PetMapper.toDomain(petEntity)
+        val pet = petFor(petId) ?: return@withContext AdventureGatePurchaseResult(false, AdventureGatePurchaseError.NO_PET)
         if (!isWorldIndexUnlocked(equipment.unlockWorldIndex, getProgress(petId))) {
             return@withContext AdventureGatePurchaseResult(false, AdventureGatePurchaseError.LOCKED)
         }
@@ -416,7 +410,7 @@ class AdventureGateRepository(
         ) {
             return@withContext AdventureGatePurchaseResult(false, AdventureGatePurchaseError.EQUIPPED)
         }
-        val pet = dao.getPet(petId)?.let(PetMapper::toDomain)
+        val pet = petFor(petId)
             ?: return@withContext AdventureGatePurchaseResult(false, AdventureGatePurchaseError.NO_PET)
         val updatedInventory = consumeInventoryItem(pet.inventory, equipment.id)
             ?: return@withContext AdventureGatePurchaseResult(false, AdventureGatePurchaseError.UNKNOWN_ITEM)
@@ -453,7 +447,7 @@ class AdventureGateRepository(
             if (equipment.slot != slot) {
                 return@withContext AdventureGateEquipResult(normalized, false, AdventureGateEquipError.WRONG_SLOT)
             }
-            val pet = dao.getPet(petId)?.let(PetMapper::toDomain)
+            val pet = petFor(petId)
             if (pet?.inventory?.none { it.id == equipment.id } != false) {
                 return@withContext AdventureGateEquipResult(normalized, false, AdventureGateEquipError.NOT_OWNED)
             }
@@ -480,7 +474,7 @@ class AdventureGateRepository(
         if (supply.kind == AdventureGateSupplyKind.CLEANSE) {
             return@withContext AdventureGatePotionUseResult(used = false, error = AdventureGatePotionUseError.ACTIVE_BATTLE_REQUIRED)
         }
-        val pet = dao.getPet(petId)?.let(PetMapper::toDomain)
+        val pet = petFor(petId)
             ?: return@withContext AdventureGatePotionUseResult(used = false, error = AdventureGatePotionUseError.NOT_OWNED)
         val updatedInventory = consumeInventoryItem(pet.inventory, supply.id)
             ?: return@withContext AdventureGatePotionUseResult(used = false, error = AdventureGatePotionUseError.NOT_OWNED)
@@ -508,7 +502,7 @@ class AdventureGateRepository(
         petId: String,
         supplyId: String
     ): AdventureGatePotionUseResult = withContext(Dispatchers.IO) {
-        val pet = dao.getPet(petId)?.let(PetMapper::toDomain)
+        val pet = petFor(petId)
             ?: return@withContext AdventureGatePotionUseResult(used = false, error = AdventureGatePotionUseError.NOT_OWNED)
         if (pet.inventory.none { it.id == supplyId && it.quantity > 0 }) {
             return@withContext AdventureGatePotionUseResult(used = false, error = AdventureGatePotionUseError.NOT_OWNED)
@@ -550,7 +544,7 @@ class AdventureGateRepository(
         if (snapshot != null && applyRetreatPenalty && !snapshot.isCompleted) {
             val phase = phaseForSnapshot(snapshot)
             val penalty = AdventureGateCatalog.phaseRetreatPenalty(phase).toLong()
-            val pet = dao.getPet(petId)?.let(PetMapper::toDomain)
+            val pet = petFor(petId)
             if (pet != null) {
                 paidPenalty = minOf(pet.money, penalty)
                 dao.savePet(PetMapper.toEntity(pet.copy(money = (pet.money - paidPenalty).coerceAtLeast(0L))))
@@ -575,7 +569,7 @@ class AdventureGateRepository(
         val lastRecoveryAt = profile.lastRecoveryAt.takeIf { it > 0L } ?: now
         val minutes = ((now - lastRecoveryAt).coerceAtLeast(0L) / 60_000L).toInt()
         if (minutes <= 0) return profile.copy(lastRecoveryAt = lastRecoveryAt)
-        val pet = dao.getPet(petId)
+        val pet = petFor(petId)
         val sleeping = pet?.isSleeping == true
         val relaxing = pet?.currentActivity == "RELAXING"
         val hpRate = when {
@@ -657,7 +651,7 @@ class AdventureGateRepository(
     }
 
     private suspend fun applyDefeatCarePenalty(petId: String) {
-        val pet = dao.getPet(petId)?.let(PetMapper::toDomain) ?: return
+        val pet = petFor(petId) ?: return
         val penalizedStats = pet.stats.copy(
             happiness = minOf(pet.stats.happiness, 25f),
             health = minOf(pet.stats.health, 25f)

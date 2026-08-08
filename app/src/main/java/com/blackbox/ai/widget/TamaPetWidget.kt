@@ -110,7 +110,7 @@ class TamaPetWidgetProvider : AppWidgetProvider() {
 
         private suspend fun loadActivePetState(context: Context): TamaWidgetPetState {
             val database = TamaDatabase.getInstance(context)
-            val pet = database.tamaDao().getActivePet()?.let(PetMapper::toDomain)
+            val pet = activePet(database.tamaDao())
             val profile = pet?.let { activePet ->
                 runCatching {
                     AdventureGateRepository(database).recoverProfile(activePet.id)

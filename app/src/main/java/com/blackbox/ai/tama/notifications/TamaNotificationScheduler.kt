@@ -140,7 +140,7 @@ object TamaNotificationScheduler {
     suspend fun scheduleAll(context: Context) = withContext(Dispatchers.IO) {
         val appContext = context.applicationContext
         val database = TamaDatabase.getInstance(appContext)
-        val activePet = database.tamaDao().getActivePet()
+        val activePet = activePet(database.tamaDao())
         val petIds = database.tamaDao().getAllPetIds()
         petIds.forEach { petId ->
             if (activePet?.id == petId) {

@@ -145,3 +145,6 @@ object PetMapper {
         } catch (e: Exception) { setOf("home") }
     )
 }
+
+suspend fun activePet(dao: com.blackbox.ai.tama.db.TamaDao): com.blackbox.ai.tama.data.TamaPet? =
+    dao.getActivePet()?.let(::toDomain)

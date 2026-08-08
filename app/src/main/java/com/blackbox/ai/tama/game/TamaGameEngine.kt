@@ -2902,7 +2902,7 @@ class TamaGameEngine(
 
     private suspend fun buildBackupPackage(): TamaBackupPackage {
         val database = TamaDatabase.getInstance(context)
-        val pet = _pet.value ?: dao.getActivePet()?.let(PetMapper::toDomain)
+        val pet = activePet(dao) ?: _pet.value
             ?: throw IllegalStateException("No active pet to export")
         val now = System.currentTimeMillis()
         val events = dao.getAllEvents(pet.id)
