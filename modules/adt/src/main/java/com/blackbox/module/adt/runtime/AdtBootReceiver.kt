@@ -3,7 +3,7 @@ package com.blackbox.module.adt.runtime
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.blackbox.core.module.adt.service.AdtServiceCatalog
+import com.blackbox.module.adt.service.AdtServiceCatalog
 
 class AdtBootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {

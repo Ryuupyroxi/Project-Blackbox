@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import com.blackbox.module.adt.AdtModuleImpl
 
 class BlackboxApp : Application() {
     override fun onCreate() {

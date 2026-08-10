@@ -1,8 +1,8 @@
 package com.blackbox.module.adt.service
 
-import com.blackbox.core.module.adt.model.AdtForegroundType
-import com.blackbox.core.module.adt.model.AdtReceiverDefinition
-import com.blackbox.core.module.adt.model.AdtServiceDefinition
+import com.blackbox.core.module.contract.AdtForegroundType
+import com.blackbox.core.module.contract.AdtReceiverDefinition
+import com.blackbox.core.module.contract.AdtServiceDefinition
 
 object AdtServiceCatalog {
     val services: List<AdtServiceDefinition> = listOf(

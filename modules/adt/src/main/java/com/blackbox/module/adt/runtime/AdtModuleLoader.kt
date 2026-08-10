@@ -2,8 +2,9 @@ package com.blackbox.module.adt.runtime
 
 import android.content.Context
 import android.content.Intent
-import com.blackbox.core.module.adt.bridge.AdtManifestMapper
-import com.blackbox.core.module.adt.model.AdtServiceDefinition
+import com.blackbox.core.module.contract.AdtReceiverDefinition
+import com.blackbox.core.module.contract.AdtServiceDefinition
+import com.blackbox.module.adt.bridge.AdtManifestMapper
 
 class AdtModuleLoader(private val context: Context) {
     fun loadServices(): List<AdtServiceDefinition> = AdtManifestMapper.services()

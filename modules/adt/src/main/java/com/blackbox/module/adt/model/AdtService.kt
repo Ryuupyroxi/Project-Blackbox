@@ -1,26 +1,8 @@
 package com.blackbox.module.adt.model
 
-enum class AdtForegroundType(val value: String) {
-    DATA_SYNC("dataSync"),
-    MEDIA_PLAYBACK("mediaPlayback"),
-    MICROPHONE("microphone"),
-    SPECIAL_USE("specialUse")
-}
-
-data class AdtServiceDefinition(
-    val id: String,
-    val className: String,
-    val foregroundType: AdtForegroundType?,
-    val exported: Boolean,
-    val description: String
-)
-
-data class AdtReceiverDefinition(
-    val id: String,
-    val className: String,
-    val exported: Boolean,
-    val actions: List<String>
-)
+// NOTE: AdtForegroundType, AdtServiceDefinition and AdtReceiverDefinition now
+// live in `:modules:core` (com.blackbox.core.module.contract) as shared
+// contracts. Only ADT-specific types remain here.
 
 data class AdtPermissionDefinition(
     val name: String,

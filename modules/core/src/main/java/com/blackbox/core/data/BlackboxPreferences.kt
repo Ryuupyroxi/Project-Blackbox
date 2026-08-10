@@ -129,8 +129,8 @@ class BlackboxPreferences(private val context: Context) {
         context.blackboxStore.edit { it[BlackboxKeys.SELECTED_MODEL_IMAGES] = images }
     }
 
-    suspend fun setSelectedModelContext(context: String) {
-        context.blackboxStore.edit { it[BlackboxKeys.SELECTED_MODEL_CONTEXT] = context }
+    suspend fun setSelectedModelContext(contextValue: String) {
+        context.blackboxStore.edit { it[BlackboxKeys.SELECTED_MODEL_CONTEXT] = contextValue }
     }
 
     suspend fun setSelectedModelMaxOutput(maxOutput: String) {

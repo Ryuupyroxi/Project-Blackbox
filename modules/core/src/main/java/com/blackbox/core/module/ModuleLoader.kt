@@ -1,9 +1,10 @@
 package com.blackbox.core.module
 
 import android.content.Context
-import com.blackbox.core.module.adt.runtime.AdtModuleLoader
+import com.blackbox.core.module.contract.AdtModule
 import dalvik.system.DexClassLoader
 import java.io.File
+import java.util.zip.ZipInputStream
 
 class ModuleLoader(private val context: Context) {
     private val moduleDir = File(context.filesDir, "modules").apply { mkdirs() }
@@ -23,8 +24,7 @@ class ModuleLoader(private val context: Context) {
         instance.onLoad(context, classLoader)
 
         if (manifest.id == "adt") {
-            val loader = AdtModuleLoader(context)
-            (instance as? AdtModule)?.registerRuntime(loader.loadServices(), loader.loadBootReceivers())
+            (instance as? AdtModule)?.registerRuntime()
         }
 
         return instance

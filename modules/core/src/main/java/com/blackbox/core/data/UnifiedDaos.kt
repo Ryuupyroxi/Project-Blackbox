@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.PrimaryKey
+import androidx.room.Query
 
 @Entity(tableName = "channel_conversations")
 data class ChannelConversationEntity(
