@@ -8,12 +8,13 @@ import com.blackbox.module.adt.bridge.AdtManifestMapper
 
 class AdtModuleLoader(private val context: Context) {
     fun loadServices(): List<AdtServiceDefinition> = AdtManifestMapper.services()
-    fun loadBootReceivers(): List<com.blackbox.core.module.adt.model.AdtReceiverDefinition> = AdtManifestMapper.bootReceivers()
+    fun loadBootReceivers(): List<com.blackbox.core.module.contract.AdtReceiverDefinition> = AdtManifestMapper.bootReceivers()
 
     fun startService(service: AdtServiceDefinition) {
         val intent = Intent().setClassName(context.packageName, service.className)
-        if (service.foregroundType != null) {
-            intent.putExtra("foreground_type", service.foregroundType.name)
+        val fg = service.foregroundType
+        if (fg != null) {
+            intent.putExtra("foreground_type", fg.name)
         }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             context.startForegroundService(intent)

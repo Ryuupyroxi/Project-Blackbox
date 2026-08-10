@@ -28,13 +28,13 @@ class ZimDownloadReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val action = intent.action ?: return
         val uri = intent.data ?: return
-        val zimId = intent.getStringExtra("zim_id") ?: uri.lastPathSegment ?: "unknown_${System.currentTimeMillis()}"
+        val zimIdValue = intent.getStringExtra("zim_id") ?: uri.lastPathSegment ?: "unknown_${System.currentTimeMillis()}"
 
         if (action == Intent.ACTION_VIEW || action == "android.intent.action.DOWNLOAD_COMPLETE") {
-            val dest = File(context.filesDir, "zim/$zimId.zim")
+            val dest = File(context.filesDir, "zim/$zimIdValue.zim")
             dest.parentFile?.mkdirs()
-            val download = ZimDownload(zimId, uri, dest)
-            pendingDownloads[zimId] = download
+            val download = ZimDownload(zimIdValue, uri, dest)
+            pendingDownloads[zimIdValue] = download
             scope.launch { processDownload(context, download) }
         }
     }
@@ -51,7 +51,7 @@ class ZimDownloadReceiver : BroadcastReceiver() {
             val size = download.destination.length()
             download.status = "completed"
             android.util.Log.i("ZimDownloadReceiver", "[ZIM] Downloaded file at: ${download.destination.absolutePath} ($size bytes)")
-            android.util.Log.i("ZimDownloadReceiver", "[ZIM] Registered in database: $zimId -> ${download.destination.absolutePath}")
+            android.util.Log.i("ZimDownloadReceiver", "[ZIM] Registered in database: ${download.zimId} -> ${download.destination.absolutePath}")
             // Notify via broadcast that ZIM is ready for indexing
             val ready = Intent("com.blackbox.module.adt.ZIM_READY").apply {
                 `package` = context.packageName

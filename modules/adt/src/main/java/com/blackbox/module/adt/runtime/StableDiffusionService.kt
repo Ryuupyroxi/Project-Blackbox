@@ -58,7 +58,11 @@ class StableDiffusionService : Service() {
         fun getOutput(id: String): File? = outputs[id]
         fun cancel(id: String) {
             val lock = locks.remove(id)
-            synchronized(lock ?: return) { lock.notifyAll() }
+            if (lock != null) {
+                synchronized(lock) {
+                    (lock as java.lang.Object).notifyAll()
+                }
+            }
             jobs.remove(id)
         }
     }

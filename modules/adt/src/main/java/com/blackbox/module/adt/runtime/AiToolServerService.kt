@@ -34,7 +34,7 @@ class AiToolServerService : Service() {
 
     inner class Binder : android.os.Binder() {
         fun listTools(): List<ToolDescriptor> = toolRegistry.values.toList()
-        fun registerTool(descriptor: ToolDescriptor) {
+        fun registerTool(descriptor: ToolDescriptor): Unit {
             toolRegistry[descriptor.id] = descriptor
             _tools.value = toolRegistry.toMap()
         }
@@ -79,7 +79,7 @@ class AiToolServerService : Service() {
     }
 
     private fun seedDefaultTools() {
-        registerTool(
+        binder.registerTool(
             ToolDescriptor(
                 id = TOOL_TXT2IMG,
                 name = "Text to Image",
@@ -87,7 +87,7 @@ class AiToolServerService : Service() {
                 parameters = mapOf("prompt" to "string", "negative" to "string", "steps" to "int")
             )
         )
-        registerTool(
+        binder.registerTool(
             ToolDescriptor(
                 id = TOOL_IMG2IMG,
                 name = "Image to Image",
@@ -95,7 +95,7 @@ class AiToolServerService : Service() {
                 parameters = mapOf("input" to "file", "prompt" to "string", "steps" to "int")
             )
         )
-        registerTool(
+        binder.registerTool(
             ToolDescriptor(
                 id = TOOL_UPSCALE,
                 name = "Upscale",
@@ -103,7 +103,7 @@ class AiToolServerService : Service() {
                 parameters = mapOf("input" to "file", "scale" to "int")
             )
         )
-        registerTool(
+        binder.registerTool(
             ToolDescriptor(
                 id = TOOL_ONNX,
                 name = "ONNX Inference",

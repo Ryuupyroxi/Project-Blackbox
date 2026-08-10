@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
+import com.blackbox.module.adt.service.AdtServiceCatalog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -115,7 +116,8 @@ class AgentForegroundService : Service() {
         delay(2000)
         val catalog = AdtServiceCatalog.services
         catalog.forEach { def ->
-            if (def.foregroundType != null) {
+            val fg = def.foregroundType
+            if (fg != null) {
                 val i = Intent().setClassName(packageName, def.className)
                 try {
                     if (def.className == this@AgentForegroundService::class.java.name) return@forEach

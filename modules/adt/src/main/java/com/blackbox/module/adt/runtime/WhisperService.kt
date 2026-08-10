@@ -58,7 +58,7 @@ class WhisperService : Service() {
         stopWhisperProcess()
     }
 
-    private suspend fun extractFfmpegLibs() {
+    private fun extractFfmpegLibs() {
         val ffDir = File(filesDir, "ffmpeg_libs")
         ffDir.mkdirs()
         // Best-effort extraction; actual extraction should be done via zip/apk

@@ -22,9 +22,9 @@ class AdtModuleImpl : BlackboxModule, AdtModule {
     override fun version() = "0.948"
     override fun description() = "AI-Doomsday-Toolbox runtime port"
 
-    override fun onLoad(context: Context, classLoader: DexClassLoader) {
+    override fun onLoad(context: Context, classLoader: ClassLoader) {
         this.context = context
-        this.classLoader = classLoader
+        this.classLoader = classLoader as DexClassLoader
         this.nativeLoader = AdtNativeLoader(context)
         if (!nativeLoader!!.isReady()) {
             nativeLoader!!.extractFromApk()

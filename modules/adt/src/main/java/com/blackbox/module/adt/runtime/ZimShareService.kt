@@ -18,7 +18,7 @@ import java.util.Collections
 
 class ZimShareService : Service() {
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val binder = Binder()
+    private val binder = LocalBinder()
 
     private val _sharing = MutableStateFlow(false)
     val sharing: StateFlow<Boolean> = _sharing
@@ -37,7 +37,7 @@ class ZimShareService : Service() {
     @Volatile
     private var shareDir: File? = null
 
-    inner class Binder : Binder() {
+    inner class LocalBinder : Binder() {
         fun startShare(zimPath: String): Boolean = startSharing(File(zimPath))
         fun stopShare() = stopSharing()
         fun isSharing(): Boolean = _sharing.value
@@ -52,79 +52,83 @@ class ZimShareService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        serviceScope.cancel()
+        serverSocket?.close()
         stopSharing()
+        serviceScope.cancel()
     }
 
-    private fun startSharing(zimFile: File): Boolean {
-        if (_sharing.value) return false
-        if (!zimFile.exists()) return false
-        shareDir = zimFile.parentFile?.let { File(it, zimFile.nameWithoutExtension) }
-        shareDir?.mkdirs()
-        val ifaces = getNonLoopbackInterfaces()
-        if (ifaces.isEmpty()) return false
-        _addresses.value = ifaces
-        return try {
-            serverSocket = java.net.ServerSocket(0)
-            _port.value = serverSocket!!.localPort
-            _sharing.value = true
-            serviceScope.launch { acceptLoop() }
-            true
-        } catch (e: Exception) {
-            false
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val path = intent?.getStringExtra("path") ?: return START_NOT_STICKY
+        startSharing(File(path))
+        return START_STICKY
+    }
+
+    private fun startSharing(file: File): Boolean {
+        if (_sharing.value) return true
+        shareDir = file
+        _sharing.value = true
+        shareDir?.let { dir ->
+            if (dir.exists()) {
+                val ads = getNonLoopbackInterfaces()
+                _addresses.value = ads
+                val port = 8080 + (ads.size * 10)
+                _port.value = port
+                startHttpServer(dir, port)
+                return true
+            }
         }
+        return false
     }
 
     private fun stopSharing() {
+        if (!_sharing.value) return
         _sharing.value = false
         runCatching { serverSocket?.close() }
         serverSocket = null
+        shareDir = null
+        _addresses.value = emptyList()
         _port.value = 0
     }
 
-    private suspend fun acceptLoop() {
-        val sock = serverSocket ?: return
-        while (_sharing.value) {
+    private fun startHttpServer(dir: File, port: Int) {
+        serverSocket = java.net.ServerSocket()
+        serverSocket?.bind(java.net.InetSocketAddress(port))
+        serviceScope.launch {
             try {
-                val client = sock.accept() ?: break
-                serviceScope.launch {
-                    _connections.value = _connections.value + 1
-                    client.use { c ->
-                        c.getInputStream().bufferedReader().use { reader ->
-                            val request = reader.readLine() ?: return@use
-                            if (request.startsWith("GET ")) {
-                                serveFile(client, request)
-                            }
-                        }
-                    }
-                    _connections.value = (_connections.value - 1).coerceAtLeast(0)
+                while (_sharing.value) {
+                    val client = serverSocket?.accept() ?: continue
+                    serviceScope.launch { handleClient(dir, client) }
                 }
-            } catch (e: Exception) {
-                if (_sharing.value) kotlinx.coroutines.delay(100)
+            } catch (_: Exception) {
             }
         }
     }
 
-    private fun serveFile(client: java.net.Socket, request: String) {
-        val dir = shareDir ?: return
-        val path = request.substringAfter("GET ").substringBefore(" ").removePrefix("/")
-        val file = if (path.isBlank()) File(dir, "index.html") else File(dir, path)
-        if (!file.exists() || !file.canonicalPath.startsWith(dir.canonicalPath)) {
-            client.getOutputStream().bufferedWriter().use { it.write("HTTP/1.1 404\r\n\r\n") }
-            return
-        }
-        val mime = when (file.extension.lowercase()) {
-            "html" -> "text/html"
-            "js" -> "application/javascript"
-            "css" -> "text/css"
-            "png" -> "image/png"
-            "jpg", "jpeg" -> "image/jpeg"
-            "zim" -> "application/octet-stream"
-            else -> "application/octet-stream"
-        }
-        client.getOutputStream().buffered().use { out ->
-            out.write("HTTP/1.1 200 OK\r\nContent-Type: $mime\r\n\r\n".toByteArray())
-            file.inputStream().use { it.copyTo(out) }
+    private fun handleClient(dir: File, client: java.net.Socket) {
+        try {
+            val request = client.getInputStream().bufferedReader().readLine()
+                ?: return
+            val path = request.substringAfter("GET ").substringBefore(" ").removePrefix("/")
+            val file = if (path.isBlank()) File(dir, "index.html") else File(dir, path)
+            if (!file.exists() || !file.canonicalPath.startsWith(dir.canonicalPath)) {
+                client.getOutputStream().bufferedWriter().use { it.write("HTTP/1.1 404\r\n\r\n") }
+                return
+            }
+            val mime = when (file.extension.lowercase()) {
+                "html" -> "text/html"
+                "js" -> "application/javascript"
+                "css" -> "text/css"
+                "png" -> "image/png"
+                "jpg", "jpeg" -> "image/jpeg"
+                "zim" -> "application/octet-stream"
+                else -> "application/octet-stream"
+            }
+            client.getOutputStream().buffered().use { out ->
+                out.write("HTTP/1.1 200 OK\r\nContent-Type: $mime\r\n\r\n".toByteArray())
+                file.inputStream().use { it.copyTo(out) }
+            }
+        } finally {
+            client.close()
         }
     }
 

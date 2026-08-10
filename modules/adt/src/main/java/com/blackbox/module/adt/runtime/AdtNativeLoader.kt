@@ -1,6 +1,7 @@
 package com.blackbox.module.adt.runtime
 
 import android.content.Context
+import android.os.Build
 import android.os.Process
 import java.io.File
 
@@ -34,7 +35,7 @@ class AdtNativeLoader(private val context: Context) {
     fun extractFromApk() {
         val apk = context.packageResourcePath ?: return
         val abi = when {
-            Process.SUPPORTS_64_BIT -> "arm64-v8a"
+            "arm64-v8a" in Build.SUPPORTED_ABIS -> "arm64-v8a"
             else -> "armeabi-v7a"
         }
         runCatching {
