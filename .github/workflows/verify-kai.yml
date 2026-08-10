@@ -1,0 +1,21 @@
+name: Verify Kai module
+
+on:
+  push:
+    branches: [ automation/source-of-truth-version ]
+  pull_request:
+    branches: [ automation/source-of-truth-version ]
+
+jobs:
+  verify-kai:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Verify Kai module compiles
+        working-directory: /home/Ryuu/Project-Blackbox-worktree
+        run: ./gradlew :modules:kai:compileDebugKotlin

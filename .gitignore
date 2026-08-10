@@ -1,0 +1,29 @@
+# Build outputs
+*.apk
+*.ap_
+*.dex
+*.jar
+*.aar
+.gradle/
+build/
+
+# Local properties
+local.properties
+
+# IDE
+.idea/
+*.iml
+
+# Wrapper
+gradle/wrapper/gradle-wrapper.jar
+
+# Decompiled reference trees
+*decompiled/
+*-decompiled/
+
+# Temporary/non-source artifacts
+*.apk
+*.zip
+*.tar.gz
+*.tar.zst
+*.bin
