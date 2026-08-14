@@ -4,7 +4,7 @@ import android.content.Context
 import com.blackbox.ai.agent.runtime.AgentCatalog
 import com.blackbox.ai.agent.runtime.AgentRuntimeManager
 import com.blackbox.ai.agent.runtime.EmbeddedRuntimeManager
-import com.blackbox.ai.util.DebugLog.LogEntry
+import com.blackbox.ai.util.LogEntry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
