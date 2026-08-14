@@ -27,7 +27,7 @@ Everything runs **on-device by default**. Cloud/API keys are optional — add th
 
 Grab the latest APK from the [Releases](https://github.com/Ryuupyroxi/Project-Blackbox/releases) page.
 
-- Current: **v1.0.3** (`com.blackbox.ai`, versionName `1.0.3`)
+- Current: **v1.2.0-beta** (`com.blackbox.ai`, versionName `1.2.0-beta`)
 - Debug build (~124 MB arm64); install with "Install unknown apps" allowed for your browser/file manager.
 
 > ⚠️ This is a beta. It ships as a debug build for early testing.
