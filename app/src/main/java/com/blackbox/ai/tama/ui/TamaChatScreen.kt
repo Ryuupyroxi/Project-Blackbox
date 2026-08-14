@@ -397,17 +397,17 @@ fun TamaChatScreen(
                     )
                 }
 
-                if (attachedImagePath != null) {
+                attachedImagePath?.let { imagePath ->
                     TamaChatImageAttachmentChip(
-                        imagePath = attachedImagePath,
-                        onPreview = { imagePreviewPath = attachedImagePath },
+                        imagePath = imagePath,
+                        onPreview = { imagePreviewPath = imagePath },
                         onRemove = { dropImageAttachment(deleteFile = true) }
                     )
                 }
 
-                if (attachedAudioPath != null) {
+                attachedAudioPath?.let { audioPath ->
                     TamaChatAudioAttachmentChip(
-                        audioPath = attachedAudioPath,
+                        audioPath = audioPath,
                         audioDurationMs = attachedAudioDurationMs,
                         onPreview = {
                             // no-op preview handled inside chip

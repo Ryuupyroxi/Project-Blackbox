@@ -147,4 +147,7 @@ object PetMapper {
 }
 
 suspend fun activePet(dao: com.blackbox.ai.tama.db.TamaDao): com.blackbox.ai.tama.data.TamaPet? =
-    dao.getActivePet()?.let(::toDomain)
+    dao.getActivePet()?.let { PetMapper.toDomain(it) }
+
+suspend fun activePet(dao: com.blackbox.ai.tama.db.TamaDao, petId: String): com.blackbox.ai.tama.data.TamaPet? =
+    dao.getPet(petId)?.let { PetMapper.toDomain(it) }

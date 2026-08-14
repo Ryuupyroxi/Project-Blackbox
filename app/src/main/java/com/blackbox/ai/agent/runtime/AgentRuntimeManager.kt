@@ -201,13 +201,13 @@ object AgentRuntimeManager {
         }
     }
 
-    private suspend fun isConnected(context: Context): Boolean {
+    suspend fun isConnected(context: Context): Boolean {
         return when (EngineKeysStore(context).getRuntimeMode()) {
             EngineKeysStore.RUNTIME_MODE_PROOT -> {
                 val pm = prootService(context)
                 pm.isRootfsReady()
             }
-            else -> sshService(context).checkConnection()
+            else -> SSHService.checkConnection()
         }
     }
 

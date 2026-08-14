@@ -28,9 +28,18 @@ class ProotManager(private val context: Context) {
     }
     
     private val prootDir = File(context.filesDir, "proot")
-    private val rootfsDir = File(prootDir, "rootfs")
+    val rootfsDir = File(prootDir, "rootfs")
+    @Volatile private var activeProcess: Process? = null
     private val downloadDir = File(prootDir, "downloads")
     
+    /**
+     * Stop any currently running proot server process.
+     */
+    fun stopRunningServers() {
+        activeProcess?.destroy()
+        activeProcess = null
+    }
+
     /**
      * Check if A1111 environment is installed
      */
@@ -309,6 +318,7 @@ class ProotManager(private val context: Context) {
             pb.environment()["LD_LIBRARY_PATH"] = nativeLibDir
             
             val process = pb.start()
+            activeProcess = process
             
             // Read output
             process.inputStream.bufferedReader().useLines { lines ->
@@ -320,6 +330,7 @@ class ProotManager(private val context: Context) {
             
             val exitCode = process.waitFor()
             DebugLog.log("ProotManager: Command exited with code $exitCode")
+            activeProcess = null
             return@withContext exitCode
         } catch (e: Exception) {
             DebugLog.log("ProotManager: Command error: ${e.message}")

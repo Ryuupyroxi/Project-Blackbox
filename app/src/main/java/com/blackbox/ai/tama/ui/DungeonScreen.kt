@@ -29,6 +29,7 @@ import com.blackbox.ai.R
 import com.blackbox.ai.tama.adventure.DungeonType
 import com.blackbox.ai.tama.adventure.localizedName
 import com.blackbox.ai.tama.db.TamaDatabase
+import com.blackbox.ai.tama.game.activePet
 import com.blackbox.ai.ui.navigation.Screen
 import com.blackbox.ai.data.SettingsRepository
 import kotlinx.coroutines.launch

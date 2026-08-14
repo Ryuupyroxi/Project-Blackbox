@@ -293,7 +293,7 @@ fun FarmScreen(
                 inventory = pet.inventory,
                 onDismiss = { showSeedPicker = null },
                 onSeedSelected = { seed ->
-                    val seedPicker = showSeedPicker ?: return@onSeedSelected
+                    val seedPicker = showSeedPicker ?: return@SeedPickerDialog
                     val tile = tiles.find { it.id == seedPicker } ?: FarmTile(id = seedPicker)
                     val updatedTile = tile.copy(
                         crop = PlantedCrop(

@@ -430,23 +430,6 @@ interface TamaDao {
     @Query(
         """
         SELECT * FROM tama_pets
-        ORDER BY CASE stage
-            WHEN 'EGG' THEN 0
-            WHEN 'BABY' THEN 1
-            WHEN 'CHILD' THEN 2
-            WHEN 'TEEN' THEN 3
-            WHEN 'ADULT' THEN 4
-            WHEN 'SENIOR' THEN 5
-            ELSE -1
-        END DESC,
-        lastDecayTime DESC,
-        rowid DESC
-        LIMIT 1
-        """
-    )
-    @Query(
-        """
-        SELECT * FROM tama_pets
         ORDER BY birthTimestamp DESC,
         rowid DESC
         LIMIT 1

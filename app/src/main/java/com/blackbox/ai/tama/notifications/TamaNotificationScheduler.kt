@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import com.blackbox.ai.R
 import com.blackbox.ai.service.GenerationDiagnosticsStore
+import com.blackbox.ai.util.DebugLog
 import com.blackbox.ai.service.TamaDeepDreamService
 import com.blackbox.ai.service.UnifiedNotificationManager
 import com.blackbox.ai.tama.data.FarmLivestockType
@@ -26,6 +27,7 @@ import com.blackbox.ai.tama.data.livestockNeedsFeed
 import com.blackbox.ai.tama.data.nextLivestockFeedDueAt
 import com.blackbox.ai.tama.data.isPoopGenerationPaused
 import com.blackbox.ai.tama.data.storedLivestockOutput
+import com.blackbox.ai.tama.game.activePet
 import com.blackbox.ai.tama.db.TamaDatabase
 import com.blackbox.ai.tama.db.TamaDeepDreamRunEntity
 import com.blackbox.ai.tama.db.TamaStudySessionEntity

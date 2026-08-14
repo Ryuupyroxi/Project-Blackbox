@@ -48,6 +48,7 @@ import com.blackbox.ai.tama.data.farmPageCountForFarmlandLevel
 import com.blackbox.ai.tama.data.farmTileIdsForPage
 import com.blackbox.ai.tama.data.FARMLAND_UPGRADE_ID
 import com.blackbox.ai.tama.db.TamaDatabase
+import com.blackbox.ai.tama.game.activePet
 import com.blackbox.ai.tama.game.FarmEngine
 import com.blackbox.ai.tama.game.FarmRepository
 import com.blackbox.ai.tama.game.PetMapper

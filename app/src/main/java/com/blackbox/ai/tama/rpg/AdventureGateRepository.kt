@@ -6,6 +6,7 @@ import com.blackbox.ai.tama.db.AdventureGateProfileEntity
 import com.blackbox.ai.tama.db.AdventureGateWorldProgressEntity
 import com.blackbox.ai.tama.db.TamaDatabase
 import com.blackbox.ai.tama.db.TamaEventEntity
+import com.blackbox.ai.tama.data.ActivityType
 import com.blackbox.ai.tama.data.EventType
 import com.blackbox.ai.tama.data.GrowthStage
 import com.blackbox.ai.tama.data.InventoryItem
@@ -573,7 +574,7 @@ class AdventureGateRepository(
         if (minutes <= 0) return profile.copy(lastRecoveryAt = lastRecoveryAt)
         val pet = petFor(petId)
         val sleeping = pet?.isSleeping == true
-        val relaxing = pet?.currentActivity == "RELAXING"
+        val relaxing = pet?.currentActivity == ActivityType.RELAXING
         val hpRate = when {
             sleeping -> SLEEP_HP_PER_MINUTE
             relaxing -> RELAX_HP_PER_MINUTE

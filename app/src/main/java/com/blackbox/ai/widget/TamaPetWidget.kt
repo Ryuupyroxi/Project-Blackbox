@@ -25,6 +25,7 @@ import com.blackbox.ai.tama.data.LocationType
 import com.blackbox.ai.tama.data.PetSpeciesLine
 import com.blackbox.ai.tama.data.TamaDecorCatalog
 import com.blackbox.ai.tama.data.TamaPet
+import com.blackbox.ai.tama.game.activePet
 import com.blackbox.ai.tama.data.TAMA_RELAX_INTROSPECTION_PER_HOUR
 import com.blackbox.ai.tama.data.TAMA_TRAINING_EXERCISE_PER_HOUR
 import com.blackbox.ai.tama.data.TAMA_TRAINING_HAPPINESS_PER_HOUR
@@ -42,6 +43,7 @@ import com.blackbox.ai.tama.rpg.AdventureGateRepository
 import com.blackbox.ai.ui.navigation.Screen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
@@ -112,9 +114,11 @@ class TamaPetWidgetProvider : AppWidgetProvider() {
             val database = TamaDatabase.getInstance(context)
             val pet = activePet(database.tamaDao())
             val profile = pet?.let { activePet ->
-                runCatching {
-                    AdventureGateRepository(database).recoverProfile(activePet.id)
-                }.getOrNull()
+                withContext(Dispatchers.IO) {
+                    runCatching {
+                        AdventureGateRepository(database).recoverProfile(activePet.id)
+                    }.getOrNull()
+                }
             }?.let(AdventureGateCombatEngine::normalizedProfile)
             return TamaWidgetPetState(pet = pet, adventureGateProfile = profile)
         }

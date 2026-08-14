@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.QrCodeScanner
@@ -96,6 +97,10 @@ import com.blackbox.ai.service.AiServerRuntimeState
 import com.blackbox.ai.service.AiServerType
 import com.blackbox.ai.service.AiToolServerService
 import com.blackbox.ai.service.RuntimeAgentServerCard
+import com.blackbox.ai.ui.navigation.Screen
+import com.blackbox.ai.agent.runtime.EmbeddedRuntimeManager
+import com.blackbox.ai.agent.runtime.AgentRuntimeManager
+import com.blackbox.ai.agent.runtime.AgentCatalog
 import com.blackbox.ai.service.RuntimeAgentServerStore
 import com.blackbox.ai.ui.components.AppContentColumn
 import com.blackbox.ai.ui.components.AppHeroCard
@@ -536,7 +541,6 @@ private fun RuntimeAgentServerCard(
     }
 }
 
-@Composable
 @Composable
 private fun AiServerConfigCard(
     config: AiServerConfigEntity,

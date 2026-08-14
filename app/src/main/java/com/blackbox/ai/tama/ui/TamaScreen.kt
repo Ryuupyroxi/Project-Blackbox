@@ -138,7 +138,8 @@ fun TamaScreen(
     onChat: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val pet by gameEngine.pet.collectAsState()
+    val petState by gameEngine.pet.collectAsState()
+    val pet = petState
     val events by gameEngine.events.collectAsState()
     val schoolPaintingEnabled by settingsRepo.tamaSchoolPaintingEnabled.collectAsState()
     val artworkFeed = remember(pet?.id) {

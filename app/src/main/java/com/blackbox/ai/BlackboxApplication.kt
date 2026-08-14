@@ -17,6 +17,7 @@ import com.blackbox.ai.engine.AgentEngineAdapter
 import com.blackbox.ai.engine.EngineKeysStore
 import com.blackbox.ai.service.AiRuntimeJobStore
 import com.blackbox.ai.service.AssistantDaemonService
+import com.blackbox.ai.service.FirstBootAgentVerifier
 import com.blackbox.ai.service.GenerationDiagnosticsStore
 import com.blackbox.ai.service.OrganizerAlarmScheduler
 import com.blackbox.ai.service.LlamaScheduledTaskScheduler

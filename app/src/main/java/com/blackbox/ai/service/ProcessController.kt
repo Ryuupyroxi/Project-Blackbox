@@ -292,6 +292,25 @@ class ProcessController {
                 add("--spec-draft-p-min")
                 add(String.format(java.util.Locale.US, "%.2f", config.mtpDraftPMin.coerceIn(0f, 1f)))
             }
+            LlamaSpeculativeMode.DRAFT_DFLASH -> {
+                val draftModel = config.draftModelPath ?: return emptyList()
+                listOf(
+                    "--spec-type", config.speculativeMode.flagValue,
+                    "--spec-draft-model", draftModel,
+                    "--spec-draft-n-max", config.draftMax.coerceAtLeast(1).toString(),
+                    "--spec-draft-n-min", config.draftMin.coerceAtLeast(0).toString(),
+                    "--spec-draft-p-min", String.format(java.util.Locale.US, "%.2f", config.draftPMin.coerceIn(0f, 1f))
+                )
+            }
+            LlamaSpeculativeMode.NGRAM_MOD,
+            LlamaSpeculativeMode.NGRAM_SIMPLE,
+            LlamaSpeculativeMode.NGRAM_MAP_K,
+            LlamaSpeculativeMode.NGRAM_MAP_K4V,
+            LlamaSpeculativeMode.NGRAM_CACHE -> listOf(
+                "--spec-type", config.speculativeMode.flagValue,
+                "--spec-ngram-min", config.draftMin.coerceAtLeast(0).toString(),
+                "--spec-ngram-max", config.draftMax.coerceAtLeast(1).toString()
+            )
         }
     }
 

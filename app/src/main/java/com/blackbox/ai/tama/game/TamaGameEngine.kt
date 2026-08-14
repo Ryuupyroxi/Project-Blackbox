@@ -233,7 +233,7 @@ class TamaGameEngine(
     private suspend fun petFor(petId: String): TamaPet? =
         dao.getPet(petId)?.let(PetMapper::toDomain)
 
-    private suspend fun loadPet(): TamaPet? {
+    suspend fun loadPet(): TamaPet? {
         val entity = activePetEntity() ?: return null
         val pet = PetMapper.toDomain(entity)
         pruneExtraPetsKeeping(pet.id)

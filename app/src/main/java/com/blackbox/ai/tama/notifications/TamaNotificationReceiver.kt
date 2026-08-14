@@ -18,6 +18,7 @@ import com.blackbox.ai.tama.data.isLivestockStructureFull
 import com.blackbox.ai.tama.data.isPoopGenerationPaused
 import com.blackbox.ai.tama.db.TamaDatabase
 import com.blackbox.ai.tama.db.TamaEventEntity
+import com.blackbox.ai.tama.game.activePet
 import com.blackbox.ai.tama.game.FarmEngine
 import com.blackbox.ai.tama.game.FarmRepository
 import com.blackbox.ai.tama.game.PetMapper

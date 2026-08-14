@@ -775,6 +775,7 @@ fun LLMSettingsScreen(navController: NavController) {
                                 text = when (speculativeMode) {
                                     LlamaSpeculativeMode.DRAFT_MTP -> stringResource(R.string.general_mtp_decoding_hint)
                                     LlamaSpeculativeMode.DRAFT_SIMPLE -> stringResource(R.string.dist_speculative_simple_hint)
+                                    else -> ""
                                 },
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)

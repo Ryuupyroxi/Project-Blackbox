@@ -215,7 +215,7 @@ fun AdventureScreen(
                         AdventureInfoMessage(stringResource(R.string.adventure_error_no_pet))
                     }
                     localErrorMessage != null -> {
-                        AdventureInfoMessage(localErrorMessage)
+                        AdventureInfoMessage(localErrorMessage.orEmpty())
                     }
                     storyStages.isEmpty() && isGenerating -> {
                         AdventureLoadingMessage(
