@@ -3320,7 +3320,6 @@
     <string name="dist_speculative_mode_ngram_map_k4v">Ngram map-k4v</string>
     <string name="dist_speculative_mode_ngram_cache">Ngram cache</string>
     <string name="dist_speculative_simple_hint">Uses the selected draft model and draft options, then adds --spec-type draft-simple on the next server start.</string>
-    <string name="general_mtp_decoding_hint">Uses --spec-type draft-mtp on the next server start. You can run it against the current GGUF only, or optionally enable a separate MTP draft model below. Requires an MTP-capable GGUF and a llama.cpp binary with MTP support.</string>
     <string name="dist_edit_command">Edit Command</string>
     <string name="runtime_mode_termux">Termux</string>
     <string name="runtime_mode_proot">Linux Proot</string>
