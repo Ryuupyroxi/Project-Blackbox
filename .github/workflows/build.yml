@@ -65,13 +65,27 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
 
+      - name: Compute release metadata
+        if: success()
+        id: meta
+        run: |
+          VER=$(grep -oP 'versionName\s*=\s*"\K[^"]+' app/build.gradle.kts | head -1)
+          echo "version=${VER:-unknown}" >> "$GITHUB_OUTPUT"
+          echo "date=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+          echo "sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
       - name: Create Release with APK
         if: success()
         uses: softprops/action-gh-release@v1
         with:
           tag_name: daily-build-${{ github.run_number }}
-          name: Daily Build #${{ github.run_number }}
-          body: Automated daily APK build from main.
+          name: Daily Build — v${{ steps.meta.outputs.version }} (${{ steps.meta.outputs.date }})
+          body: |
+            Automated daily APK build from main.
+
+            Version: v${{ steps.meta.outputs.version }} (versionCode 1200)
+            Built: ${{ steps.meta.outputs.date }} UTC
+            Commit: ${{ steps.meta.outputs.sha }}
           files: app/build/outputs/apk/debug/app-debug.apk
           draft: false
           prerelease: true
