@@ -22,11 +22,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.blackbox.ai.agent.runtime.AgentCatalog
 import com.blackbox.ai.R
+import com.blackbox.ai.agent.runtime.AgentHealthState
 import com.blackbox.ai.agent.runtime.AgentRuntimeManager
 import com.blackbox.ai.agent.runtime.RuntimeAgent
 import com.blackbox.ai.engine.EngineKeysStore
 import com.blackbox.ai.service.SSHService
 import com.blackbox.ai.ui.navigation.Screen
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,6 +48,7 @@ fun AgentRuntimeScreen(navController: NavController) {
     var prootInstalled by remember { mutableStateOf(keys.isProotInstalled()) }
 
     val isProot = runtimeMode == EngineKeysStore.RUNTIME_MODE_PROOT
+    val agentHealth by AgentRuntimeManager.agentHealth.collectAsState()
 
     // Auto-connect to local Termux when needed, using stored or default credentials
     suspend fun ensureConnection(): Boolean {
@@ -74,6 +77,18 @@ fun AgentRuntimeScreen(navController: NavController) {
                         status = "Auto-connect failed: ${it.message}"
                         false
                     })
+            }
+        }
+    }
+
+    // Periodic health refresh every 30 seconds
+    LaunchedEffect(isProot, prootInstalled) {
+        while (true) {
+            delay(30_000L)
+            if (isProot && prootInstalled) {
+                AgentRuntimeManager.refreshAllAgentHealth(context)
+            } else if (!isProot && SSHService.isConnected.value) {
+                AgentRuntimeManager.refreshAllAgentHealth(context)
             }
         }
     }
@@ -203,9 +218,11 @@ fun AgentRuntimeScreen(navController: NavController) {
             }
 
             items(AgentCatalog.all, key = { it.id }) { agent ->
+                val health = agentHealth[agent.id] ?: AgentHealthState.UNKNOWN
                 RuntimeAgentCard(
                     agent = agent,
                     isBusy = isBusy,
+                    healthState = health,
                     onInstall = {
                         scope.launch {
                             if (!ensureConnection()) {
@@ -309,6 +326,7 @@ fun AgentRuntimeScreen(navController: NavController) {
 private fun RuntimeAgentCard(
     agent: RuntimeAgent,
     isBusy: Boolean,
+    healthState: AgentHealthState,
     onInstall: () -> Unit,
     onStart: () -> Unit,
     onStop: () -> Unit,
@@ -316,13 +334,36 @@ private fun RuntimeAgentCard(
     onLogs: () -> Unit,
     onOpenWeb: (() -> Unit)?
 ) {
+    val statusColor = when {
+        healthState.healthy -> Color(0xFF4CAF50)
+        healthState.running -> Color(0xFFFFC107)
+        healthState.installed -> Color(0xFF2196F3)
+        healthState.lastCheck > 0L -> Color(0xFFFF5722)
+        else -> Color.Gray
+    }
+
     Card {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(agent.emoji, fontSize = 24.sp)
                 Spacer(modifier = Modifier.width(10.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(agent.name, fontWeight = FontWeight.Bold)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(agent.name, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Surface(
+                            shape = MaterialTheme.shapes.small,
+                            color = statusColor.copy(alpha = 0.15f)
+                        ) {
+                            Text(
+                                text = healthState.statusLabel,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = statusColor,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
                     Text(
                         agent.description,
                         fontSize = 12.sp,
@@ -335,17 +376,29 @@ private fun RuntimeAgentCard(
             }
             Spacer(modifier = Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = onInstall, enabled = !isBusy, modifier = Modifier.weight(1f)) {
+                OutlinedButton(
+                    onClick = onInstall,
+                    enabled = !isBusy && !healthState.installed,
+                    modifier = Modifier.weight(1f)
+                ) {
                     Icon(Icons.Default.Download, null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Install")
+                    Text(if (healthState.installed) "Installed" else "Install")
                 }
-                Button(onClick = onStart, enabled = !isBusy, modifier = Modifier.weight(1f)) {
+                Button(
+                    onClick = onStart,
+                    enabled = !isBusy && !healthState.running,
+                    modifier = Modifier.weight(1f)
+                ) {
                     Icon(Icons.Default.PlayArrow, null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Start")
+                    Text(if (healthState.running) "Running" else "Start")
                 }
-                OutlinedButton(onClick = onStop, enabled = !isBusy, modifier = Modifier.weight(1f)) {
+                OutlinedButton(
+                    onClick = onStop,
+                    enabled = !isBusy && healthState.running,
+                    modifier = Modifier.weight(1f)
+                ) {
                     Icon(Icons.Default.Stop, null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
                     Text("Stop")

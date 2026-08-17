@@ -73,6 +73,13 @@ class FirstBootAgentVerifier(private val context: Context) {
             results += result
         }
 
+        // Refresh all agent health states after verification
+        try {
+            AgentRuntimeManager.refreshAllAgentHealth(context)
+        } catch (e: Exception) {
+            DebugLog.log("[FirstBootAgentVerifier] Failed to refresh agent health: ${e.message}")
+        }
+
         return results
     }
 

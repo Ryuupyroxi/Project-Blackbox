@@ -11,6 +11,29 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withTimeout
 
 /**
+ * Health state for a single runtime agent.
+ */
+data class AgentHealthState(
+    val installed: Boolean = false,
+    val running: Boolean = false,
+    val healthy: Boolean = false,
+    val lastCheck: Long = 0L,
+    val detail: String = "Not checked"
+) {
+    val statusLabel: String
+        get() = when {
+            healthy -> "Running"
+            running && !healthy -> "Running (unhealthy)"
+            installed && !running -> "Installed"
+            else -> "Stopped"
+        }
+
+    companion object {
+        val UNKNOWN = AgentHealthState(detail = "Unknown")
+    }
+}
+
+/**
  * Drives the local Termux/Ubuntu runtime exactly like Blackbox does: an SSH channel
  * into the Termux-hosted environment (default 127.0.0.1:8025, user-configurable).
  * Runtime agents (Hermes, Codex CLI, OpenClaw) are installed, started, stopped,
@@ -31,6 +54,44 @@ object AgentRuntimeManager {
 
     private val _console = MutableStateFlow("")
     val console: StateFlow<String> = _console.asStateFlow()
+
+    private val _agentHealth = MutableStateFlow<Map<String, AgentHealthState>>(emptyMap())
+    val agentHealth: StateFlow<Map<String, AgentHealthState>> = _agentHealth.asStateFlow()
+
+    fun getAgentHealth(agentId: String): AgentHealthState =
+        _agentHealth.value[agentId] ?: AgentHealthState.UNKNOWN
+
+    suspend fun refreshAgentHealth(context: Context, agent: RuntimeAgent) {
+        val installed = checkInstalled(context, agent)
+        val healthResult = runCatching { health(context, agent) }.getOrNull()
+        val healthText = healthResult?.getOrNull() ?: ""
+
+        val running = healthText.contains("ALIVE", ignoreCase = true) ||
+            healthText.contains("HTTP 200", ignoreCase = true) ||
+            healthText.contains("HTTP 2", ignoreCase = true)
+        val healthy = running || (installed && healthText.contains("PORT ${agent.port}", ignoreCase = true) && !healthText.contains("CLOSED", ignoreCase = true))
+
+        val detail = when {
+            healthText.isNotBlank() -> healthText.trim().take(120)
+            installed -> "Installed"
+            else -> "Not installed"
+        }
+
+        val state = AgentHealthState(
+            installed = installed,
+            running = running,
+            healthy = healthy,
+            lastCheck = System.currentTimeMillis(),
+            detail = detail
+        )
+        _agentHealth.value = _agentHealth.value + (agent.id to state)
+    }
+
+    suspend fun refreshAllAgentHealth(context: Context) {
+        for (agent in AgentCatalog.all) {
+            refreshAgentHealth(context, agent)
+        }
+    }
 
     private fun sshService(context: Context): SSHService = SSHService(context)
     private fun prootService(context: Context): ProotManager = ProotManager(context)
@@ -62,7 +123,7 @@ object AgentRuntimeManager {
     }
 
     suspend fun install(context: Context, agent: RuntimeAgent): Result<String> {
-        return runWithConsole(context, "Install ${agent.name}") {
+        val result = runWithConsole(context, "Install ${agent.name}") {
             if (!isConnected(context)) {
                 return@runWithConsole "Not connected. Connect first, then retry Install."
             }
@@ -90,10 +151,12 @@ object AgentRuntimeManager {
             }
             lastOutput
         }
+        result.onSuccess { refreshAgentHealth(context, agent) }
+        return result
     }
 
     suspend fun start(context: Context, agent: RuntimeAgent): Result<String> {
-        return runWithConsole(context, "Start ${agent.name}") {
+        val result = runWithConsole(context, "Start ${agent.name}") {
             if (!isConnected(context)) {
                 return@runWithConsole "Not connected. Connect first, then retry Start."
             }
@@ -113,10 +176,12 @@ object AgentRuntimeManager {
                 onFailure = { e -> "Start failed: ${e.message}" }
             )
         }
+        result.onSuccess { refreshAgentHealth(context, agent) }
+        return result
     }
 
     suspend fun stop(context: Context, agent: RuntimeAgent): Result<String> {
-        return runWithConsole(context, "Stop ${agent.name}") {
+        val result = runWithConsole(context, "Stop ${agent.name}") {
             if (!isConnected(context)) {
                 return@runWithConsole "Not connected. Connect first, then retry Stop."
             }
@@ -131,14 +196,25 @@ object AgentRuntimeManager {
                 onFailure = { e -> "Stop: ${e.message}" }
             )
         }
+        result.onSuccess { refreshAgentHealth(context, agent) }
+        return result
     }
 
     suspend fun health(context: Context, agent: RuntimeAgent): Result<String> {
+        val installed = checkInstalled(context, agent)
         val cmd = buildString {
+            if (installed) {
+                append("INSTALLED=YES\n")
+            } else {
+                append("INSTALLED=NO\n")
+            }
             append("if [ -f ${pidFile(agent.id)} ]; then\n")
-            append("  if kill -0 \$(cat ${pidFile(agent.id)} 2>/dev/null) 2>/dev/null; then echo \"PID \$(cat ${pidFile(agent.id)}) ALIVE\"; else echo \"PID \$(cat ${pidFile(agent.id)}) DEAD\"; fi\n")
+            append("  PID=\$(cat ${pidFile(agent.id)} 2>/dev/null)\n")
+            append("  if kill -0 \$PID 2>/dev/null; then echo \"PID \$PID ALIVE\"; else echo \"PID \$PID DEAD\"; fi\n")
             append("else echo \"NOT RUNNING\"; fi\n")
-            append("curl -s -o /dev/null -w \"PORT ${agent.port} HTTP %{http_code}\" --max-time 5 http://127.0.0.1:${agent.port} 2>/dev/null || echo \"PORT ${agent.port} CLOSED\"")
+            if (agent.port > 0) {
+                append("curl -s -o /dev/null -w \"PORT ${agent.port} HTTP %{http_code}\" --max-time 5 http://127.0.0.1:${agent.port} 2>/dev/null || echo \"PORT ${agent.port} CLOSED\"")
+            }
         }
         return execute(context, cmd)
     }
