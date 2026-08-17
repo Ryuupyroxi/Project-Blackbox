@@ -314,3 +314,28 @@ See `AGENTS.md` (repo root) for orientation. Key focus areas for the next agent:
     (Connect vs Reconnect, Link vs Refresh); install/reconnect buttons always present.
   - Added `ClipboardManager` integration for one-tap copy of setup commands.
   Version bumped to `1.2.3-beta` (versionCode 1203).
+
+- 2026-08-17: **Issue #7 — Compilation/size investigation.** User reported APK is 140 MB
+  with only 3 assets, suspecting missing code. Investigation found:
+  - **No code is missing.** All ADT, Kai, and agent-merge Kotlin code compiles and is
+    present in the APK. CI runs are green (assembleDebug succeeds).
+  - **APK size is expected.** The 140 MB comes from bundled heavy dependencies: ONNX
+    Runtime (~50 MB), Hadoop/Parquet, PDFBox, ML Kit text recognition, Compose UI,
+    OkHttp, JSch SSH, Room DB, plus all ADT Kotlin sources. The "three assets"
+    (bootstrap-aarch64.zip 30 MB, proxy.js, bionic-compat.js) are only the OpenClaw
+    runtime files; the APK also bundles 133 Tama PNGs and farm/crop/minigame sprites.
+  - **Feature modules intentionally disabled.** The10 dynamic feature modules
+    (`:feature_llm_*`, `:feature_kiwix_*`, `:feature_media_*`, `:feature_upscaler`) are
+    commented out in `settings.gradle.kts` because their source hasn't been ported yet.
+    This means native binaries (llama_server, ffmpeg, kiwix-serve, whisper-cli, ncnn)
+    are NOT bundled. All services handle missing binaries gracefully (return null, show
+    user-facing error).
+  - **Build config fix applied.** `checkReleaseFeatureSplitSizes` task in
+    `build.gradle.kts` referenced non-existent modules — filtered to only existing ones
+    and guarded with an empty-list early return. `bundleRelease` would have crashed
+    without this fix.
+  - `continue-on-error: true` on bootstrap download step (build.yml:40) is intentional
+    and acceptable — bootstrap is optional; the build step itself does NOT have
+    continue-on-error.
+  - `if-no-files-found: error` on APK upload (build.yml:64) is correctly set.
+  Version bumped to `1.2.4-beta` (versionCode 1204).

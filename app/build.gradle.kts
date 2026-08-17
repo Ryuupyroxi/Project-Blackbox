@@ -54,8 +54,8 @@ android {
         applicationId = "com.blackbox.ai"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1203
-        versionName = "1.2.3-beta"
+        versionCode = 1204
+        versionName = "1.2.4-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -303,7 +303,7 @@ val releaseFeatureModules = listOf(
     ":feature_media_dotprod",
     ":feature_media_armv9",
     ":feature_upscaler"
-)
+).filter { project.findProject(it) != null }
 
 tasks.register("checkReleaseFeatureSplitSizes") {
     group = "verification"
@@ -311,6 +311,10 @@ tasks.register("checkReleaseFeatureSplitSizes") {
     mustRunAfter("bundleRelease")
 
     doLast {
+        if (releaseFeatureModules.isEmpty()) {
+            logger.lifecycle("No dynamic feature modules found — skipping split-size check.")
+            return@doLast
+        }
         val oversized = releaseFeatureModules.flatMap { path ->
             val buildDir = project(path).layout.buildDirectory.asFile.get()
             releaseFeatureSizeScanRoots
@@ -339,6 +343,6 @@ tasks.register("checkReleaseFeatureSplitSizes") {
     }
 }
 
-tasks.matching { it.name == "bundleRelease" }.configureEach {
+tasks.matching { it.name == "bundleRelease" && releaseFeatureModules.isNotEmpty() }.configureEach {
     finalizedBy("checkReleaseFeatureSplitSizes")
 }
