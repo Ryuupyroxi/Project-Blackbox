@@ -102,10 +102,10 @@ object AgentCatalog {
         installCommands = listOf(
             DEPS,
             "curl -fsSL https://raw.githubusercontent.com/opencode-ai/opencode/main/install.sh | bash 2>&1 || " +
-                "(export GOPATH=/tmp/gopath && export PATH=\"\\$GOPATH/bin:\\$PATH\" && " +
+                "(export GOPATH=/tmp/gopath && export PATH=\"\$GOPATH/bin:\$PATH\" && " +
                 "command -v go >/dev/null 2>&1 || DEBIAN_FRONTEND=noninteractive apt-get install -y golang-go 2>&1 && " +
                 "go install github.com/opencode-ai/opencode@latest 2>&1 && " +
-                "cp \\$GOPATH/bin/opencode /usr/local/bin/opencode 2>&1)"
+                "cp \$GOPATH/bin/opencode /usr/local/bin/opencode 2>&1)"
         ),
         runCommand = "opencode --non-interactive --port 8083",
         stopPattern = "opencode"
