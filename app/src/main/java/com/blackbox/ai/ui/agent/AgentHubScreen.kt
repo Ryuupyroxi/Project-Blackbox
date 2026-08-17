@@ -1,11 +1,15 @@
 package com.blackbox.ai.ui.agent
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -14,9 +18,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -41,6 +47,7 @@ import com.blackbox.ai.engine.ChatChannelClient
 import com.blackbox.ai.engine.EngineKeysStore
 import com.blackbox.ai.engine.enabledChannels
 import com.blackbox.ai.service.AssistantDaemonService
+import com.blackbox.ai.service.SSHService
 import com.blackbox.ai.ui.navigation.Screen
 import kotlinx.coroutines.launch
 
@@ -87,6 +94,13 @@ fun AgentHubScreen(navController: NavController) {
     var termuxUser by remember { mutableStateOf(keys.getTermuxUser()) }
     var termuxPassword by remember { mutableStateOf(keys.getTermuxPassword()) }
     var termuxStatus by remember { mutableStateOf("Not connected") }
+    var showSshSetupGuide by remember { mutableStateOf(false) }
+    val sshConnected by SSHService.isConnected.collectAsState()
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+    fun copyToClipboard(text: String) {
+        clipboard.setPrimaryClip(ClipData.newPlainText("SSH Setup", text))
+    }
 
     // Embedded LOCAL runtime state (zero-Termux channel)
     var localRuntimeStatus by remember { mutableStateOf("Not installed") }
@@ -375,11 +389,32 @@ fun AgentHubScreen(navController: NavController) {
             item {
                 Card {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Local Termux / SSH Channel", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Local Termux / SSH Channel", fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
+                            val sshStatusColor = if (sshConnected) Color(0xFF4CAF50) else Color(0xFFFF5722)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .clip(CircleShape)
+                                        .background(sshStatusColor)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    if (sshConnected) "Connected" else "Disconnected",
+                                    fontSize = 12.sp,
+                                    color = sshStatusColor,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             "Optional external SSH channel to a separate Termux/Ubuntu proot outside this app. " +
-                            "For agent coding in the app's own runtime, use the Embedded LOCAL Runtime above.",
+                            "For agent coding in the app's own runtime, use the Embedded LOCAL Runtime below.",
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -416,17 +451,34 @@ fun AgentHubScreen(navController: NavController) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(termuxStatus, fontSize = 12.sp, color = Color.Gray)
+                            Text(termuxStatus, fontSize = 12.sp, color = if (sshConnected) Color(0xFF4CAF50) else Color.Gray, modifier = Modifier.weight(1f))
                             Button(onClick = {
                                 keys.setTermux(termuxHost, termuxPort.toIntOrNull() ?: 8025, termuxUser, termuxPassword)
                                 scope.launch {
                                     termuxStatus = AgentRuntimeManager.connect(context)
                                         .fold(onSuccess = { it }, onFailure = { "Error: ${it.message}" })
                                 }
-                            }) { Text("Connect") }
+                            }) {
+                                Icon(if (sshConnected) Icons.Default.Refresh else Icons.Default.Link, null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(if (sshConnected) "Reconnect" else "Connect")
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedButton(
+                            onClick = { showSshSetupGuide = !showSshSetupGuide },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Default.Info, null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(if (showSshSetupGuide) "Hide Setup Guide" else "Show SSH Setup Guide")
+                        }
+                        if (showSshSetupGuide) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            HubSshSetupGuide(onCopy = { copyToClipboard(it) })
                         }
                     }
                 }
@@ -979,5 +1031,87 @@ private fun ChannelFields(
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
+    }
+}
+
+@Composable
+private fun HubSshSetupGuide(onCopy: (String) -> Unit) {
+    val sshPort = 8025
+    Column {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            )
+        ) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                Text("Quick Setup (copy & paste each step into Termux):", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                val steps = listOf(
+                    "1. Install SSH server" to "pkg install openssh-server -y",
+                    "2. Create sshd runtime dir" to "mkdir -p /run/sshd && chmod 755 /run/sshd",
+                    "3. Configure password auth" to "sed -i '/^#\\?PermitRootLogin/d' /etc/ssh/sshd_config\nsed -i '/^#\\?PasswordAuthentication/d' /etc/ssh/sshd_config\nsed -i '/^#\\?Port /d' /etc/ssh/sshd_config\nprintf 'Port $sshPort\\nPermitRootLogin yes\\nPasswordAuthentication yes\\n' >> /etc/ssh/sshd_config",
+                    "4. Set your password" to "passwd",
+                    "5. Start SSH server" to "sshd"
+                )
+                steps.forEach { (label, command) ->
+                    Text(label, fontSize = 13.sp)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    HubCommandBlock(command = command, onCopy = onCopy)
+                    Spacer(modifier = Modifier.height(6.dp))
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("One-liner (all steps combined):", fontWeight = FontWeight.Medium, fontSize = 13.sp)
+                Spacer(modifier = Modifier.height(4.dp))
+                HubCommandBlock(
+                    command = "pkg install openssh-server -y && mkdir -p /run/sshd && chmod 755 /run/sshd && sed -i '/^#\\?PermitRootLogin/d' /etc/ssh/sshd_config && sed -i '/^#\\?PasswordAuthentication/d' /etc/ssh/sshd_config && sed -i '/^#\\?Port /d' /etc/ssh/sshd_config && printf 'Port $sshPort\\nPermitRootLogin yes\\nPasswordAuthentication yes\\n' >> /etc/ssh/sshd_config && echo 'Now run: passwd && sshd'",
+                    onCopy = onCopy
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    "Port: $sshPort · Default user: root · After setup, enter credentials above and tap Connect.",
+                    fontSize = 11.sp,
+                    color = Color.Gray
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun HubCommandBlock(command: String, onCopy: (String) -> Unit) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(6.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
+        ) {
+            Text(
+                command,
+                color = Color.White,
+                fontSize = 11.sp,
+                fontFamily = FontFamily.Monospace,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 6.dp)
+            )
+            IconButton(
+                onClick = { onCopy(command) },
+                modifier = Modifier.size(28.dp)
+            ) {
+                Icon(
+                    Icons.Default.ContentCopy,
+                    contentDescription = "Copy",
+                    tint = Color(0xFF4CAF50),
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
     }
 }

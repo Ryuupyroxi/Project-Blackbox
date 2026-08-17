@@ -298,3 +298,19 @@ See `AGENTS.md` (repo root) for orientation. Key focus areas for the next agent:
   Removed `kaiAssistant` from `AgentCatalog.all` in `RuntimeAgent.kt`. Kai's voice
   functionality is already handled by the app's own `AssistantDaemonService`.
   Version bumped to `1.2.2-beta` (versionCode 1202).
+
+- 2026-08-17: **Issue #5 — Unintuitive Buttons fixed.** Rewrote the connection/setup UX in
+  `AgentRuntimeScreen.kt` and `AgentHubScreen.kt`:
+  - Buttons are always visible and clickable: status text uses `weight(1f)` so it never
+    pushes buttons off-screen; action buttons use `weight(1f)` inside spacedBy rows.
+  - SSH setup provides copy/paste code: collapsible `SshSetupGuideCard` in
+    `AgentRuntimeScreen` (step-by-step Termux SSH setup with one-liner, plus proot
+    instructions); `HubSshSetupGuide` in `AgentHubScreen` (same copy/paste commands
+    embedded in the Termux/SSH channel card).
+  - Clear status indicators: colored dots (green=connected/ready, yellow=installing,
+    red=disconnected/not installed) with descriptive labels replace bare gray text.
+  - Buttons reflect actual system state: SSH connected state tracked via
+    `SSHService.isConnected.collectAsState()`; button labels/icons change dynamically
+    (Connect vs Reconnect, Link vs Refresh); install/reconnect buttons always present.
+  - Added `ClipboardManager` integration for one-tap copy of setup commands.
+  Version bumped to `1.2.3-beta` (versionCode 1203).

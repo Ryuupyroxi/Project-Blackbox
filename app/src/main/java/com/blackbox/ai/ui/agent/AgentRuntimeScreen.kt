@@ -1,9 +1,14 @@
 package com.blackbox.ai.ui.agent
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -12,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -36,10 +42,12 @@ import kotlinx.coroutines.launch
 fun AgentRuntimeScreen(navController: NavController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
     val connected by SSHService.isConnected.collectAsState()
     var status by remember { mutableStateOf("Connect to the local Termux/Ubuntu runtime to begin.") }
     var expandedLog by remember { mutableStateOf<String?>(null) }
+    var showSetupGuide by remember { mutableStateOf(false) }
     val console by AgentRuntimeManager.console.collectAsState()
     val isBusy by AgentRuntimeManager.isBusy.collectAsState()
 
@@ -50,25 +58,23 @@ fun AgentRuntimeScreen(navController: NavController) {
     val isProot = runtimeMode == EngineKeysStore.RUNTIME_MODE_PROOT
     val agentHealth by AgentRuntimeManager.agentHealth.collectAsState()
 
-    // Auto-connect to local Termux when needed, using stored or default credentials
+    fun copyToClipboard(text: String) {
+        clipboard.setPrimaryClip(ClipData.newPlainText("SSH Setup", text))
+    }
+
     suspend fun ensureConnection(): Boolean {
         return if (isProot) {
             if (prootInstalled) {
                 status = "Linux proot runtime is ready."
                 true
             } else {
-                status = "Linux proot rootfs not installed yet."
+                status = "Linux proot rootfs not installed yet. Tap Install below."
                 false
             }
         } else {
-            val host = keys.getTermuxHost().ifBlank { "127.0.0.1" }
-            val port = keys.getTermuxPort().takeIf { it > 0 } ?: 8025
-            val user = keys.getTermuxUser().ifBlank { "user" }
-            val password = keys.getTermuxPassword().ifBlank { "" }
-            return if (SSHService.isConnected.value) {
+            if (SSHService.isConnected.value) {
                 true
             } else {
-                val config = com.blackbox.ai.service.SSHConfig(host, port, user, password)
                 AgentRuntimeManager.connect(context)
                     .fold(onSuccess = {
                         status = it
@@ -112,6 +118,7 @@ fun AgentRuntimeScreen(navController: NavController) {
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // ── Runtime mode switch + connection card ─────────────────────
             item {
                 Card {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -154,47 +161,91 @@ fun AgentRuntimeScreen(navController: NavController) {
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         if (isProot) {
-                            Spacer(modifier = Modifier.height(6.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                "Kai/AnyClaw assistant layer and OpenClaw/Hermes/Codex/OpenCode can run here.",
+                                "OpenClaw, Hermes, Codex, OpenCode can run here.",
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Status indicator row
+                        val statusColor = when {
+                            isProot && prootInstalled -> Color(0xFF4CAF50)
+                            !isProot && connected -> Color(0xFF4CAF50)
+                            isProot && !prootInstalled -> Color(0xFFFFC107)
+                            else -> Color(0xFFFF5722)
+                        }
+                        val statusText = when {
+                            isProot && prootInstalled -> "Proot ready"
+                            !isProot && connected -> "SSH connected"
+                            isProot && !prootInstalled -> "Proot not installed"
+                            else -> "Not connected"
+                        }
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(status, fontSize = 12.sp, color = if (isProot) Color(0xFF4CAF50) else if (connected) Color(0xFF4CAF50) else Color.Gray)
+                            Box(
+                                modifier = Modifier
+                                    .size(10.dp)
+                                    .clip(CircleShape)
+                                    .background(statusColor)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(statusText, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = statusColor)
+                            if (status.isNotBlank()) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(status, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Action buttons — always visible, never squeezed
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
                             if (isProot) {
                                 if (!prootInstalled) {
-                                    Button(onClick = {
-                                        scope.launch {
-                                            status = "Installing Linux proot rootfs…"
-                                            val result = runCatching {
-                                                val pm = com.blackbox.ai.data.proot.ProotManager(context)
-                                                var ok = false
-                                                runCatching { ok = pm.downloadRootfs { } }.getOrElse { }
-                                                if (ok) runCatching { ok = pm.extractRootfs { } }.getOrElse { }
-                                                ok
-                                            }.getOrDefault(false)
-                                            prootInstalled = result
-                                            keys.setProotInstalled(result)
-                                            status = if (result) "Linux proot runtime ready" else "Proot install failed"
-                                        }
-                                    }, enabled = !isBusy) {
+                                    Button(
+                                        onClick = {
+                                            scope.launch {
+                                                status = "Installing Linux proot rootfs…"
+                                                val result = runCatching {
+                                                    val pm = com.blackbox.ai.data.proot.ProotManager(context)
+                                                    var ok = false
+                                                    runCatching { ok = pm.downloadRootfs { } }.getOrElse { }
+                                                    if (ok) runCatching { ok = pm.extractRootfs { } }.getOrElse { }
+                                                    ok
+                                                }.getOrDefault(false)
+                                                prootInstalled = result
+                                                keys.setProotInstalled(result)
+                                                status = if (result) "Proot rootfs installed and ready" else "Proot install failed — retry or check storage"
+                                            }
+                                        },
+                                        enabled = !isBusy,
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Icon(Icons.Default.Download, null, modifier = Modifier.size(16.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
                                         Text(stringResource(R.string.runtime_proot_install))
                                     }
                                 } else {
-                                    OutlinedButton(onClick = {
-                                        scope.launch {
-                                            AgentRuntimeManager.connect(context)
-                                                .onSuccess { status = it }
-                                                .onFailure { status = "Error: ${it.message}" }
-                                        }
-                                    }, enabled = !isBusy) {
+                                    OutlinedButton(
+                                        onClick = {
+                                            scope.launch {
+                                                AgentRuntimeManager.connect(context)
+                                                    .onSuccess { status = it }
+                                                    .onFailure { status = "Error: ${it.message}" }
+                                            }
+                                        },
+                                        enabled = !isBusy,
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Icon(Icons.Default.Refresh, null, modifier = Modifier.size(16.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
                                         Text("Reconnect")
                                     }
                                 }
@@ -207,13 +258,38 @@ fun AgentRuntimeScreen(navController: NavController) {
                                                 .onFailure { status = "Error: ${it.message}" }
                                         }
                                     },
-                                    enabled = !isBusy
+                                    enabled = !isBusy,
+                                    modifier = Modifier.weight(1f)
                                 ) {
+                                    Icon(
+                                        if (connected) Icons.Default.Refresh else Icons.Default.Link,
+                                        null,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
                                     Text(if (connected) "Reconnect" else "Connect")
                                 }
                             }
+                            OutlinedButton(
+                                onClick = { showSetupGuide = !showSetupGuide },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.Info, null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Setup Guide")
+                            }
                         }
                     }
+                }
+            }
+
+            // ── Setup guide (collapsible) ─────────────────────────────────
+            if (showSetupGuide) {
+                item {
+                    SshSetupGuideCard(
+                        isProot = isProot,
+                        onCopy = { copyToClipboard(it) }
+                    )
                 }
             }
 
@@ -423,6 +499,111 @@ private fun RuntimeAgentCard(
                         Text("Web UI")
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SshSetupGuideCard(isProot: Boolean, onCopy: (String) -> Unit) {
+    val sshPort = 8025
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+        )
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                if (isProot) "Proot Setup Guide" else "SSH Server Setup Guide",
+                fontWeight = FontWeight.Bold,
+                fontSize = 15.sp
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                if (isProot)
+                    "Set up the embedded Linux proot environment. Install rootfs, then agents run inside it."
+                else
+                    "Set up a Termux/Ubuntu SSH server so Blackbox can connect and manage agents.",
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+
+            if (isProot) {
+                Text("Step 1: Tap \"Install Proot Rootfs\" above", fontSize = 13.sp)
+                Spacer(modifier = Modifier.height(2.dp))
+                Text("This downloads and extracts the Ubuntu rootfs automatically.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(modifier = Modifier.height(6.dp))
+                Text("Step 2: Tap \"Reconnect\" to initialize the runtime", fontSize = 13.sp)
+                Spacer(modifier = Modifier.height(6.dp))
+                Text("Step 3: Install agents from the cards below (Install → Start → Health)", fontSize = 13.sp)
+            } else {
+                val steps = listOf(
+                    "Step 1: Open Termux (install from F-Droid or GitHub)" to null,
+                    "Step 2: Install SSH server" to "pkg install openssh-server -y",
+                    "Step 3: Configure SSH for password login" to "mkdir -p /run/sshd && chmod 755 /run/sshd\nsed -i '/^#\\?PermitRootLogin/d' /etc/ssh/sshd_config\nsed -i '/^#\\?PasswordAuthentication/d' /etc/ssh/sshd_config\nsed -i '/^#\\?Port /d' /etc/ssh/sshd_config\nprintf 'Port $sshPort\\nPermitRootLogin yes\\nPasswordAuthentication yes\\n' >> /etc/ssh/sshd_config",
+                    "Step 4: Set a password" to "passwd",
+                    "Step 5: Start the SSH server" to "sshd",
+                    "Step 6: Come back here, enter your credentials, and tap Connect" to null
+                )
+                steps.forEach { (label, command) ->
+                    Text(label, fontSize = 13.sp)
+                    if (command != null) {
+                        SetupCommandBlock(command = command, onCopy = onCopy)
+                    }
+                    Spacer(modifier = Modifier.height(6.dp))
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("One-liner (paste into Termux):", fontWeight = FontWeight.Medium, fontSize = 13.sp)
+                SetupCommandBlock(
+                    command = "pkg install openssh-server -y && mkdir -p /run/sshd && chmod 755 /run/sshd && sed -i '/^#\\?PermitRootLogin/d' /etc/ssh/sshd_config && sed -i '/^#\\?PasswordAuthentication/d' /etc/ssh/sshd_config && sed -i '/^#\\?Port /d' /etc/ssh/sshd_config && printf 'Port $sshPort\\nPermitRootLogin yes\\nPasswordAuthentication yes\\n' >> /etc/ssh/sshd_config && echo 'Now run: passwd'",
+                    onCopy = onCopy
+                )
+                Text(
+                    "Default port: $sshPort · Then run: passwd && sshd",
+                    fontSize = 11.sp,
+                    color = Color.Gray
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SetupCommandBlock(command: String, onCopy: (String) -> Unit) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
+        ) {
+            Text(
+                command,
+                color = Color.White,
+                fontSize = 11.sp,
+                fontFamily = FontFamily.Monospace,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp)
+            )
+            IconButton(
+                onClick = { onCopy(command) },
+                modifier = Modifier.size(28.dp)
+            ) {
+                Icon(
+                    Icons.Default.ContentCopy,
+                    contentDescription = "Copy",
+                    tint = Color(0xFF4CAF50),
+                    modifier = Modifier.size(16.dp)
+                )
             }
         }
     }
