@@ -25,6 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
@@ -6623,7 +6624,7 @@ fun HatchingEggPreview(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                "Tap to hatch!",
+                stringResource(R.string.tama_tap_to_hatch),
                 fontFamily = FontFamily.Monospace,
                 fontSize = 12.sp,
                 color = TamaAccent
@@ -6646,6 +6647,24 @@ fun NewPetDialog(
         onDismissRequest = onDismiss,
         bodyContent = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                // Animated egg display
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    AsyncImage(
+                        model = "file:///android_asset/" + resolvePetSpriteAssetPath(
+                            speciesLine = selectedSpecies,
+                            stage = GrowthStage.EGG,
+                            state = PetSpriteState.IDLE,
+                            frameIndex = 0
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier.size(80.dp),
+                        contentScale = ContentScale.Fit,
+                        filterQuality = FilterQuality.None
+                    )
+                }
                 Text(stringResource(R.string.tama_egg_appeared), fontFamily = FontFamily.Monospace)
                 OutlinedTextField(
                     value = name,

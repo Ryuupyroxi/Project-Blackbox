@@ -1,6 +1,6 @@
 # Blackbox — Master Build Plan (LIVING DOCUMENT)
 
-> Maintained continuously as the merge progresses. Updated: 2026-08-17 (v1.2.5-beta).
+> Maintained continuously as the merge progresses. Updated: 2026-08-17 (v1.2.6-beta).
 > This is the single source of truth for what Blackbox is, what has been built,
 > what is next, and where the code lives. The debugger/tester agent reads this
 > file first, then `AGENTS.md`.
@@ -365,3 +365,27 @@ See `AGENTS.md` (repo root) for orientation. Key focus areas for the next agent:
   - Added `Screen.Logs` to the bottom navigation bar items in `BlackboxApp.kt`.
   - Fixed a missing closing brace on the `NightArena` composable that caused
     `OnlineHub`, `DeviceToolkit`, and `AgentImporter` to be incorrectly nested.
+
+- 2026-08-17: **Issue #4 — Tama/Pet Section visual overhaul.** User reported pet sprites
+  look like generic little people, no backgrounds, no egg hatching, no icons on buttons.
+  Fixes:
+  - **126 new pet sprites** generated (3 species × 6 growth states × 4 animation states ×
+    2 frames): dragon (orange-red, wings, horns, fire tail), unicorn (pink, golden horn,
+    purple mane, sparkly tail), kitsune (orange, pointy ears, whiskers, multi-tails).
+    Each stage scales body/head proportions; walk/eat/sleep states have distinct poses.
+  - **18 background PNGs** generated/replaced: bedroom, bathroom, park, shop, classroom,
+    workplace, farm, dungeon, adventure gate, arcade (room + location), garden, kitchen,
+    library, art studio, modern loft, dream, popup, boxing ring. Gradients + pixel-art
+    details (trees, clouds, furniture, neon lights).
+  - **72 UI icon PNGs** created in `tama/icons/ui/` — all icons referenced by
+    `TamaUiIconCatalog.emojiToAsset` now have matching asset files (mood faces,
+    location icons, food, tools, dungeon icons, etc.). Chat button (`💬`) now resolves
+    to `chat_bubble.png`; pet tab uses custom `pet_tab_icon.png`.
+  - **Hatching egg animation** (`HatchingEggPreview` composable): animated egg preview
+    cycles through 3 species eggs with wobble, glow, and "Tap to hatch!" prompt.
+    `NewPetDialog` shows species-specific egg sprite at top.
+  - **Bottom nav pet tab** now uses custom `pet_tab_icon.png` (heart + paw) instead of
+    Material `Icons.Default.Favorite`.
+  - Pet sprites are still small pixel art — professional artist pass recommended for
+    production. Backgrounds are functional but could be more detailed.
+  Version bumped to `1.2.6-beta` (versionCode 1206).

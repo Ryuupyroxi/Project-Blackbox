@@ -3628,6 +3628,7 @@
     <string name="tama_final_warning">🛑 FINAL WARNING</string>
     <string name="tama_reset_final_msg">REALLY delete %s? All stats, money, and items will be lost forever.</string>
     <string name="tama_no_pet_yet">No pet yet!</string>
+    <string name="tama_tap_to_hatch">Tap to hatch!</string>
     <string name="tama_unknown_place">Unknown Place</string>
     <string name="tama_unknown_warning">Unknown place, it could be dangerous, are you sure you wanna go there?</string>
     <string name="tama_you_are_here">📍 You are here!</string>
