@@ -286,6 +286,7 @@ fun BlackboxApp(
         Screen.Tama,  // Virtual pet tab
         Screen.ModelManager,
         Screen.Agents,
+        Screen.Logs,
         Screen.Settings
     )
     
@@ -887,7 +888,8 @@ fun BlackboxApp(
                     database = tamaDatabase,
                     mode = com.blackbox.ai.tama.ui.AdventureGateScreenMode.NIGHT_ARENA
                 )
-  
+            }
+
             // === Blackbox Custom Screens ===
             composable(Screen.OnlineHub.route) {
                 OnlineHubScreen(
