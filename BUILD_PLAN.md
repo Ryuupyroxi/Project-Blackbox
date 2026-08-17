@@ -292,3 +292,9 @@ See `AGENTS.md` (repo root) for orientation. Key focus areas for the next agent:
   `stopPatterns`, and `ports` list fields (default empty; single-value fields still used for
   non-multi agents). `AgentRuntimeManager.start/stop/health` updated to iterate the list fields.
   Version bumped to `1.2.1-beta` (versionCode 1201).
+
+- 2026-08-17: **Issue #6 — Kai removed from AgentCatalog.** Kai is an APK-based voice
+  assistant (not a CLI coding agent) and cannot be installed inside a proot container.
+  Removed `kaiAssistant` from `AgentCatalog.all` in `RuntimeAgent.kt`. Kai's voice
+  functionality is already handled by the app's own `AssistantDaemonService`.
+  Version bumped to `1.2.2-beta` (versionCode 1202).
