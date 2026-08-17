@@ -358,3 +358,10 @@ See `AGENTS.md` (repo root) for orientation. Key focus areas for the next agent:
   - Diagnostic output now includes channel type ("SSH health=" vs "Embedded ...") so the
     logs clearly show which path was used.
   Version bumped to `1.2.5-beta` (versionCode 1205).
+
+- 2026-08-17: **Issue #3 — Logs Missing from navigation.** `LogsScreen` composable
+  existed and was registered in `NavHost`, but `Screen.Logs` was not in the bottom
+  navigation items list — users could only reach Logs via Settings. Fix:
+  - Added `Screen.Logs` to the bottom navigation bar items in `BlackboxApp.kt`.
+  - Fixed a missing closing brace on the `NightArena` composable that caused
+    `OnlineHub`, `DeviceToolkit`, and `AgentImporter` to be incorrectly nested.
