@@ -3,8 +3,10 @@ package com.blackbox.ai.service
 import android.content.Context
 import com.blackbox.ai.agent.runtime.AgentCatalog
 import com.blackbox.ai.agent.runtime.AgentRuntimeManager
+import com.blackbox.ai.agent.runtime.EmbeddedRuntimeManager
 import com.blackbox.ai.agent.runtime.RuntimeAgent
 import com.blackbox.ai.engine.EngineKeysStore
+import com.blackbox.ai.runtime.CodexServerManager
 import com.blackbox.ai.util.DebugLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,11 +17,14 @@ import kotlinx.coroutines.withTimeout
 /**
  * First-boot and runtime verification for all packaged runtime agents.
  *
- * Behavior aligns with the conversation constraints:
+ * Behavior:
  *  - Runs on first boot or when verifier is explicitly triggered.
  *  - Checks install + health for each agent in [AgentCatalog.all].
+ *  - SSH/proot agents (Hermes, OpenCode) require a connected runtime channel.
+ *  - Embedded agents (Codex, OpenClaw) are checked via [EmbeddedRuntimeManager]
+ *    when the SSH/proot channel is unavailable, and via SSH when it is available.
  *  - Attempts install/start only when the runtime channel is available.
- *  - Records results in [GenerationDiagnosticsStore] so Xander/the user can audit outcomes.
+ *  - Records results in [GenerationDiagnosticsStore] so the user can audit outcomes.
  *  - Never claims success from a no-op; health is verified by real port/poll checks.
  */
 class FirstBootAgentVerifier(private val context: Context) {
@@ -28,6 +33,9 @@ class FirstBootAgentVerifier(private val context: Context) {
         private const val PREFS_NAME = "first_boot_agent_verifier"
         private const val KEY_LAST_RUN_VERSION = "last_run_version_code"
         private const val AGENT_TIMEOUT_MS = 180_000L
+
+        /** Agents that can run via the embedded LOCAL runtime (no SSH required). */
+        private val EMBEDDED_AGENTS = setOf("codex", "openclaw")
     }
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -68,8 +76,36 @@ class FirstBootAgentVerifier(private val context: Context) {
 
         DebugLog.log("[FirstBootAgentVerifier] Runtime mode=$mode")
 
+        val sshConnected = try {
+            withTimeout(AGENT_TIMEOUT_MS) { AgentRuntimeManager.isConnected(context) }
+        } catch (e: Exception) {
+            DebugLog.log("[FirstBootAgentVerifier] SSH/proot connect check failed: ${e.message}")
+            false
+        }
+
+        val embeddedReady = try {
+            EmbeddedRuntimeManager.isInstalled(context)
+        } catch (e: Exception) {
+            DebugLog.log("[FirstBootAgentVerifier] Embedded runtime check failed: ${e.message}")
+            false
+        }
+
+        DebugLog.log("[FirstBootAgentVerifier] SSH connected=$sshConnected, embedded ready=$embeddedReady")
+
         for (agent in AgentCatalog.all) {
-            val result = verifyAgent(agent, mode)
+            val isEmbedded = agent.id in EMBEDDED_AGENTS
+            val result = when {
+                sshConnected -> verifyAgentSsh(agent, mode)
+                isEmbedded && embeddedReady -> verifyAgentEmbedded(agent)
+                isEmbedded -> AgentResult(
+                    agent.id, AgentResult.Status.SKIPPED,
+                    "Embedded runtime not installed; run Install first"
+                )
+                else -> AgentResult(
+                    agent.id, AgentResult.Status.SKIPPED,
+                    "Runtime not connected; connect Termux/SSH or proot first"
+                )
+            }
             results += result
         }
 
@@ -83,20 +119,10 @@ class FirstBootAgentVerifier(private val context: Context) {
         return results
     }
 
-    private suspend fun verifyAgent(agent: RuntimeAgent, mode: String): AgentResult {
-        DebugLog.log("[FirstBootAgentVerifier] Verifying agent=${agent.id} mode=$mode")
+    // ── SSH / proot verification (Hermes, OpenCode, or any agent when connected) ──
 
-        val connected = try {
-            withTimeout(AGENT_TIMEOUT_MS) { AgentRuntimeManager.isConnected(context) }
-        } catch (e: Exception) {
-            DebugLog.log("[FirstBootAgentVerifier] connect check failed for ${agent.id}: ${e.message}")
-            false
-        }
-
-        if (!connected) {
-            DebugLog.log("[FirstBootAgentVerifier] Runtime not connected; skipping ${agent.id}")
-            return AgentResult(agent.id, AgentResult.Status.SKIPPED, "Runtime not connected")
-        }
+    private suspend fun verifyAgentSsh(agent: RuntimeAgent, mode: String): AgentResult {
+        DebugLog.log("[FirstBootAgentVerifier] Verifying ${agent.id} via SSH mode=$mode")
 
         val installed = try {
             withTimeout(AGENT_TIMEOUT_MS) { AgentRuntimeManager.checkInstalled(context, agent) }
@@ -119,9 +145,9 @@ class FirstBootAgentVerifier(private val context: Context) {
                     val actuallyInstalled = out.contains("INSTALLED", ignoreCase = true) ||
                         out.contains("already", ignoreCase = true)
                     if (actuallyInstalled) {
-                        startAndCheckHealth(agent, mode)
+                        startAndCheckHealthSsh(agent)
                     } else {
-                        AgentResult(agent.id, AgentResult.Status.FAILED, "Install output did not confirm success: ${out.take(200)}")
+                        AgentResult(agent.id, AgentResult.Status.FAILED, "Install output unclear: ${out.take(200)}")
                     }
                 },
                 onFailure = { e ->
@@ -130,10 +156,10 @@ class FirstBootAgentVerifier(private val context: Context) {
             )
         }
 
-        return startAndCheckHealth(agent, mode)
+        return startAndCheckHealthSsh(agent)
     }
 
-    private suspend fun startAndCheckHealth(agent: RuntimeAgent, mode: String): AgentResult {
+    private suspend fun startAndCheckHealthSsh(agent: RuntimeAgent): AgentResult {
         return try {
             withTimeout(AGENT_TIMEOUT_MS) { AgentRuntimeManager.start(context, agent) }
         } catch (e: Exception) {
@@ -161,10 +187,10 @@ class FirstBootAgentVerifier(private val context: Context) {
                             health.contains("HTTP %{http_code}", ignoreCase = true) ||
                             health.contains("PORT ${agent.port}", ignoreCase = true)
                         val status = if (healthy) AgentResult.Status.PASSED else AgentResult.Status.WARNING
-                        AgentResult(agent.id, status, "Health=$health")
+                        AgentResult(agent.id, status, "SSH health=$health")
                     },
                     onFailure = { e ->
-                        AgentResult(agent.id, AgentResult.Status.FAILED, "Health failed: ${e.message}")
+                        AgentResult(agent.id, AgentResult.Status.FAILED, "SSH health failed: ${e.message}")
                     }
                 )
             },
@@ -174,10 +200,93 @@ class FirstBootAgentVerifier(private val context: Context) {
         )
     }
 
+    // ── Embedded runtime verification (Codex, OpenClaw when SSH unavailable) ──
+
+    private suspend fun verifyAgentEmbedded(agent: RuntimeAgent): AgentResult {
+        DebugLog.log("[FirstBootAgentVerifier] Verifying ${agent.id} via embedded runtime")
+
+        return when (agent.id) {
+            "codex" -> verifyCodexEmbedded()
+            "openclaw" -> verifyOpenclawEmbedded()
+            else -> AgentResult(agent.id, AgentResult.Status.SKIPPED, "No embedded runtime for ${agent.id}")
+        }
+    }
+
+    private suspend fun verifyCodexEmbedded(): AgentResult {
+        val status = try {
+            withTimeout(AGENT_TIMEOUT_MS) { EmbeddedRuntimeManager.status(context) }
+        } catch (e: Exception) {
+            DebugLog.log("[FirstBootAgentVerifier] embedded status check failed for codex: ${e.message}")
+            return AgentResult("codex", AgentResult.Status.FAILED, "Status check failed: ${e.message}")
+        }
+
+        return when {
+            status.serverRunning -> {
+                AgentResult("codex", AgentResult.Status.PASSED, "Embedded codex server running (port ${CodexServerManager.SERVER_PORT})")
+            }
+            status.ready -> {
+                AgentResult("codex", AgentResult.Status.WARNING, "Embedded codex installed (bootstrap=${status.bootstrap}, node=${status.node}, codex=${status.codex}) but server not running")
+            }
+            else -> {
+                val parts = mutableListOf<String>()
+                if (!status.bootstrap) parts.add("bootstrap")
+                if (!status.node) parts.add("node")
+                if (!status.codex) parts.add("codex")
+                if (!status.platformBinary) parts.add("platform-binary")
+                AgentResult("codex", AgentResult.Status.SKIPPED, "Embedded codex missing: ${parts.joinToString(", ")}")
+            }
+        }
+    }
+
+    private suspend fun verifyOpenclawEmbedded(): AgentResult {
+        val openclawInstalled = try {
+            withTimeout(AGENT_TIMEOUT_MS) {
+                CodexServerManager(context).isOpenClawInstalled()
+            }
+        } catch (e: Exception) {
+            DebugLog.log("[FirstBootAgentVerifier] openclaw install check failed: ${e.message}")
+            false
+        }
+
+        if (!openclawInstalled) {
+            return AgentResult("openclaw", AgentResult.Status.SKIPPED, "OpenClaw not installed in embedded runtime")
+        }
+
+        // Check if gateway is reachable
+        val healthCheck = try {
+            withTimeout(AGENT_TIMEOUT_MS) {
+                EmbeddedRuntimeManager.healthCheck(context)
+            }
+        } catch (e: Exception) {
+            DebugLog.log("[FirstBootAgentVerifier] openclaw health check failed: ${e.message}")
+            Result.failure(e)
+        }
+
+        return healthCheck.fold(
+            onSuccess = { output ->
+                val healthy = output.contains("passed", ignoreCase = true) ||
+                    output.contains("ALIVE", ignoreCase = true)
+                if (healthy) {
+                    AgentResult("openclaw", AgentResult.Status.PASSED, "OpenClaw gateway reachable (port ${CodexServerManager.OPENCLAW_GATEWAY_PORT})")
+                } else {
+                    AgentResult("openclaw", AgentResult.Status.WARNING, "OpenClaw installed but health unclear: ${output.take(200)}")
+                }
+            },
+            onFailure = { e ->
+                AgentResult("openclaw", AgentResult.Status.WARNING, "OpenClaw installed but gateway not running: ${e.message}")
+            }
+        )
+    }
+
+    // ── Summary ──
+
     private fun buildSummary(results: List<AgentResult>): String {
         val counts = results.groupingBy { it.status }.eachCount()
         val details = results.joinToString("\n") { "${it.agentId}: ${it.status} - ${it.detail}" }
-        return "Verification complete. passed=${counts[AgentResult.Status.PASSED] ?: 0} warning=${counts[AgentResult.Status.WARNING] ?: 0} failed=${counts[AgentResult.Status.FAILED] ?: 0} skipped=${counts[AgentResult.Status.SKIPPED] ?: 0}. Details:\n$details"
+        return "Verification complete. passed=${counts[AgentResult.Status.PASSED] ?: 0} " +
+            "warning=${counts[AgentResult.Status.WARNING] ?: 0} " +
+            "failed=${counts[AgentResult.Status.FAILED] ?: 0} " +
+            "skipped=${counts[AgentResult.Status.SKIPPED] ?: 0}.\n$details"
     }
 
     data class AgentResult(

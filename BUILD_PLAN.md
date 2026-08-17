@@ -1,6 +1,6 @@
 # Blackbox — Master Build Plan (LIVING DOCUMENT)
 
-> Maintained continuously as the merge progresses. Updated: 2026-08-07 (v1beta prep).
+> Maintained continuously as the merge progresses. Updated: 2026-08-17 (v1.2.5-beta).
 > This is the single source of truth for what Blackbox is, what has been built,
 > what is next, and where the code lives. The debugger/tester agent reads this
 > file first, then `AGENTS.md`.
@@ -339,3 +339,22 @@ See `AGENTS.md` (repo root) for orientation. Key focus areas for the next agent:
     continue-on-error.
   - `if-no-files-found: error` on APK upload (build.yml:64) is correctly set.
   Version bumped to `1.2.4-beta` (versionCode 1204).
+
+- 2026-08-17: **Issue #2 — Generation Diagnostics: all agents SKIPPED.** Root cause:
+  `FirstBootAgentVerifier` gated ALL agents on `AgentRuntimeManager.isConnected()` (SSH/proot).
+  When the runtime channel was disconnected, even embedded-runtime agents (Codex, OpenClaw)
+  were skipped with "Runtime not connected" — producing diagnostic output like
+  `hermes: SKIPPED - Runtime not connected` for every agent. Fix:
+  - Split verification into SSH path and embedded-runtime path. SSH-only agents (Hermes,
+    OpenCode) are SKIPPED when the channel is down. Embedded agents (Codex, OpenClaw) are
+    verified via `EmbeddedRuntimeManager.status()` / `CodexServerManager.isOpenClawInstalled()`
+    when the SSH channel is unavailable.
+  - `verifyAllAgents()` now checks both `AgentRuntimeManager.isConnected()` and
+    `EmbeddedRuntimeManager.isInstalled()` up front, then routes each agent to the
+    appropriate verification path.
+  - `verifyCodexEmbedded()` reports bootstrap/node/codex/platform-binary status and whether
+    the codex server is running.
+  - `verifyOpenclawEmbedded()` checks OpenClaw installation and gateway reachability.
+  - Diagnostic output now includes channel type ("SSH health=" vs "Embedded ...") so the
+    logs clearly show which path was used.
+  Version bumped to `1.2.5-beta` (versionCode 1205).
