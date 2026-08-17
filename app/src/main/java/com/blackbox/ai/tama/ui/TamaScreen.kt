@@ -620,20 +620,11 @@ fun TamaScreen(
                     )
                 }
             } else {
-                // No pet yet
-                Column(
+                // No pet yet — animated hatching egg
+                HatchingEggPreview(
                     modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    TamaEmojiIcon("🥚", fontSize = 48.sp)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        stringResource(R.string.tama_no_pet_yet),
-                        fontFamily = FontFamily.Monospace,
-                        color = TamaDark
-                    )
-                }
+                    onTap = { showNameDialog = true }
+                )
             }
         }
 
@@ -6512,6 +6503,130 @@ fun TamaEventLog(events: List<TamaEvent>) {
                 color = TamaAccent,
                 fontFamily = FontFamily.Monospace,
                 fontSize = 10.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun HatchingEggPreview(
+    modifier: Modifier = Modifier,
+    onTap: () -> Unit = {}
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "egg_hatch")
+    val cycleProgress by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(3000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "egg_cycle"
+    )
+
+    val eggWobble by infiniteTransition.animateFloat(
+        initialValue = -3f,
+        targetValue = 3f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(400, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "egg_wobble"
+    )
+
+    val glowAlpha by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 0.6f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1500, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "egg_glow"
+    )
+
+    val frameIndex = if (cycleProgress < 0.7f) {
+        if (cycleProgress % 0.35f < 0.175f) 0 else 1
+    } else {
+        1
+    }
+
+    val eggAssets = listOf(
+        "tama/pets/dragon/egg/idle_0.png",
+        "tama/pets/unicorn/egg/idle_0.png",
+        "tama/pets/kitsune/egg/idle_0.png"
+    )
+    val eggAssetsAlt = listOf(
+        "tama/pets/dragon/egg/idle_1.png",
+        "tama/pets/unicorn/egg/idle_1.png",
+        "tama/pets/kitsune/egg/idle_1.png"
+    )
+
+    val currentEggIndex = ((cycleProgress * 3).toInt().coerceIn(0, 2))
+    val currentAsset = if (frameIndex == 0) eggAssets[currentEggIndex] else eggAssetsAlt[currentEggIndex]
+
+    Box(
+        modifier = modifier
+            .clickable { onTap() },
+        contentAlignment = Alignment.Center
+    ) {
+        // Glow behind egg
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .graphicsLayer {
+                    alpha = glowAlpha
+                    scaleX = 1f + glowAlpha * 0.15f
+                    scaleY = 1f + glowAlpha * 0.15f
+                }
+                .background(
+                    brush = androidx.compose.ui.graphics.Brush.radialGradient(
+                        colors = listOf(
+                            Color(0xFFFFF9C4).copy(alpha = 0.8f),
+                            Color(0xFFFFF9C4).copy(alpha = 0f)
+                        ),
+                        radius = 80f
+                    ),
+                    shape = androidx.compose.foundation.shape.CircleShape
+                )
+        )
+
+        // Egg image with wobble
+        Box(
+            modifier = Modifier
+                .size(100.dp)
+                .graphicsLayer {
+                    rotationZ = eggWobble
+                    translationY = -kotlin.math.abs(eggWobble) * 2f
+                }
+        ) {
+            AsyncImage(
+                model = "file:///android_asset/$currentAsset",
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Fit,
+                filterQuality = FilterQuality.None
+            )
+        }
+
+        // Tap hint text
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                stringResource(R.string.tama_no_pet_yet),
+                fontFamily = FontFamily.Monospace,
+                fontSize = 14.sp,
+                color = TamaDark
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                "Tap to hatch!",
+                fontFamily = FontFamily.Monospace,
+                fontSize = 12.sp,
+                color = TamaAccent
             )
         }
     }

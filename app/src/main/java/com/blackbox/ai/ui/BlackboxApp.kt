@@ -48,6 +48,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import com.blackbox.ai.ui.navigation.Screen
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -341,7 +344,15 @@ fun BlackboxApp(
                                 Screen.Dashboard -> Icon(Icons.Default.Home, null)
                                 Screen.AIHub -> Icon(Icons.Default.PlayArrow, null)
                                 Screen.NotesManager -> Icon(Icons.Default.Edit, null)
-                                Screen.Tama -> Icon(Icons.Default.Favorite, null)  // Heart for pet
+                                Screen.Tama -> {
+                                    AsyncImage(
+                                        model = "file:///android_asset/tama/icons/ui/pet_tab_icon.png",
+                                        contentDescription = stringResource(R.string.nav_tama),
+                                        modifier = Modifier.size(24.dp),
+                                        contentScale = ContentScale.Fit,
+                                        filterQuality = FilterQuality.None
+                                    )
+                                }
                                 Screen.ModelManager -> Icon(Icons.Default.Star, null)
                                 Screen.Agents -> Icon(Icons.Default.SmartToy, null)
                                 Screen.Settings -> Icon(Icons.Default.Settings, null)
@@ -888,8 +899,7 @@ fun BlackboxApp(
                     database = tamaDatabase,
                     mode = com.blackbox.ai.tama.ui.AdventureGateScreenMode.NIGHT_ARENA
                 )
-            }
-
+  
             // === Blackbox Custom Screens ===
             composable(Screen.OnlineHub.route) {
                 OnlineHubScreen(
