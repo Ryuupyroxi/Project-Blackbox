@@ -15,18 +15,33 @@ data class RuntimeAgent(
     val installCheckCommand: String,
     val installCommands: List<String>,
     val runCommand: String,
-    val stopPattern: String
-)
+    val stopPattern: String,
+    val runCommands: List<String> = emptyList(),
+    val stopPatterns: List<String> = emptyList(),
+    val ports: List<Int> = emptyList()
+) {
+    /** Effective run commands: list if provided, else single runCommand wrapped in a list. */
+    val effectiveRunCommands: List<String>
+        get() = runCommands.ifEmpty { listOf(runCommand) }
+
+    /** Effective stop patterns: list if provided, else single stopPattern. */
+    val effectiveStopPatterns: List<String>
+        get() = stopPatterns.ifEmpty { listOf(stopPattern) }
+
+    /** Effective ports for health checks: list if provided, else single port. */
+    val effectivePorts: List<Int>
+        get() = ports.ifEmpty { listOf(port) }
+}
 
 object AgentCatalog {
 
     private const val DEPS = "if command -v pkg >/dev/null 2>&1; then pkg install -y nodejs python git curl 2>&1; else DEBIAN_FRONTEND=noninteractive apt-get update -y 2>&1 && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs npm python3 python3-pip curl git 2>&1; fi"
 
-    val hermesDashboard = RuntimeAgent(
-        id = "hermes-dashboard",
-        name = "Hermes Dashboard",
+    val hermes = RuntimeAgent(
+        id = "hermes",
+        name = "Hermes",
         emoji = "🪄",
-        description = "Nous Research agent dashboard web UI",
+        description = "Nous Research agent: dashboard web UI + OpenAI-compatible chat API",
         port = 9119,
         webUrl = "http://127.0.0.1:9119",
         installCheckCommand = "command -v hermes >/dev/null 2>&1 && echo INSTALLED || echo MISSING",
@@ -35,23 +50,13 @@ object AgentCatalog {
             "pip install --no-input hermes-agent 2>&1 || pip3 install --no-input hermes-agent 2>&1"
         ),
         runCommand = "hermes dashboard --host 0.0.0.0 --port 9119 --no-open",
-        stopPattern = "hermes.*dashboard"
-    )
-
-    val hermesApi = RuntimeAgent(
-        id = "hermes-serve",
-        name = "Hermes API",
-        emoji = "🪄",
-        description = "Hermes chat API server (OpenAI-compatible)",
-        port = 9120,
-        webUrl = "http://127.0.0.1:9120",
-        installCheckCommand = "command -v hermes >/dev/null 2>&1 && echo INSTALLED || echo MISSING",
-        installCommands = listOf(
-            DEPS,
-            "pip install --no-input hermes-agent 2>&1 || pip3 install --no-input hermes-agent 2>&1"
+        stopPattern = "hermes.*dashboard",
+        runCommands = listOf(
+            "hermes dashboard --host 0.0.0.0 --port 9119 --no-open",
+            "hermes chat --host 0.0.0.0 --port 9120"
         ),
-        runCommand = "hermes chat --host 0.0.0.0 --port 9120",
-        stopPattern = "hermes.*serve"
+        stopPatterns = listOf("hermes.*dashboard", "hermes.*serve"),
+        ports = listOf(9119, 9120)
     )
 
     val codex = RuntimeAgent(
@@ -121,5 +126,5 @@ object AgentCatalog {
         stopPattern = "opencode"
     )
 
-    val all = listOf(hermesDashboard, hermesApi, codex, openclaw, kaiAssistant, openCode)
+    val all = listOf(hermes, codex, openclaw, kaiAssistant, openCode)
 }

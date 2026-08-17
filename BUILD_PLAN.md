@@ -285,3 +285,10 @@ See `AGENTS.md` (repo root) for orientation. Key focus areas for the next agent:
 - 2026-08-17: Added OpenCode to `AgentCatalog` as a runtime coding agent (port 8083, install via
   shell script or Go fallback, `--non-interactive --port` run command). UI auto-renders via
   `AgentCatalog.all`. Version already at `1.2.0-beta` (versionCode 1200). Issue #10 resolved.
+
+- 2026-08-17: **Issue #9 — Hermes redundant UI fixed.** Merged `hermesDashboard` (port 9119) and
+  `hermesApi` (port 9120) into a single `hermes` agent in `AgentCatalog`. One button installs,
+  starts, stops, and health-checks both processes together. `RuntimeAgent` gained `runCommands`,
+  `stopPatterns`, and `ports` list fields (default empty; single-value fields still used for
+  non-multi agents). `AgentRuntimeManager.start/stop/health` updated to iterate the list fields.
+  Version bumped to `1.2.1-beta` (versionCode 1201).

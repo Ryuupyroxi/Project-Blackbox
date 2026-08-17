@@ -69,7 +69,9 @@ object AgentRuntimeManager {
         val running = healthText.contains("ALIVE", ignoreCase = true) ||
             healthText.contains("HTTP 200", ignoreCase = true) ||
             healthText.contains("HTTP 2", ignoreCase = true)
-        val healthy = running || (installed && healthText.contains("PORT ${agent.port}", ignoreCase = true) && !healthText.contains("CLOSED", ignoreCase = true))
+        val healthy = running || (installed && agent.effectivePorts.all { p ->
+            healthText.contains("PORT $p", ignoreCase = true) && !healthText.contains("PORT $p CLOSED", ignoreCase = true)
+        })
 
         val detail = when {
             healthText.isNotBlank() -> healthText.trim().take(120)
@@ -160,21 +162,52 @@ object AgentRuntimeManager {
             if (!isConnected(context)) {
                 return@runWithConsole "Not connected. Connect first, then retry Start."
             }
-            val cmd = buildString {
-                append("mkdir -p \$HOME/.blackbox-agents\n")
-                append("cd \$HOME\n")
-                append("nohup bash -c '${agent.runCommand}' > ${logFile(agent.id)} 2>&1 &\n")
-                append("echo \$! > ${pidFile(agent.id)}\n")
-                append("sleep 2\n")
-                append("if kill -0 \$(cat ${pidFile(agent.id)} 2>/dev/null) 2>/dev/null; then echo STARTED; else echo FAILED; fi")
+            val cmds = agent.effectiveRunCommands
+            if (cmds.size == 1) {
+                // Single process agent — original path
+                val cmd = buildString {
+                    append("mkdir -p \$HOME/.blackbox-agents\n")
+                    append("cd \$HOME\n")
+                    append("nohup bash -c '${cmds[0]}' > ${logFile(agent.id)} 2>&1 &\n")
+                    append("echo \$! > ${pidFile(agent.id)}\n")
+                    append("sleep 2\n")
+                    append("if kill -0 \$(cat ${pidFile(agent.id)} 2>/dev/null) 2>/dev/null; then echo STARTED; else echo FAILED; fi")
+                }
+                appendConsole("> ${cmds[0]}")
+                runCatching {
+                    withTimeout(START_TIMEOUT_MS) { execute(context, cmd) }
+                }.getOrElse { Result.failure(it) }.fold(
+                    onSuccess = { "Start: ${it.trim()}" },
+                    onFailure = { e -> "Start failed: ${e.message}" }
+                )
+            } else {
+                // Multi-process agent (e.g. Hermes: dashboard + API)
+                val cmd = buildString {
+                    append("mkdir -p \$HOME/.blackbox-agents\n")
+                    append("cd \$HOME\n")
+                    for ((idx, c) in cmds.withIndex()) {
+                        val log = "\$HOME/.blackbox-agents/${agent.id}-$idx.log"
+                        val pid = "\$HOME/.blackbox-agents/${agent.id}-$idx.pid"
+                        append("nohup bash -c '$c' > $log 2>&1 &\n")
+                        append("echo \$! > $pid\n")
+                        appendConsole("> $c")
+                    }
+                    append("sleep 3\n")
+                    // Report status of all sub-processes
+                    append("FAIL=0\n")
+                    for (idx in cmds.indices) {
+                        val pid = "\$HOME/.blackbox-agents/${agent.id}-$idx.pid"
+                        append("if kill -0 \$(cat $pid 2>/dev/null) 2>/dev/null; then echo \"SUB$idx OK\"; else echo \"SUB$idx FAILED\"; FAIL=1; fi\n")
+                    }
+                    append("if [ \$FAIL -eq 0 ]; then echo STARTED; else echo PARTIAL; fi")
+                }
+                runCatching {
+                    withTimeout(START_TIMEOUT_MS) { execute(context, cmd) }
+                }.getOrElse { Result.failure(it) }.fold(
+                    onSuccess = { "Start: ${it.trim()}" },
+                    onFailure = { e -> "Start failed: ${e.message}" }
+                )
             }
-            appendConsole("> ${agent.runCommand}")
-            runCatching {
-                withTimeout(START_TIMEOUT_MS) { execute(context, cmd) }
-            }.getOrElse { Result.failure(it) }.fold(
-                onSuccess = { "Start: ${it.trim()}" },
-                onFailure = { e -> "Start failed: ${e.message}" }
-            )
         }
         result.onSuccess { refreshAgentHealth(context, agent) }
         return result
@@ -185,10 +218,23 @@ object AgentRuntimeManager {
             if (!isConnected(context)) {
                 return@runWithConsole "Not connected. Connect first, then retry Stop."
             }
-            val pattern = bracketPattern(agent.stopPattern)
+            val patterns = agent.effectiveStopPatterns
             val cmd = buildString {
-                append("if [ -f ${pidFile(agent.id)} ]; then kill \$(cat ${pidFile(agent.id)}) 2>/dev/null; rm -f ${pidFile(agent.id)}; fi\n")
-                append("pkill -f '$pattern' 2>/dev/null\n")
+                // Kill PID files (single or multi-process)
+                if (patterns.size == 1) {
+                    append("if [ -f ${pidFile(agent.id)} ]; then kill \$(cat ${pidFile(agent.id)}) 2>/dev/null; rm -f ${pidFile(agent.id)}; fi\n")
+                } else {
+                    for (idx in patterns.indices) {
+                        val pid = "\$HOME/.blackbox-agents/${agent.id}-$idx.pid"
+                        append("if [ -f $pid ]; then kill \$(cat $pid) 2>/dev/null; rm -f $pid; fi\n")
+                    }
+                    // Also kill the main PID file if it exists
+                    append("if [ -f ${pidFile(agent.id)} ]; then kill \$(cat ${pidFile(agent.id)}) 2>/dev/null; rm -f ${pidFile(agent.id)}; fi\n")
+                }
+                // pkill each pattern
+                for (p in patterns) {
+                    append("pkill -f '${bracketPattern(p)}' 2>/dev/null\n")
+                }
                 append("echo STOPPED")
             }
             execute(context, cmd).fold(
@@ -202,18 +248,32 @@ object AgentRuntimeManager {
 
     suspend fun health(context: Context, agent: RuntimeAgent): Result<String> {
         val installed = checkInstalled(context, agent)
+        val ports = agent.effectivePorts
         val cmd = buildString {
             if (installed) {
                 append("INSTALLED=YES\n")
             } else {
                 append("INSTALLED=NO\n")
             }
-            append("if [ -f ${pidFile(agent.id)} ]; then\n")
-            append("  PID=\$(cat ${pidFile(agent.id)} 2>/dev/null)\n")
-            append("  if kill -0 \$PID 2>/dev/null; then echo \"PID \$PID ALIVE\"; else echo \"PID \$PID DEAD\"; fi\n")
-            append("else echo \"NOT RUNNING\"; fi\n")
-            if (agent.port > 0) {
-                append("curl -s -o /dev/null -w \"PORT ${agent.port} HTTP %{http_code}\" --max-time 5 http://127.0.0.1:${agent.port} 2>/dev/null || echo \"PORT ${agent.port} CLOSED\"")
+            // Check all PID files (single or multi-process)
+            if (ports.size == 1) {
+                append("if [ -f ${pidFile(agent.id)} ]; then\n")
+                append("  PID=\$(cat ${pidFile(agent.id)} 2>/dev/null)\n")
+                append("  if kill -0 \$PID 2>/dev/null; then echo \"PID \$PID ALIVE\"; else echo \"PID \$PID DEAD\"; fi\n")
+                append("else echo \"NOT RUNNING\"; fi\n")
+            } else {
+                for (idx in ports.indices) {
+                    val pid = "\$HOME/.blackbox-agents/${agent.id}-$idx.pid"
+                    append("if [ -f $pid ]; then\n")
+                    append("  PID=\$(cat $pid 2>/dev/null)\n")
+                    append("  if kill -0 \$PID 2>/dev/null; then echo \"PID \$PID ALIVE\"; else echo \"PID \$PID DEAD\"; fi\n")
+                    append("else echo \"SUB$idx NOT RUNNING\"; fi\n")
+                }
+            }
+            // Check all ports
+            for (p in ports) {
+                append("curl -s -o /dev/null -w \"PORT $p HTTP %{http_code}\" --max-time 5 http://127.0.0.1:$p 2>/dev/null || echo \"PORT $p CLOSED\"")
+                if (p != ports.last()) append("\n")
             }
         }
         return execute(context, cmd)

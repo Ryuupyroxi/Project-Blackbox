@@ -54,8 +54,8 @@ android {
         applicationId = "com.blackbox.ai"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1200
-        versionName = "1.2.0-beta"
+        versionCode = 1201
+        versionName = "1.2.1-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
