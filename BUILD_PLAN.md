@@ -37,7 +37,7 @@ private, local-first Android application:
 - [x] `ChatChannel` + `ChatChannelClient` — unified chat engine: local llama/Ollama OR any API key
 - [x] `WorkspaceStore` — multi-workspace support (add/switch/delete, per-workspace channel Local/SSH/Kai)
 - [x] `FeatureAccessStore` — assistant feature authorization grants (Organizer, Notes, Calendar, Kiwix, PDF, Tama, Models, Chat)
-- [x] `RuntimeAgent` catalog + `AgentRuntimeManager` — Hermes / Codex CLI / OpenClaw over the local Termux/Ubuntu SSH channel (commands from termux-agents-hub)
+- [x] `RuntimeAgent` catalog + `AgentRuntimeManager` — Hermes / Codex CLI / OpenClaw / OpenCode over the local Termux/Ubuntu SSH channel (commands from termux-agents-hub)
 - [x] `AgentHubScreen` — channel status, API keys, workspace manager, quick agent chat, daemon toggle
 - [x] `AgentRuntimeScreen` — install/start/stop/health/logs/web-UI for runtime agents
 - [x] `AssistantDaemonService` (Kai-style foreground daemon) + `ACTION_ASSIST` manifest filter + MainActivity hook → opens agent chat
@@ -281,3 +281,7 @@ See `AGENTS.md` (repo root) for orientation. Key focus areas for the next agent:
     - **AI Servers Hub:** New `RuntimeAgentServerStore` polls runtime agent status every 5s and renders Codex/OpenClaw/Hermes cards with Start/Stop/Health/Open controls.
     - **Tama assets:** 133 placeholder PNGs added (`pets` 111, `backgrounds` 8, `npcs` 2, `crops` 12). `TamaPetSprite` now draws species-colored fallback behind `AsyncImage` so missing assets don't crash.
   - ZIM download path: `DownloadManager` + `ZimDownloadReceiver` correctly registers completed downloads by ID and inserts them into the DB.
+
+- 2026-08-17: Added OpenCode to `AgentCatalog` as a runtime coding agent (port 8083, install via
+  shell script or Go fallback, `--non-interactive --port` run command). UI auto-renders via
+  `AgentCatalog.all`. Version already at `1.2.0-beta` (versionCode 1200). Issue #10 resolved.

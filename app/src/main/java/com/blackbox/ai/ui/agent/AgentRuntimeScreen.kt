@@ -156,7 +156,7 @@ fun AgentRuntimeScreen(navController: NavController) {
                         if (isProot) {
                             Spacer(modifier = Modifier.height(6.dp))
                             Text(
-                                "Kai/AnyClaw assistant layer and OpenClaw/Hermes/Codex can run here.",
+                                "Kai/AnyClaw assistant layer and OpenClaw/Hermes/Codex/OpenCode can run here.",
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

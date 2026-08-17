@@ -101,5 +101,25 @@ object AgentCatalog {
         stopPattern = "kai"
     )
 
-    val all = listOf(hermesDashboard, hermesApi, codex, openclaw, kaiAssistant)
+    val openCode = RuntimeAgent(
+        id = "opencode",
+        name = "OpenCode",
+        emoji = "⚡",
+        description = "Open-source AI coding agent (Go binary, TUI + LSP)",
+        port = 8083,
+        webUrl = null,
+        installCheckCommand = "command -v opencode >/dev/null 2>&1 && echo INSTALLED || echo MISSING",
+        installCommands = listOf(
+            DEPS,
+            "curl -fsSL https://raw.githubusercontent.com/opencode-ai/opencode/main/install.sh | bash 2>&1 || " +
+                "(export GOPATH=/tmp/gopath && export PATH=\"\\$GOPATH/bin:\\$PATH\" && " +
+                "command -v go >/dev/null 2>&1 || DEBIAN_FRONTEND=noninteractive apt-get install -y golang-go 2>&1 && " +
+                "go install github.com/opencode-ai/opencode@latest 2>&1 && " +
+                "cp \\$GOPATH/bin/opencode /usr/local/bin/opencode 2>&1)"
+        ),
+        runCommand = "opencode --non-interactive --port 8083",
+        stopPattern = "opencode"
+    )
+
+    val all = listOf(hermesDashboard, hermesApi, codex, openclaw, kaiAssistant, openCode)
 }
